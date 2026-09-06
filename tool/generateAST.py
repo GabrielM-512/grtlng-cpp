@@ -80,6 +80,7 @@ if __name__ == "__main__":
                [
                   "Binary | const Expr* left = nullptr, Lexing::Tokens::TokenType operatorType = Lexing::Tokens::ERROR, const Expr* right = nullptr",
                   "Unary | Lexing::Tokens::TokenType operatorType = Lexing::Tokens::ERROR, const Expr* right = nullptr",
-                  "Number | double value = 0"
+                  "Number | double value = 0",
+                  "Identifier | const char* target"
               ],
                "\"../compiler/lexing.h\"")

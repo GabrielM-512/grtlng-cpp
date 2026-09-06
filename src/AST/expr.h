@@ -6,6 +6,7 @@ namespace Expr {
     struct Binary;
     struct Unary;
     struct Number;
+    struct Identifier;
 
     class ExprVisitor {
     public:
@@ -14,6 +15,7 @@ namespace Expr {
         virtual void visitBinaryExpr(const Binary* expr) const = 0;
         virtual void visitUnaryExpr(const Unary* expr) const = 0;
         virtual void visitNumberExpr(const Number* expr) const = 0;
+        virtual void visitIdentifierExpr(const Identifier* expr) const = 0;
     };
 
     struct Expr {
@@ -60,6 +62,18 @@ namespace Expr {
 
         void accept(ExprVisitor* visitor) override {
             visitor->visitNumberExpr(this);
+        }
+    };
+
+    struct Identifier: Expr {
+        const char* target;
+
+        explicit Identifier(
+            const char* target
+        ): target(target) {}
+
+        void accept(ExprVisitor* visitor) override {
+            visitor->visitIdentifierExpr(this);
         }
     };
 }
