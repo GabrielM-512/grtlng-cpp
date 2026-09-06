@@ -61,7 +61,7 @@ def define_ast(output_dir : str, base_class : str, classes : list[str], includes
 
     output += ("    };\n\n" +
               f"    struct {base_class} " + "{\n" +
-              f"        virtual ~{base_class}() = 0;\n" +
+              f"        virtual ~{base_class}() = default;\n" +
               f"        virtual void accept({base_class}Visitor *visitor) = 0;\n" +
                "    };")
 
