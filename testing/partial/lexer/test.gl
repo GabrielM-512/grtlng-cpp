@@ -1,0 +1,28 @@
+andy formless fo _ _123 _abc ab123
+abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890_
+
+else false for if return true while extern print
+
+u8 u16 u32 u64 i8 i16 i32 i64 f32 f64 void
+
+?
+
+"hahahoho"
+1
+2
+3
+
+;
+
+()
+{}
+[]
+
++ - * /
++= -= *= /=
+++ --
+& | ~
+&& ||
+&= |=
+! . ,
+> < = == >= <= !=

@@ -1,0 +1,83 @@
+{
+  "Instance": "/home/gabriel/CLionProjects/grtlng-cpp/cmake-build-debug/grtlng_cpp",
+  "log": "/home/gabriel/CLionProjects/grtlng-cpp/testing/end-to-end/log.txt",
+  "tests": {
+    "assignment.associativity": {
+      "testfile": "assignment/associativity.gl",
+      "stdout": "assignment/associativity_stdout"
+    },
+    "assignment.global": {
+      "testfile": "assignment/global.gl",
+      "stdout": "assignment/global_stdout"
+    },
+    "assignment.infix": {
+      "testfile": "assignment/infix_operator.gl",
+      "stderr": "assignment/infix_operator_stderr"
+    },
+    "assignment.local": {
+      "testfile": "assignment/local.gl",
+      "stdout": "assignment/global_stdout"
+    },
+    "assignment.prefix": {
+      "testfile": "assignment/prefix_operator.gl",
+      "stderr": "assignment/prefix_operator_stderr"
+    },
+    "block.empty": {
+      "testfile": "block/empty.gl",
+      "stdout": "block/empty_stdout"
+    },
+    "block.scope": {
+      "testfile": "block/scope.gl",
+      "stdout": "block/scope_stdout"
+    },
+    "block.unterminated": {
+      "testfile": "block/unterminated.gl",
+      "stderr": "block/unterminated_stderr"
+    },
+    "call.extra_arguments": {
+      "testfile": "call/extra_arguments.gl",
+      "stderr": "call/extra_arguments_stderr"
+    },
+    "call.missing_arguments": {
+      "testfile": "call/missing_arguments.gl",
+      "stderr": "call/missing_arguments_stderr"
+    },
+    "call.num": {
+      "testfile": "call/num.gl",
+      "stderr": "call/num_stderr"
+    },
+    "expressions.evaluate": {
+      "testfile": "expressions/evaluate.gl",
+      "stdout": "expressions/evaluate_stdout"
+    },
+    "for.return_inside": {
+      "testfile": "for/return_inside.gl",
+      "stdout": "for/return_inside_stdout"
+    },
+    "function.body_block": {
+      "testfile": "function/body_must_be_block.gl",
+      "stderr": "function/body_must_be_block_stderr"
+    },
+    "function.duplicate_parameter": {
+      "testfile": "function/duplicate_parameter.gl",
+      "stderr": "function/duplicate_parameter_stderr"
+    },
+    "function.local": {
+      "testfile": "function/local.gl",
+      "stderr": "function/local_stderr"
+    },
+    "print.missing_argument": {
+      "testfile": "print/missing_argument.gl",
+      "stderr": "print/missing_argument_stderr"
+    },
+    "print.numbers": {
+      "testfile": "print/numbers.gl",
+      "stdout": "print/numbers_stdout"
+    },
+    "variable.own_initialiser": {
+      "testfile": "variable/own_initialiser.gl",
+      "stderr": "variable/own_initialiser_stderr"
+    }
+  }
+
+}
