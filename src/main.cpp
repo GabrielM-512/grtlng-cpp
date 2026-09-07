@@ -32,6 +32,9 @@ int main(const int argc, char* argv[]) {
     try {
         const std::string file = fileIO::readFile(compileFlags.filePath);
         Compiler::CompileResult program = Compiler::compile(file);
+
+        if (!program.success) return 1;
+
         std::cout << Printer::print(program.expr) << std::endl;
 
     } catch (std::exception& e) {

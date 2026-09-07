@@ -80,6 +80,7 @@ Expr::Expr* Parser::parseExpression() {
     if (prefix == nullptr) {
         // TODO: Proper error handling
         std::cerr << "Error on line " << previous.line << "Expected expression at \"" << previous.toString() << "\"" << std::endl;
+        hadError = true;
         return nullptr;
     }
 

@@ -5,6 +5,7 @@
 
 namespace Compiler {
     typedef struct {
+        bool success;
         Expr::Expr* expr;
     } CompileResult;
 

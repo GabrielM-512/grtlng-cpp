@@ -7,12 +7,14 @@
 #include "parsing/parsing.h"
 
 Compiler::CompileResult Compiler::compile(const std::string& source) {
-    CompileResult result = {nullptr};
+    CompileResult result = {.success = true, .expr = nullptr};
 
     std::vector<Lexing::Tokens::Token> tokens = Lexing::scan(source);
 
     Parsing::Parser parser(tokens);
     result.expr = parser.parse();
+
+    if (parser.hadParseError()) result.success = false;
 
     return result;
 }
