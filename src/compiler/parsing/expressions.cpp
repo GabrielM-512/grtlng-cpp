@@ -30,6 +30,16 @@ public:
     }
 };
 
+class GroupingParselet : public Parsing::PrefixParselet {
+public:
+    Expr::Expr* parse (Parsing::Parser& parser, Lexing::Tokens::Token) override {
+        Expr::Expr* node = parser.expression();
+        parser.consume(Lexing::Tokens::RIGHT_PAREN, "Expected ')'");
+
+        return node;
+    }
+};
+
 /*
      III    N   N   FFFFF    III    X   X
      III    NN  N   F        III     X X
@@ -61,6 +71,7 @@ void registerBinaryParselet(Parsing::Parser& parser, Lexing::Tokens::TokenType t
 void Expressions::registerExpressionParselets(Parsing::Parser &parser) {
     parser.registerPrefixParselet(new IdentifierParselet(), Lexing::Tokens::IDENTIFIER);
     parser.registerPrefixParselet(new NumberParselet(), Lexing::Tokens::NUMBER);
+    parser.registerPrefixParselet(new GroupingParselet(), Lexing::Tokens::LEFT_PAREN);
 
     registerUnaryParselet(parser, Lexing::Tokens::PLUS);
     registerUnaryParselet(parser, Lexing::Tokens::MINUS);
