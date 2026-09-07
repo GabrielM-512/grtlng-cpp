@@ -8,14 +8,14 @@
     P       R   R   EEEEE   F        III    X   X
 */
 
-class identifierParselet : public Parsing::PrefixParselet {
+class IdentifierParselet : public Parsing::PrefixParselet {
 public:
     Expr::Expr* parse(Parsing::Parser&, Lexing::Tokens::Token token) override {
         return new Expr::Identifier(token.data.name);
     }
 };
 
-class numberParselet : public Parsing::PrefixParselet {
+class NumberParselet : public Parsing::PrefixParselet {
 public:
     Expr::Expr* parse(Parsing::Parser&, Lexing::Tokens::Token token) override {
         return new Expr::Number(token.data.number);
@@ -23,6 +23,7 @@ public:
 };
 
 class unaryParselet : public Parsing::PrefixParselet {
+class UnaryParselet : public Parsing::PrefixParselet {
     Expr::Expr* parse(Parsing::Parser& parser, Lexing::Tokens::Token token) override {
         Expr::Expr* operand = parser.parseExpression();
         return new Expr::Unary(token.type, operand);
@@ -38,6 +39,7 @@ class unaryParselet : public Parsing::PrefixParselet {
 */
 
 class binaryParselet : public Parsing::InfixParselet {
+class BinaryParselet : public Parsing::InfixParselet {
 public:
     Expr::Expr* parse(Parsing::Parser &parser, Expr::Expr *left, Lexing::Tokens::Token token) override {
         Expr::Expr* right = parser.parseExpression();
@@ -46,16 +48,16 @@ public:
 };
 
 void registerUnaryParselet(Parsing::Parser& parser, Lexing::Tokens::TokenType type) {
-    parser.registerPrefixParselet(new unaryParselet(), type);
+    parser.registerPrefixParselet(new UnaryParselet(), type);
 }
 
 void registerBinaryParselet(Parsing::Parser& parser, Lexing::Tokens::TokenType type) {
-    parser.registerInfixParselet(new binaryParselet(), type);
+    parser.registerInfixParselet(new BinaryParselet(), type);
 }
 
 void Expressions::registerExpressionParselets(Parsing::Parser &parser) {
-    parser.registerPrefixParselet(new identifierParselet(), Lexing::Tokens::IDENTIFIER);
-    parser.registerPrefixParselet(new numberParselet(), Lexing::Tokens::NUMBER);
+    parser.registerPrefixParselet(new IdentifierParselet(), Lexing::Tokens::IDENTIFIER);
+    parser.registerPrefixParselet(new NumberParselet(), Lexing::Tokens::NUMBER);
 
     registerUnaryParselet(parser, Lexing::Tokens::PLUS);
     registerUnaryParselet(parser, Lexing::Tokens::MINUS);
