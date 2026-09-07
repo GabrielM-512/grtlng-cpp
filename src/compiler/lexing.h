@@ -7,7 +7,7 @@
 namespace Lexing {
 
     namespace Tokens {
-        typedef enum {
+        typedef enum : u16{
             END_OF_FILE, // End of source file
             ERROR,
 
@@ -91,7 +91,7 @@ namespace Lexing {
             LAST // a marker token to always be the last token
         } TokenType;
 
-        typedef struct {
+        struct Token {
             TokenType type;
             u16 line;
             u32 position;
@@ -100,7 +100,7 @@ namespace Lexing {
                 double number;
             } data;
 
-            std::string toString() const;
+            [[nodiscard]] std::string toString() const;
             static std::string toString(TokenType tokenType);
 
         };
