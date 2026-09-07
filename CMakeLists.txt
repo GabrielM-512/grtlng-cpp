@@ -12,6 +12,8 @@ add_executable(grtlng_cpp
         src/compiler/lexing.h
         src/compiler/lexing.h
         src/AST/expr.h
+        tool/prettyPrinter.cpp
+        tool/prettyPrinter.h
 )
 
 target_compile_options(grtlng_cpp

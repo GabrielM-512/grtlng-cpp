@@ -99,7 +99,11 @@ namespace Lexing {
                 const char* name;
                 double number;
             } data;
-        } Token;
+
+            std::string toString() const;
+            static std::string toString(TokenType tokenType);
+
+        };
     }
 
     class ScanException : public std::runtime_error {

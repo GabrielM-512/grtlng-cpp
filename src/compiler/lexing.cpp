@@ -4,6 +4,86 @@
 
 using namespace Lexing::Tokens;
 
+std::string Token::toString(TokenType tokenType) {
+
+    switch (tokenType) {
+        case END_OF_FILE: return "[End of file]";
+        case ERROR: return "an error";
+        case NUMBER: return "a number";
+        case STRING: return "a string";
+        case SEMICOLON: return "\";\"";
+        case LEFT_PAREN: return "\"(\"";
+        case RIGHT_PAREN: return "\")\"";
+        case LEFT_BRACE: return "\"{\"";
+        case RIGHT_BRACE: return "\"}\"";
+        case LEFT_BRACKET: return "\"[\"";
+        case RIGHT_BRACKET: return "\"]\"";
+        case PLUS: return "\"+\"";
+        case MINUS: return "\"-\"";
+        case STAR: return "\"*\"";
+        case SLASH: return "\"/\"";
+        case PLUS_EQUALS: return "\"+=\"";
+        case MINUS_EQUALS: return "\"-=\"";
+        case STAR_EQUALS: return "\"*=\"";
+        case SLASH_EQUALS: return "\"/=\"";
+        case PLUS_PLUS: return "\"++\"";
+        case MINUS_MINUS: return "\"--\"";
+        case AMP: return "\"&\"";
+        case PIPE: return "\"|\"";
+        case TILDE: return "\"~\"";
+        case AMP_AMP: return "\"&&\"";
+        case PIPE_PIPE: return "\"||\"";
+        case AMP_EQUALS: return "\"&=\"";
+        case BANG: return "\"!\"";
+        case DOT: return "\".\"";
+        case COMMA: return "\",\"";
+        case MORE: return "\">\"";
+        case LESS: return "\"<\"";
+        case EQUALS: return "\"=\"";
+        case EQUALS_EQUALS: return "\"==\"";
+        case MORE_EQUALS: return "\">=\"";
+        case LESS_EQUALS: return "\"<=\"";
+        case BANG_EQUALS: return "\"!=\"";
+        case IDENTIFIER: return "an identifier";
+        case I16: return "\"i16\"";
+        case I32: return "\"i32\"";
+        case I64: return "\"i64\"";
+        case U16: return "\"u16\"";
+        case U32: return "\"u32\"";
+        case U64: return "\"u64\"";
+        case VOID: return "\"void\"";
+        case RETURN: return "\"return\"";
+        case EXTERN: return "\"extern\"";
+        case IF: return "\"if\"";
+        case ELSE: return "\"else\"";
+        case WHILE: return "\"while\"";
+        case FOR: return "\"for\"";
+        case PRINT: return "\"print\"";
+        case FALSE:
+            break;
+        case TRUE:
+            break;
+        case PIPE_EQUALS:
+            break;
+        case I8:
+            break;
+        case U8:
+            break;
+        case F32:
+            break;
+        case F64:
+            break;
+        case LAST:
+            break;
+    }
+
+    return "";
+}
+
+std::string Token::toString() const {
+    return toString(type);
+}
+
 class Lexer {
     std::string source;
     u32 base, head;
