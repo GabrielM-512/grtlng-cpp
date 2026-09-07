@@ -1,8 +1,8 @@
 #include <iostream>
 #include <sysexits.h>
 
+#include "../tool/prettyPrinter.h"
 #include "compiler/compiler.h"
-#include "compiler/lexing.h"
 #include "util/fileIO.h"
 
 struct parseFlags {
@@ -30,9 +30,10 @@ int main(const int argc, char* argv[]) {
     if (!(compileFlags = parseArgs(argc, argv)).flagsOK) exit(EX_USAGE);
 
     try {
-        const std::string file = fileIO::readFile(argv[1]);
-        const std::vector<Lexing::Tokens::Token> tokens = Lexing::scan(file);
         const std::string file = fileIO::readFile(compileFlags.filePath);
+        Compiler::CompileResult program = Compiler::compile(file);
+        std::cout << Printer::print(program.expr) << std::endl;
+
     } catch (std::exception& e) {
         std::cerr << "Error: " << e.what() << std::endl;
         return 1;

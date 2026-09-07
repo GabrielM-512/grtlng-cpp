@@ -11,6 +11,8 @@ add_executable(grtlng_cpp
         src/compiler/lexing.cpp
         src/compiler/lexing.h
         src/compiler/lexing.h
+        src/compiler/compiler.cpp
+        src/compiler/compiler.h
         src/AST/expr.h
         src/compiler/parsing/parsing.cpp
         src/compiler/parsing/parsing.h
@@ -41,3 +43,11 @@ add_test(lexer_partial ${CMAKE_CTEST_COMMAND}
         --build-makeprogram ${CMAKE_MAKE_PROGRAM}
         --build-project lexer_test
         --test-command lexer_test)
+
+add_test(parser_partial ${CMAKE_CTEST_COMMAND}
+        --build-and-test "${CMAKE_SOURCE_DIR}/testing/partial/parser"
+        "${CMAKE_BINARY_DIR}/testing/partial/parser"
+        --build-generator ${CMAKE_GENERATOR}
+        --build-makeprogram ${CMAKE_MAKE_PROGRAM}
+        --build-project parser_partial
+        --test-command parser_partial)
