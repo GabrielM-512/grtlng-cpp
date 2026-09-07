@@ -37,8 +37,6 @@ namespace Parsing {
         Lexing::Tokens::Token advance();
         [[nodiscard]] Lexing::Tokens::Token peek() const;
 
-        bool consume(Lexing::Tokens::TokenType type);
-
         [[nodiscard]] PrefixParselet* getPrefixParselet(Lexing::Tokens::TokenType type) const;
         [[nodiscard]] InfixParselet* getInfixParselet(Lexing::Tokens::TokenType type) const;
 
@@ -46,6 +44,8 @@ namespace Parsing {
         [[nodiscard]] int getPrecedence(Lexing::Tokens::TokenType type) const;
 
     public:
+        bool consume(Lexing::Tokens::TokenType type, const std::string &message);
+
         explicit Parser(std::vector<Lexing::Tokens::Token>& tokens);
         Expr::Expr* parse();
         [[nodiscard]] bool hadParseError() const;

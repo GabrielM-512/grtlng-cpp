@@ -81,6 +81,16 @@ Lexing::Tokens::Token Parser::advance() {
     return previous;
 }
 
+bool Parser::consume(Lexing::Tokens::TokenType type, const std::string &message) {
+    if (peek().type == type) {
+        if (!isAtEnd()) advance();
+        return true;
+    }
+    // TODO: proper error handling
+    std::cerr << "Error on line " << peek().line << ": " << message << std::endl;
+    return false;
+}
+
 Lexing::Tokens::Token Parser::peek() const {
     return current;
 }
