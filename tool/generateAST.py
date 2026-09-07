@@ -98,5 +98,5 @@ if __name__ == "__main__":
                   "Number | double value = 0",
                   "Identifier | const char* target"
               ],
-               visit_results= "std::string",
-               includes = "\"../compiler/lexing.h\"")
+               visit_results= "std::string, Value::Value",
+               includes = "\"../compiler/lexing.h\" | \"../value.h\"")

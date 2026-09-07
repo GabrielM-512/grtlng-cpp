@@ -2,7 +2,8 @@
 
 #include <variant>
 
-#include "../compiler/lexing.h"
+#include "../compiler/lexing.h" 
+#include  "../value.h"
 
 namespace Expr {
     struct Binary;
@@ -10,7 +11,7 @@ namespace Expr {
     struct Number;
     struct Identifier;
 
-    #define ExprVisitResults std::variant<std::string>
+    #define ExprVisitResults std::variant<std::string, Value::Value>
 
     class ExprVisitor {
     public:
