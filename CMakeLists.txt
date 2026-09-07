@@ -39,7 +39,5 @@ add_test(lexer_partial ${CMAKE_CTEST_COMMAND}
         "${CMAKE_BINARY_DIR}/testing/partial/lexer"
         --build-generator ${CMAKE_GENERATOR}
         --build-makeprogram ${CMAKE_MAKE_PROGRAM}
-        --build-project lexer_partial
-        --test-command lexer_partial)
         --build-project lexer_test
         --test-command lexer_test)
