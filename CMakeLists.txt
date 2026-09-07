@@ -12,6 +12,10 @@ add_executable(grtlng_cpp
         src/compiler/lexing.h
         src/compiler/lexing.h
         src/AST/expr.h
+        src/compiler/parsing/parsing.cpp
+        src/compiler/parsing/parsing.h
+        src/compiler/parsing/expressions.cpp
+        src/compiler/parsing/expressions.h
         tool/prettyPrinter.cpp
         tool/prettyPrinter.h
 )
