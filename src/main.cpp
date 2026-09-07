@@ -3,6 +3,7 @@
 
 #include "../tool/prettyPrinter.h"
 #include "compiler/compiler.h"
+#include "interpreter/interpreting.h"
 #include "util/fileIO.h"
 
 struct parseFlags {
@@ -36,6 +37,9 @@ int main(const int argc, char* argv[]) {
         if (!program.success) return 1;
 
         std::cout << Printer::print(program.expr) << std::endl;
+        double result = Interpreting::interpret(program.expr);
+        std::cout << "Result: " << result << std::endl;
+        return (int) result;
 
     } catch (std::exception& e) {
         std::cerr << "Error: " << e.what() << std::endl;

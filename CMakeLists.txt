@@ -20,6 +20,8 @@ add_executable(grtlng_cpp
         src/compiler/parsing/expressions.h
         tool/prettyPrinter.cpp
         tool/prettyPrinter.h
+        src/interpreter/interpreting.cpp
+        src/interpreter/interpreting.h
         src/value.cpp
         src/value.h
 )
