@@ -13,6 +13,7 @@ public:
     virtual ~InfixParselet() = default;
 
     virtual Expr::Expr* parse(Parser& parser, Expr::Expr* left, Lexing::Tokens::Token token) = 0;
+    virtual int getPrecedence() = 0;
 };
 
 namespace Expressions {

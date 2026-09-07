@@ -22,10 +22,10 @@ public:
     }
 };
 
-class unaryParselet : public Parsing::PrefixParselet {
 class UnaryParselet : public Parsing::PrefixParselet {
+public:
     Expr::Expr* parse(Parsing::Parser& parser, Lexing::Tokens::Token token) override {
-        Expr::Expr* operand = parser.parseExpression();
+        Expr::Expr* operand = parser.parseExprPrecRight();
         return new Expr::Unary(token.type, operand);
     }
 };
@@ -38,21 +38,24 @@ class UnaryParselet : public Parsing::PrefixParselet {
      III    N   N   F        III    X   X
 */
 
-class binaryParselet : public Parsing::InfixParselet {
 class BinaryParselet : public Parsing::InfixParselet {
+    int precedence;
 public:
+    BinaryParselet(int precedence): precedence(precedence) {}
+
     Expr::Expr* parse(Parsing::Parser &parser, Expr::Expr *left, Lexing::Tokens::Token token) override {
-        Expr::Expr* right = parser.parseExpression();
+        Expr::Expr* right = parser.parseExprPrec();
         return new Expr::Binary(left, token.type, right);
     }
+    int getPrecedence() override {return precedence;}
 };
 
 void registerUnaryParselet(Parsing::Parser& parser, Lexing::Tokens::TokenType type) {
     parser.registerPrefixParselet(new UnaryParselet(), type);
 }
 
-void registerBinaryParselet(Parsing::Parser& parser, Lexing::Tokens::TokenType type) {
-    parser.registerInfixParselet(new BinaryParselet(), type);
+void registerBinaryParselet(Parsing::Parser& parser, Lexing::Tokens::TokenType type, int precedence) {
+    parser.registerInfixParselet(new BinaryParselet(precedence), type);
 }
 
 void Expressions::registerExpressionParselets(Parsing::Parser &parser) {
@@ -62,8 +65,8 @@ void Expressions::registerExpressionParselets(Parsing::Parser &parser) {
     registerUnaryParselet(parser, Lexing::Tokens::PLUS);
     registerUnaryParselet(parser, Lexing::Tokens::MINUS);
 
-    registerBinaryParselet(parser, Lexing::Tokens::PLUS);
-    registerBinaryParselet(parser, Lexing::Tokens::MINUS);
-    registerBinaryParselet(parser, Lexing::Tokens::SLASH);
-    registerBinaryParselet(parser, Lexing::Tokens::STAR);
+    registerBinaryParselet(parser, Lexing::Tokens::PLUS, Parsing::Precedence::SUM);
+    registerBinaryParselet(parser, Lexing::Tokens::MINUS, Parsing::Precedence::SUM);
+    registerBinaryParselet(parser, Lexing::Tokens::SLASH, Parsing::Precedence::PRODUCT);
+    registerBinaryParselet(parser, Lexing::Tokens::STAR, Parsing::Precedence::PRODUCT);
 }

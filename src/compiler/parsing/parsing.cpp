@@ -33,7 +33,7 @@ void Parser::registerInfixParselet(InfixParselet* parselet, Lexing::Tokens::Toke
     infixTable.insert({type, parselet});
 }
 
-PrefixParselet* Parser::getPrefixParselet(Lexing::Tokens::TokenType type) {
+PrefixParselet* Parser::getPrefixParselet(Lexing::Tokens::TokenType type) const {
     auto parselet = prefixTable.find(type);
 
     return parselet == prefixTable.end() ? nullptr : parselet->second;
@@ -45,6 +45,17 @@ InfixParselet* Parser::getInfixParselet(Lexing::Tokens::TokenType type) const {
     return parselet == infixTable.end() ? nullptr : parselet->second;
 }
 
+int Parser::getPrecedence(Lexing::Tokens::TokenType type) const {
+    InfixParselet* parselet = getInfixParselet(type);
+    if (parselet != nullptr) return parselet->getPrecedence();
+
+    return 0;
+}
+
+int Parser::getPrecedence() const {
+    return getPrecedence(peek().type);
+}
+
 /*
     U   U   TTTTT    III    L        SSSS
     U   U     T      III    L       S
@@ -53,7 +64,7 @@ InfixParselet* Parser::getInfixParselet(Lexing::Tokens::TokenType type) const {
      UUU      T      III    LLLLL   SSSS
 */
 
-void Parser::advance() {
+Lexing::Tokens::Token Parser::advance() {
     previous = current;
     while (true) {
         if (isAtEnd()) {
@@ -66,35 +77,53 @@ void Parser::advance() {
 
         std::cerr << "Error on line " << current.line << ": " << current.data.name << std::endl;
     }
+
+    return previous;
+}
+
+Lexing::Tokens::Token Parser::peek() const {
+    return current;
 }
 
 bool Parser::isAtEnd() const {
     return currentToken >= tokens.size();
 }
 
-Expr::Expr* Parser::parseExpression() {
-    advance();
+Expr::Expr* Parser::parseExpression(int precedence) {
+    Lexing::Tokens::Token token = advance();
 
-    PrefixParselet* prefix = getPrefixParselet(previous.type);
+    PrefixParselet* prefix = getPrefixParselet(token.type);
 
     if (prefix == nullptr) {
         // TODO: Proper error handling
-        std::cerr << "Error on line " << previous.line << "Expected expression at \"" << previous.toString() << "\"" << std::endl;
+        std::cerr << "Error on line " << token.line << ": Expected expression at " << token.toString() << std::endl;
         hadError = true;
         return nullptr;
     }
 
-    Expr::Expr* left = prefix->parse(*this, previous);
+    Expr::Expr* left = prefix->parse(*this, token);
 
-    // TODO: implement precedence
-    while (getInfixParselet(current.type) != nullptr) {
-        advance();
-        InfixParselet* infix = getInfixParselet(previous.type);
-        left = infix->parse(*this, left, previous);
+    while (precedence < getPrecedence()) {
+        token = advance();
+
+        InfixParselet* infix = getInfixParselet(token.type);
+        left = infix->parse(*this, left, token);
     }
 
     return left;
 
+}
+
+Expr::Expr* Parser::parseExprPrec() {
+    return parseExpression(getPrecedence(previous.type));
+}
+
+Expr::Expr* Parser::parseExprPrecRight() {
+    return parseExpression(getPrecedence(previous.type) - 1);
+}
+
+Expr::Expr* Parser::expression() {
+    return parseExpression(Precedence::ASSIGNMENT);
 }
 
 
@@ -103,5 +132,5 @@ bool Parser::hadParseError() const {
 }
 
 Expr::Expr *Parser::parse() {
-    return parseExpression();
+    return expression();
 }
