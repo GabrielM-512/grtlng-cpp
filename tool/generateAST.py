@@ -29,8 +29,8 @@ def define_subclass(base_class : str, new_class : str) -> str:
 
     output = output [:-1] + " {}\n\n" # remove trailing comma
 
-    output += (f"        void accept({base_class}Visitor* visitor) override " + "{\n" +
-               f"            visitor->visit{name}{base_class}(this);\n" +
+    output += (f"        {base_class}VisitResults accept({base_class}Visitor* visitor) override " + "{\n" +
+               f"            return visitor->visit{name}{base_class}(this);\n" +
                "        }\n")
 
 
@@ -39,8 +39,20 @@ def define_subclass(base_class : str, new_class : str) -> str:
     return output
 
 
-def define_ast(output_dir : str, base_class : str, classes : list[str], includes : str = "") -> None:
-    output = "#pragma once\n\n"
+def define_visit_results(base_class : str, visit_results : str) -> str:
+    output = f"    #define {base_class}VisitResults std::variant<"
+
+    for result in visit_results.split("|"):
+        name = result.strip()
+        output += name + ", "
+
+    output = output[:-2] + ">"
+
+    return output
+
+
+def define_ast(output_dir : str, base_class : str, classes : list[str], visit_results : str, includes : str = "") -> None:
+    output = "#pragma once\n\n#include <variant>\n\n"
 
     for include in includes.split("|"):
         output += f"#include {include}\n"
@@ -51,18 +63,20 @@ def define_ast(output_dir : str, base_class : str, classes : list[str], includes
         name = new_class.split("|")[0].strip()
         output += "    struct " + name + ";\n" # forward declare classes
 
+    output += "\n" + define_visit_results(base_class, visit_results) + "\n"
+
     output += (f"\n    class {base_class}Visitor " + "{\n" +
                 "    public:\n" +
                f"        virtual ~{base_class}Visitor() = default;\n\n")
 
     for new_class in classes:
         name = new_class.split("|")[0].strip()
-        output += f"        virtual void visit{name}{base_class}(const {name}* {base_class.lower()}) const = 0;\n"
+        output += f"        virtual {base_class}VisitResults visit{name}{base_class}({name}* {base_class.lower()}) = 0;\n"
 
     output += ("    };\n\n" +
               f"    struct {base_class} " + "{\n" +
               f"        virtual ~{base_class}() = default;\n" +
-              f"        virtual void accept({base_class}Visitor *visitor) = 0;\n" +
+              f"        virtual {base_class}VisitResults accept({base_class}Visitor *visitor) = 0;\n" +
                "    };")
 
     for new_class in classes:
@@ -76,11 +90,13 @@ def define_ast(output_dir : str, base_class : str, classes : list[str], includes
 
 
 if __name__ == "__main__":
-    define_ast("/home/gabriel/CLionProjects/grtlng-cpp/src/AST/expr.h", "Expr",
-               [
-                  "Binary | const Expr* left = nullptr, Lexing::Tokens::TokenType operatorType = Lexing::Tokens::ERROR, const Expr* right = nullptr",
-                  "Unary | Lexing::Tokens::TokenType operatorType = Lexing::Tokens::ERROR, const Expr* right = nullptr",
+    define_ast(output_dir="/home/gabriel/CLionProjects/grtlng-cpp/src/AST/expr.h",
+               base_class="Expr",
+               classes = [
+                  "Binary | Expr* left = nullptr, Lexing::Tokens::TokenType operatorType = Lexing::Tokens::ERROR, Expr* right = nullptr",
+                  "Unary | Lexing::Tokens::TokenType operatorType = Lexing::Tokens::ERROR, Expr* right = nullptr",
                   "Number | double value = 0",
                   "Identifier | const char* target"
               ],
-               "\"../compiler/lexing.h\"")
+               visit_results= "std::string",
+               includes = "\"../compiler/lexing.h\"")

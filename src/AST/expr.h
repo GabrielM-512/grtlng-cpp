@@ -1,5 +1,7 @@
 #pragma once
 
+#include <variant>
+
 #include "../compiler/lexing.h"
 
 namespace Expr {
@@ -8,48 +10,50 @@ namespace Expr {
     struct Number;
     struct Identifier;
 
+    #define ExprVisitResults std::variant<std::string>
+
     class ExprVisitor {
     public:
         virtual ~ExprVisitor() = default;
 
-        virtual void visitBinaryExpr(const Binary* expr) const = 0;
-        virtual void visitUnaryExpr(const Unary* expr) const = 0;
-        virtual void visitNumberExpr(const Number* expr) const = 0;
-        virtual void visitIdentifierExpr(const Identifier* expr) const = 0;
+        virtual ExprVisitResults visitBinaryExpr(Binary* expr) = 0;
+        virtual ExprVisitResults visitUnaryExpr(Unary* expr) = 0;
+        virtual ExprVisitResults visitNumberExpr(Number* expr) = 0;
+        virtual ExprVisitResults visitIdentifierExpr(Identifier* expr) = 0;
     };
 
     struct Expr {
         virtual ~Expr() = default;
-        virtual void accept(ExprVisitor *visitor) = 0;
+        virtual ExprVisitResults accept(ExprVisitor *visitor) = 0;
     };
 
     struct Binary: Expr {
-        const Expr* left;
+        Expr* left;
         Lexing::Tokens::TokenType operatorType;
-        const Expr* right;
+        Expr* right;
 
         explicit Binary(
-            const Expr* left = nullptr,
+            Expr* left = nullptr,
             Lexing::Tokens::TokenType operatorType = Lexing::Tokens::ERROR,
-            const Expr* right = nullptr
+            Expr* right = nullptr
         ): left(left), operatorType(operatorType), right(right) {}
 
-        void accept(ExprVisitor* visitor) override {
-            visitor->visitBinaryExpr(this);
+        ExprVisitResults accept(ExprVisitor* visitor) override {
+            return visitor->visitBinaryExpr(this);
         }
     };
 
     struct Unary: Expr {
         Lexing::Tokens::TokenType operatorType;
-        const Expr* right;
+        Expr* right;
 
         explicit Unary(
             Lexing::Tokens::TokenType operatorType = Lexing::Tokens::ERROR,
-            const Expr* right = nullptr
+            Expr* right = nullptr
         ): operatorType(operatorType), right(right) {}
 
-        void accept(ExprVisitor* visitor) override {
-            visitor->visitUnaryExpr(this);
+        ExprVisitResults accept(ExprVisitor* visitor) override {
+            return visitor->visitUnaryExpr(this);
         }
     };
 
@@ -60,8 +64,8 @@ namespace Expr {
             double value = 0
         ): value(value) {}
 
-        void accept(ExprVisitor* visitor) override {
-            visitor->visitNumberExpr(this);
+        ExprVisitResults accept(ExprVisitor* visitor) override {
+            return visitor->visitNumberExpr(this);
         }
     };
 
@@ -72,8 +76,8 @@ namespace Expr {
             const char* target
         ): target(target) {}
 
-        void accept(ExprVisitor* visitor) override {
-            visitor->visitIdentifierExpr(this);
+        ExprVisitResults accept(ExprVisitor* visitor) override {
+            return visitor->visitIdentifierExpr(this);
         }
     };
 }
