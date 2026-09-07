@@ -35,3 +35,5 @@ add_test(lexer_partial ${CMAKE_CTEST_COMMAND}
         --build-makeprogram ${CMAKE_MAKE_PROGRAM}
         --build-project lexer_partial
         --test-command lexer_partial)
+        --build-project lexer_test
+        --test-command lexer_test)
