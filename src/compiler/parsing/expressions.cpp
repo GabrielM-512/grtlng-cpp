@@ -1,11 +1,11 @@
 #include "expressions.h"
 
 /*
-    PPPP    RRRR    EEEEE   FFFFF    III    X   X
-    P   P   R   R   E       F        III     X X
-    PPPP    RRRR    EEEEE   FFFFF    III      X
-    P       R  R    E       F        III     X X
-    P       R   R   EEEEE   F        III    X   X
+    PPPP    RRRR    EEEEE   FFFFF   IIIII   X   X
+    P   P   R   R   E       F         I      X X
+    PPPP    RRRR    EEEEE   FFFFF     I       X
+    P       R  R    E       F         I      X X
+    P       R   R   EEEEE   F       IIIII   X   X
 */
 
 class IdentifierParselet : public Parsing::PrefixParselet {
@@ -41,11 +41,11 @@ public:
 };
 
 /*
-     III    N   N   FFFFF    III    X   X
-     III    NN  N   F        III     X X
-     III    N N N   FFFFF    III      X
-     III    N  NN   F        III     X X
-     III    N   N   F        III    X   X
+    IIIII   N   N   FFFFF   IIIII   X   X
+      I     NN  N   F         I      X X
+      I     N N N   FFFFF     I       X
+      I     N  NN   F         I      X X
+    IIIII   N   N   F       IIIII   X   X
 */
 
 class BinaryParselet : public Parsing::InfixParselet {

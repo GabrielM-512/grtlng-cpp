@@ -57,11 +57,11 @@ int Parser::getPrecedence() const {
 }
 
 /*
-    U   U   TTTTT    III    L        SSSS
-    U   U     T      III    L       S
-    U   U     T      III    L        SSS
-    U   U     T      III    L           S
-     UUU      T      III    LLLLL   SSSS
+    U   U   TTTTT   IIIII   L        SSSS
+    U   U     T       I     L       S
+    U   U     T       I     L        SSS
+    U   U     T       I     L           S
+     UUU      T     IIIII   LLLLL   SSSS
 */
 
 Lexing::Tokens::Token Parser::advance() {
