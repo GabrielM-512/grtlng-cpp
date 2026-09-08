@@ -17,6 +17,10 @@ class Interpreter : public Expr::ExprVisitor {
         current = restore;
     }
 
+    Value::Value evaluate(Expr::Expr* expr) {
+        return get<Value::Value>(expr->accept(this));
+    }
+
 public:
 
     Interpreter() {
@@ -31,8 +35,8 @@ public:
     }
 
     ExprVisitResults visitBinaryExpr(Expr::Binary *expr) override {
-        Value::Value left = get<Value::Value>(expr->left->accept(this));
-        Value::Value right = get<Value::Value>(expr->right->accept(this));
+        Value::Value left = evaluate(expr->left);
+        Value::Value right = evaluate(expr->right);
 
         switch (expr->operatorType) {
             case Lexing::Tokens::PLUS:
@@ -49,7 +53,7 @@ public:
     }
 
     ExprVisitResults visitUnaryExpr(Expr::Unary *expr) override {
-        Value::Value operand = get<Value::Value>(expr->right->accept(this));
+        Value::Value operand = evaluate(expr->right);
         switch (expr->operatorType) {
             case Lexing::Tokens::PLUS:
                 return operand;
@@ -67,13 +71,17 @@ public:
     ExprVisitResults visitIdentifierExpr(Expr::Identifier *expr) override {
         return current->getVar(expr->target);
     }
+
+    Value::Value interpret(Expr::Expr* program) {
+        return evaluate(program);
+    }
 };
 
 Value::Value Interpreting::interpret(Expr::Expr *program) {
     Interpreter interpreter;
 
 
-    double returnCode = get<Value::Value>(program->accept(&interpreter));
+    double returnCode = interpreter.interpret(program);
 
     return returnCode;
 
