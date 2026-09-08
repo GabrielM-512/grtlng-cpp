@@ -54,8 +54,9 @@ def define_visit_results(base_class : str, visit_results : str) -> str:
 def define_ast(output_dir : str, base_class : str, classes : list[str], visit_results : str, includes : str = "") -> None:
     output = "#pragma once\n\n#include <variant>\n\n"
 
-    for include in includes.split("|"):
-        output += f"#include {include}\n"
+    if includes != "":
+        for include in includes.split("|"):
+            output += f"#include {include}\n"
 
     output += f"\nnamespace {base_class} " + '{\n'
 
@@ -100,3 +101,8 @@ if __name__ == "__main__":
               ],
                visit_results= "std::string, Value::Value",
                includes = "\"../compiler/lexing.h\" | \"../value.h\"")
+
+    define_ast(output_dir = "/home/gabriel/CLionProjects/grtlng-cpp/src/AST/stmt.h",
+               base_class = "Stmt",
+               classes = [],
+               visit_results = "",)
