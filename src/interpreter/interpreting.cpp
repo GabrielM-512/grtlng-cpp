@@ -1,11 +1,35 @@
 #include "interpreting.h"
-
-#include <cmath>
+#include "environment.h"
 
 using namespace Interpreting;
 
 class Interpreter : public Expr::ExprVisitor {
+    Environment global;
+    Environment *current;
+
+    void beginEnvironment() {
+        current = new Environment(current);
+    }
+
+    void endEnvironment() {
+        Environment* restore = current->enclosing;
+        delete current;
+        current = restore;
+    }
+
 public:
+
+    Interpreter() {
+        global = Environment();
+        current = &global;
+    }
+
+    ~Interpreter() override {
+        while (current->enclosing != nullptr) {
+            endEnvironment();
+        }
+    }
+
     ExprVisitResults visitBinaryExpr(Expr::Binary *expr) override {
         Value::Value left = get<Value::Value>(expr->left->accept(this));
         Value::Value right = get<Value::Value>(expr->right->accept(this));
@@ -40,8 +64,8 @@ public:
         return expr->value;
     }
 
-    ExprVisitResults visitIdentifierExpr(Expr::Identifier *) override {
-        return INFINITY;
+    ExprVisitResults visitIdentifierExpr(Expr::Identifier *expr) override {
+        return current->getVar(expr->target);
     }
 };
 
