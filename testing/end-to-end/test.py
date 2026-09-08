@@ -60,18 +60,18 @@ class Config:
         self.data.pop("log")
 
 class Flags:
-    def __init__(self, configFile, processing, enabledTests = None):
-        self.configFile = configFile
+    def __init__(self, config_file, processing, enabled_tests = None):
+        self.configFile = config_file
         self.processing = processing
-        self.enabledTests = enabledTests
+        self.enabledTests = enabled_tests
 
 class Result:
     def __init__(self, success : bool, message : list[str]):
         self.success : bool = success
         self.message : str =  "".join(message)
 
-def parseFlags() -> Flags:
-    configFile = sys.argv[1]
+def parse_flags() -> Flags:
+    config_file = sys.argv[1]
     processing : str
 
     match sys.argv[2]:
@@ -83,14 +83,14 @@ def parseFlags() -> Flags:
             exit(os.EX_USAGE)
 
     if len(sys.argv) == 3:
-        return Flags(configFile, processing)
+        return Flags(config_file, processing)
 
-    enabledTests = []
+    enabled_tests = []
 
     for i in range (3, len(sys.argv)):
-        enabledTests.append(sys.argv[i])
+        enabled_tests.append(sys.argv[i])
 
-    return Flags(configFile, processing, enabledTests)
+    return Flags(config_file, processing, enabled_tests)
 
 
 
@@ -223,7 +223,7 @@ def main() -> int:
         print("Improper usage: Do python test.py <config.json> <single | multi> <test names [optional]>")
         exit(os.EX_USAGE)
 
-    flags = parseFlags()
+    flags = parse_flags()
 
     config = read_config(flags.configFile)
     tests = make_tests(config)
@@ -233,17 +233,17 @@ def main() -> int:
     if flags.enabledTests is not None:
         tests_valid = True
 
-        enabledTests = []
+        enabled_tests = []
 
         for enabled in flags.enabledTests:
-            foundTest : Test = None
+            found_test : Test = None
             for test in tests:
                 if test.name == enabled:
-                    foundTest = test
+                    found_test = test
                     break
 
-            if foundTest is not None:
-                enabledTests.append(foundTest)
+            if found_test is not None:
+                enabled_tests.append(found_test)
                 continue
 
             print(f"Unknown test \"{enabled}\" in test names")
@@ -252,7 +252,7 @@ def main() -> int:
         if not tests_valid:
             return 1
 
-        tests = enabledTests
+        tests = enabled_tests
 
 
     results: list[Result] = []
