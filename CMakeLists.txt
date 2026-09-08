@@ -26,6 +26,8 @@ add_executable(grtlng_cpp
         src/value.h
         src/interpreter/environment.cpp
         src/interpreter/environment.h
+        src/AST/stmt.h
+        src/interpreter/evaluate.cpp
 )
 
 target_compile_options(grtlng_cpp
