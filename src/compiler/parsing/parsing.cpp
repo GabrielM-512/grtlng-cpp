@@ -6,7 +6,8 @@
 
 using namespace Parsing;
 
-Parser::Parser(std::vector<Lexing::Tokens::Token>& tokens): tokens(tokens) {
+Parser::Parser(std::vector<Lexing::Tokens::Token>& tokens, Error::ErrorHandler& handler) : tokens(tokens),
+    errorHandler(handler) {
     currentToken = 0;
     hadError = false;
 

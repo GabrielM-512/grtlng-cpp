@@ -2,6 +2,7 @@
 #include <map>
 
 #include "../lexing.h"
+#include "../../error.h"
 #include "../../AST/expr.h"
 
 namespace Parsing {
@@ -32,6 +33,8 @@ namespace Parsing {
         std::map<Lexing::Tokens::TokenType, PrefixParselet*> prefixTable;
         std::map<Lexing::Tokens::TokenType, InfixParselet*> infixTable;
 
+        Error::ErrorHandler& errorHandler;
+
 
         [[nodiscard]] bool isAtEnd() const;
         Lexing::Tokens::Token advance();
@@ -46,7 +49,7 @@ namespace Parsing {
     public:
         bool consume(Lexing::Tokens::TokenType type, const std::string &message);
 
-        explicit Parser(std::vector<Lexing::Tokens::Token>& tokens);
+        explicit Parser(std::vector<Lexing::Tokens::Token>& tokens, Error::ErrorHandler& handler);
         Expr::Expr* parse();
         [[nodiscard]] bool hadParseError() const;
 

@@ -2,6 +2,7 @@
 #include <string>
 
 #include "../AST/expr.h"
+#include "../error.h"
 
 namespace Compiler {
     typedef struct {
@@ -9,5 +10,5 @@ namespace Compiler {
         Expr::Expr* expr;
     } CompileResult;
 
-    CompileResult compile(const std::string &source);
+    CompileResult compile(const std::string &source, Error::ErrorHandler& errorHandler);
 }

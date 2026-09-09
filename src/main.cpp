@@ -35,7 +35,7 @@ int main(const int argc, char* argv[]) {
 
         Error::ErrorHandler handler(file);
 
-        Compiler::CompileResult program = Compiler::compile(file);
+        Compiler::CompileResult program = Compiler::compile(file, handler);
 
         if (!program.success) return 1;
 
