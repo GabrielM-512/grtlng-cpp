@@ -30,6 +30,7 @@ namespace Interpreting {
 
         StmtVisitResults visitPrintStmt(Stmt::Print *stmt) override;
         StmtVisitResults visitExpressionStmt(Stmt::Expression *stmt) override;
+        StmtVisitResults visitVariableDeclarationStmt(Stmt::VariableDeclaration *stmt) override;
     };
 
     Value::Value interpret(Compiler::CompileResult& program, Error::ErrorHandler& handler);

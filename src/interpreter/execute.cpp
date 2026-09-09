@@ -12,6 +12,15 @@ StmtVisitResults Interpreter::visitExpressionStmt(Stmt::Expression *stmt) {
     return std::monostate();
 }
 
+StmtVisitResults Interpreter::visitVariableDeclarationStmt(Stmt::VariableDeclaration *stmt) {
+    Value::Value val = 0;
+
+    if (stmt->value != nullptr) val = evaluate(stmt->value);
+
+    current->createVar(stmt->name, val);
+    return std::monostate();
+}
+
 void Interpreter::execute(Stmt::Stmt* stmt) {
     stmt->accept(this);
 }
