@@ -97,7 +97,7 @@ if __name__ == "__main__":
                   "Binary | Expr* left = nullptr, Lexing::Tokens::TokenType operatorType = Lexing::Tokens::ERROR, Expr* right = nullptr",
                   "Unary | Lexing::Tokens::TokenType operatorType = Lexing::Tokens::ERROR, Expr* right = nullptr",
                   "Number | double value = 0",
-                  "Identifier | const char* target"
+                  "Identifier | const Lexing::Tokens::Token target"
               ],
                visit_results= "std::string, Value::Value",
                includes = "\"../compiler/lexing.h\" | \"../value.h\"")

@@ -28,7 +28,7 @@ public:
     }
 
     ExprVisitResults visitIdentifierExpr(Expr::Identifier* expr) override {
-        return expr->target;
+        return expr->target.data.name;
     }
 
     std::string print(Expr::Expr* node) {

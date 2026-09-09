@@ -73,10 +73,10 @@ namespace Expr {
     };
 
     struct Identifier: Expr {
-        const char* target;
+        const Lexing::Tokens::Token target;
 
         explicit Identifier(
-            const char* target
+            const Lexing::Tokens::Token target
         ): target(target) {}
 
         ExprVisitResults accept(ExprVisitor* visitor) override {
