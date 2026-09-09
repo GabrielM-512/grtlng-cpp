@@ -75,12 +75,8 @@ int Parser::getPrecedence() const {
 Lexing::Tokens::Token Parser::advance() {
     previous = current;
     while (true) {
-        if (isAtEnd()) {
-            current = tokens[tokens.size() - 1];
-        } else {
-            current = tokens[currentToken++];
-        }
 
+        current = tokens[currentToken++];
         if (current.type != Lexing::Tokens::ERROR) break;
 
         std::cerr << "Error on line " << current.line << ": " << current.data.name << std::endl;
