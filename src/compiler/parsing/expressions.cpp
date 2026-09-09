@@ -10,21 +10,21 @@
 
 class IdentifierParselet : public Parsing::PrefixParselet {
 public:
-    Expr::Expr* parse(Parsing::Parser&, Lexing::Tokens::Token token) override {
-        return new Expr::Identifier(token.data.name);
+    Expr::Expr* parse(Parsing::Parser&, Lexing::Tokens::Token& token) override {
+        return new Expr::Identifier(token);
     }
 };
 
 class NumberParselet : public Parsing::PrefixParselet {
 public:
-    Expr::Expr* parse(Parsing::Parser&, Lexing::Tokens::Token token) override {
+    Expr::Expr* parse(Parsing::Parser&, Lexing::Tokens::Token& token) override {
         return new Expr::Number(token.data.number);
     }
 };
 
 class UnaryParselet : public Parsing::PrefixParselet {
 public:
-    Expr::Expr* parse(Parsing::Parser& parser, Lexing::Tokens::Token token) override {
+    Expr::Expr* parse(Parsing::Parser& parser, Lexing::Tokens::Token& token) override {
         Expr::Expr* operand = parser.parseExprPrecRight();
         return new Expr::Unary(token.type, operand);
     }
@@ -32,7 +32,7 @@ public:
 
 class GroupingParselet : public Parsing::PrefixParselet {
 public:
-    Expr::Expr* parse (Parsing::Parser& parser, Lexing::Tokens::Token) override {
+    Expr::Expr* parse (Parsing::Parser& parser, Lexing::Tokens::Token&) override {
         Expr::Expr* node = parser.expression();
         parser.consume(Lexing::Tokens::RIGHT_PAREN, "Expected ')'");
 
@@ -53,7 +53,7 @@ class BinaryParselet : public Parsing::InfixParselet {
 public:
     BinaryParselet(int precedence): precedence(precedence) {}
 
-    Expr::Expr* parse(Parsing::Parser &parser, Expr::Expr *left, Lexing::Tokens::Token token) override {
+    Expr::Expr* parse(Parsing::Parser &parser, Expr::Expr *left, Lexing::Tokens::Token& token) override {
         Expr::Expr* right = parser.parseExprPrec();
         return new Expr::Binary(left, token.type, right);
     }
