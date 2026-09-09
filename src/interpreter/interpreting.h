@@ -3,6 +3,7 @@
 #include "../AST/expr.h"
 #include "../AST/stmt.h"
 #include "../error.h"
+#include "../compiler/compiler.h"
 
 namespace Interpreting {
 
@@ -14,18 +15,22 @@ namespace Interpreting {
         void endEnvironment();
 
         Value::Value evaluate(Expr::Expr* expr);
+        void execute(Stmt::Stmt* stmt);
 
     public:
         Interpreter();
         ~Interpreter() override;
 
-        Value::Value interpret(Expr::Expr* program);
+        void interpret(Compiler::CompileResult& program);
 
         ExprVisitResults visitBinaryExpr(Expr::Binary *expr) override;
         ExprVisitResults visitUnaryExpr(Expr::Unary *expr) override;
         ExprVisitResults visitNumberExpr(Expr::Number* expr) override;
         ExprVisitResults visitIdentifierExpr(Expr::Identifier *expr) override;
+
+        StmtVisitResults visitPrintStmt(Stmt::Print *stmt) override;
+        StmtVisitResults visitExpressionStmt(Stmt::Expression *stmt) override;
     };
 
-    Value::Value interpret(Expr::Expr *program, Error::ErrorHandler& handler);
+    Value::Value interpret(Compiler::CompileResult& program, Error::ErrorHandler& handler);
 }

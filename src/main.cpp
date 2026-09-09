@@ -39,8 +39,8 @@ int main(const int argc, char* argv[]) {
 
         if (!program.success) return 1;
 
-        double result = Interpreting::interpret(program.expr, handler);
-        std::cout << "Result: " << result << std::endl;
+        double result = Interpreting::interpret(program, handler);
+
         return (int) result;
 
     } catch (std::exception& e) {

@@ -4,6 +4,7 @@
 
 #include "environment.h"
 #include "../error.h"
+#include "../compiler/compiler.h"
 
 using namespace Interpreting;
 
@@ -17,6 +18,7 @@ void Interpreter::endEnvironment() {
     current = restore;
 }
 
+
 Interpreter::Interpreter() {
     global = Environment();
     current = &global;
@@ -28,23 +30,22 @@ Interpreter::~Interpreter() {
     }
 }
 
-Value::Value Interpreter::interpret(Expr::Expr* program) {
-    return evaluate(program);
+void Interpreter::interpret(Compiler::CompileResult& program) {
+    for (Stmt::Stmt* stmt : program.tree) {
+        execute(stmt);
+    }
 }
 
-Value::Value Interpreting::interpret(Expr::Expr *program, Error::ErrorHandler& handler) {
+Value::Value Interpreting::interpret(Compiler::CompileResult& program, Error::ErrorHandler& handler) {
     Interpreter interpreter;
 
-    double returnCode;
-
     try {
-        returnCode = interpreter.interpret(program);
+        interpreter.interpret(program);
     } catch (RuntimeException& e) {
         handler.runtimeError(e);
         exit(EX_DATAERR);
     }
 
-
-    return returnCode;
+    return 0;
 
 }
