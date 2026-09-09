@@ -4,19 +4,48 @@
 
 #include <variant>
 
+#include "expr.h"
 
 namespace Stmt {
+    struct Expression;
+    struct Print;
 
-    #define StmtVisitResults std::variant<>
+    #define StmtVisitResults std::variant<std::monostate>
 
     class StmtVisitor {
     public:
         virtual ~StmtVisitor() = default;
 
+        virtual StmtVisitResults visitExpressionStmt(Expression* stmt) = 0;
+        virtual StmtVisitResults visitPrintStmt(Print* stmt) = 0;
     };
 
     struct Stmt {
         virtual ~Stmt() = default;
         virtual StmtVisitResults accept(StmtVisitor *visitor) = 0;
+    };
+
+    struct Expression: Stmt {
+        Expr::Expr* expression;
+
+        explicit Expression(
+            Expr::Expr* expression
+        ): expression(expression) {}
+
+        StmtVisitResults accept(StmtVisitor* visitor) override {
+            return visitor->visitExpressionStmt(this);
+        }
+    };
+
+    struct Print: Stmt {
+        Expr::Expr* expression;
+
+        explicit Print(
+            Expr::Expr* expression
+        ): expression(expression) {}
+
+        StmtVisitResults accept(StmtVisitor* visitor) override {
+            return visitor->visitPrintStmt(this);
+        }
     };
 }
