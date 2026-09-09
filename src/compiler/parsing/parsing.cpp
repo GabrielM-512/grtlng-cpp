@@ -155,8 +155,17 @@ bool Parser::hadParseError() const {
     return hadError;
 }
 
-Expr::Expr *Parser::parse() {
-    return expression();
+std::vector<Stmt::Stmt*> Parser::parse() {
+
+    std::vector<Stmt::Stmt*> tree;
+    while (!isAtEnd()) {
+        Stmt::Stmt* stmt = statement();
+        tree.push_back(stmt);
+    }
+
+    errorHandler.printErrors();
+
+    return tree;
 }
 
 void Parser::fatalErrorAtCurrent(std::string message) {

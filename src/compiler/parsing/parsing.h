@@ -4,6 +4,7 @@
 #include "../lexing.h"
 #include "../../error.h"
 #include "../../AST/expr.h"
+#include "../../AST/stmt.h"
 
 namespace Parsing {
 
@@ -47,6 +48,10 @@ namespace Parsing {
         [[nodiscard]] int getPrecedence() const;
         [[nodiscard]] int getPrecedence(Lexing::Tokens::TokenType type) const;
 
+        Stmt::Stmt* statement();
+        Stmt::Stmt* printStatement();
+        Stmt::Stmt* expressionStatement();
+        
         void errorAt(Lexing::Tokens::Token token, std::string message, std::string hint, bool fatal);
 
     public:
@@ -55,7 +60,8 @@ namespace Parsing {
         bool match(Lexing::Tokens::TokenType type);
 
         explicit Parser(std::vector<Lexing::Tokens::Token>& tokens, Error::ErrorHandler& handler);
-        Expr::Expr* parse();
+
+        std::vector<Stmt::Stmt *> parse();
         [[nodiscard]] bool hadParseError() const;
 
         void registerPrefixParselet(PrefixParselet* parselet, Lexing::Tokens::TokenType type);

@@ -31,6 +31,8 @@ add_executable(grtlng_cpp
         src/error.cpp
         src/error.h
         src/interpreter/runtimeException.h
+        src/compiler/parsing/statements.cpp
+        src/interpreter/execute.cpp
 )
 
 target_compile_options(grtlng_cpp

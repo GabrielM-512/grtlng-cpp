@@ -1,14 +1,14 @@
 #pragma once
 #include <string>
 
-#include "../AST/expr.h"
 #include "../error.h"
+#include "../AST/stmt.h"
 
 namespace Compiler {
-    typedef struct {
-        bool success;
-        Expr::Expr* expr;
-    } CompileResult;
+    struct CompileResult {
+        bool success = true;
+        std::vector<Stmt::Stmt*> tree;
+    };
 
     CompileResult compile(const std::string &source, Error::ErrorHandler& errorHandler);
 }
