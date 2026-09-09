@@ -5,6 +5,7 @@
 
 #include <iostream>
 #include <iomanip>
+#include <utility>
 
 
 using namespace Error;
@@ -19,7 +20,7 @@ void ErrorHandler::printErrorLine(const Lexing::Tokens::Token token) const {
     u32 end = token.position;
     for (u8 i = 0; i < MAX_ERROR_LINE_LENGTH; i++) {
         end++;
-        if (source[end] == '\n' || end >= source.length()) break;
+        if (end >= source.length() || source[end] == '\n') break;
     }
 
     u32 range = end - start;
