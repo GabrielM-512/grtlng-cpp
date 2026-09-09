@@ -31,13 +31,15 @@ int main(const int argc, char* argv[]) {
     if (!(compileFlags = parseArgs(argc, argv)).flagsOK) exit(EX_USAGE);
 
     try {
-        const std::string file = fileIO::readFile(compileFlags.filePath);
+        std::string file = fileIO::readFile(compileFlags.filePath);
+
+        Error::ErrorHandler handler(file);
+
         Compiler::CompileResult program = Compiler::compile(file);
 
         if (!program.success) return 1;
 
-        std::cout << Printer::print(program.expr) << std::endl;
-        double result = Interpreting::interpret(program.expr);
+        double result = Interpreting::interpret(program.expr, handler);
         std::cout << "Result: " << result << std::endl;
         return (int) result;
 

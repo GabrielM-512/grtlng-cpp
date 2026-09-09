@@ -2,13 +2,9 @@
 #include "environment.h"
 #include "../AST/expr.h"
 #include "../AST/stmt.h"
+#include "../error.h"
 
 namespace Interpreting {
-
-    class RuntimeException : public std::runtime_error {
-    public:
-        RuntimeException(const std::string& message) : std::runtime_error(message) {}
-    };
 
     class Interpreter : public Expr::ExprVisitor, public Stmt::StmtVisitor {
         Environment global;
@@ -31,5 +27,5 @@ namespace Interpreting {
         ExprVisitResults visitIdentifierExpr(Expr::Identifier *expr) override;
     };
 
-    Value::Value interpret(Expr::Expr *program);
+    Value::Value interpret(Expr::Expr *program, Error::ErrorHandler& handler);
 }

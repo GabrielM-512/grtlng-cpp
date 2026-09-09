@@ -28,6 +28,9 @@ add_executable(grtlng_cpp
         src/interpreter/environment.h
         src/AST/stmt.h
         src/interpreter/evaluate.cpp
+        src/error.cpp
+        src/error.h
+        src/interpreter/runtimeException.h
 )
 
 target_compile_options(grtlng_cpp

@@ -1,5 +1,9 @@
 #include "interpreting.h"
+
+#include <sysexits.h>
+
 #include "environment.h"
+#include "../error.h"
 
 using namespace Interpreting;
 
@@ -28,11 +32,18 @@ Value::Value Interpreter::interpret(Expr::Expr* program) {
     return evaluate(program);
 }
 
-Value::Value Interpreting::interpret(Expr::Expr *program) {
+Value::Value Interpreting::interpret(Expr::Expr *program, Error::ErrorHandler& handler) {
     Interpreter interpreter;
 
+    double returnCode;
 
-    double returnCode = interpreter.interpret(program);
+    try {
+        returnCode = interpreter.interpret(program);
+    } catch (RuntimeException& e) {
+        handler.runtimeError(e);
+        exit(EX_DATAERR);
+    }
+
 
     return returnCode;
 
