@@ -39,3 +39,22 @@ void ErrorHandler::runtimeError(Interpreting::RuntimeException &error) {
     std::cerr << "Runtime Exception on line " << error.token.line << ": " << error.message << std::endl;
     printErrorLine(error.token);
 }
+
+void ErrorHandler::compileError(std::string message, std::string hint, Lexing::Tokens::Token token) {
+    CompileError error(std::move(message), std::move(hint), token);
+    compileErrors.push_back(error);
+
+}
+void ErrorHandler::printErrors() {
+    for (u64 i = 0; i < compileErrors.size(); i++) {
+        CompileError& error = compileErrors[i];
+        std::cerr << "Encountered error on line " << error.token.line << ": " << error.message << std::endl;
+        printErrorLine(error.token);
+        if (!error.hint.empty()) {
+            std::cerr << std::endl << "Hint: " << error.hint << std::endl;
+        }
+
+        bool isLast = i + 1 >= compileErrors.size();
+        if (!isLast) std::cerr << std::endl << std::endl << std::endl;
+    }
+}
