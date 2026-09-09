@@ -60,6 +60,15 @@ public:
     int getPrecedence() override {return precedence;}
 };
 
+
+/*
+    PPPP      A     RRRR     SSSS   EEEEE   L       EEEEE   TTTTT           U   U   TTTTT   IIIII   L        SSSS
+    P   P    A A    R   R   S       E       L       E         T             U   U     T       I     L       S
+    PPPP     AAA    RRRR     SSS    EEEEE   L       EEEEE     T             U   U     T       I     L        SSS
+    P       A   A   R  R        S   E       L       E         T             U   U     T       I     L           S
+    P       A   A   R   R   SSSS    EEEEE   LLLLL   EEEEE     T              UUU      T     IIIII   LLLLL   SSSS
+*/
+
 void registerUnaryParselet(Parsing::Parser& parser, Lexing::Tokens::TokenType type) {
     parser.registerPrefixParselet(new UnaryParselet(), type);
 }
@@ -80,4 +89,50 @@ void Expressions::registerExpressionParselets(Parsing::Parser &parser) {
     registerBinaryParselet(parser, Lexing::Tokens::MINUS, Parsing::Precedence::SUM);
     registerBinaryParselet(parser, Lexing::Tokens::SLASH, Parsing::Precedence::PRODUCT);
     registerBinaryParselet(parser, Lexing::Tokens::STAR, Parsing::Precedence::PRODUCT);
+}
+
+
+/*
+    PPPP      A     RRRR     SSSS   IIIII   N   N    GGG            U   U   TTTTT   IIIII   L       IIIII   TTTTT   IIIII   EEEEE    SSSS
+    P   P    A A    R   R   S         I     NN  N   G               U   U     T       I     L         I       T       I     E       S
+    PPPP     AAA    RRRR     SSS      I     N N N   G  GG           U   U     T       I     L         I       T       I     EEEEE    SSS
+    P       A   A   R  R        S     I     N  NN   G   G           U   U     T       I     L         I       T       I     E           S
+    P       A   A   R   R   SSSS    IIIII   N   N    GGG             UUU      T     IIIII   LLLLL   IIIII     T     IIIII   EEEEE   SSSS
+*/
+
+using namespace Parsing;
+
+Expr::Expr* Parser::parseExpression(int precedence) {
+    Lexing::Tokens::Token token = advance();
+
+    PrefixParselet* prefix = getPrefixParselet(token.type);
+
+    if (prefix == nullptr) {
+        errorAt(token, "Expected expression", "", false);
+        return nullptr;
+    }
+
+    Expr::Expr* left = prefix->parse(*this, token);
+
+    while (precedence < getPrecedence()) {
+        token = advance();
+
+        InfixParselet* infix = getInfixParselet(token.type);
+        left = infix->parse(*this, left, token);
+    }
+
+    return left;
+
+}
+
+Expr::Expr* Parser::parseExprPrec() {
+    return parseExpression(getPrecedence(previous.type));
+}
+
+Expr::Expr* Parser::parseExprPrecRight() {
+    return parseExpression(getPrecedence(previous.type) - 1);
+}
+
+Expr::Expr* Parser::expression() {
+    return parseExpression(Precedence::ASSIGNMENT);
 }

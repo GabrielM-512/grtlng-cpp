@@ -11,6 +11,7 @@ Parser::Parser(std::vector<Lexing::Tokens::Token>& tokens, Error::ErrorHandler& 
     errorHandler(handler) {
     currentToken = 0;
     hadError = false;
+    hadFatalError = false;
 
     current = tokens.at(0);
     previous = (Lexing::Tokens::Token) {.type = Lexing::Tokens::ERROR, .line = 1, .position = 0, .data = {nullptr}};
@@ -20,10 +21,17 @@ Parser::Parser(std::vector<Lexing::Tokens::Token>& tokens, Error::ErrorHandler& 
     Expressions::registerExpressionParselets(*this);
 }
 
-void Parser::errorAt(Lexing::Tokens::Token token, std::string message, std::string hint, bool fatal) {
-    hadError = true;
-    if (fatal) hadFatalError = true;
-    errorHandler.compileError(std::move(message), std::move(hint), token);
+std::vector<Stmt::Stmt*> Parser::parse() {
+
+    std::vector<Stmt::Stmt*> tree;
+    while (!isAtEnd()) {
+        Stmt::Stmt* stmt = statement();
+        tree.push_back(stmt);
+    }
+
+    errorHandler.printErrors();
+
+    return tree;
 }
 
 /*
@@ -115,57 +123,27 @@ bool Parser::isAtEnd() const {
     return currentToken >= tokens.size();
 }
 
-Expr::Expr* Parser::parseExpression(int precedence) {
-    Lexing::Tokens::Token token = advance();
-
-    PrefixParselet* prefix = getPrefixParselet(token.type);
-
-    if (prefix == nullptr) {
-        errorAt(token, "Expected expression", "", false);
-        return nullptr;
-    }
-
-    Expr::Expr* left = prefix->parse(*this, token);
-
-    while (precedence < getPrecedence()) {
-        token = advance();
-
-        InfixParselet* infix = getInfixParselet(token.type);
-        left = infix->parse(*this, left, token);
-    }
-
-    return left;
-
-}
-
-Expr::Expr* Parser::parseExprPrec() {
-    return parseExpression(getPrecedence(previous.type));
-}
-
-Expr::Expr* Parser::parseExprPrecRight() {
-    return parseExpression(getPrecedence(previous.type) - 1);
-}
-
-Expr::Expr* Parser::expression() {
-    return parseExpression(Precedence::ASSIGNMENT);
-}
-
 
 bool Parser::hadParseError() const {
     return hadError;
 }
 
-std::vector<Stmt::Stmt*> Parser::parse() {
+bool Parser::hadFatalParseError() const {
+    return hadFatalError;
+}
 
-    std::vector<Stmt::Stmt*> tree;
-    while (!isAtEnd()) {
-        Stmt::Stmt* stmt = statement();
-        tree.push_back(stmt);
-    }
+/*
+    EEEEE   RRRR    RRRR     OOO    RRRR     SSSS
+    E       R   R   R   R   O   O   R   R   S
+    EEEEE   RRRR    RRRR    O   O   RRRR     SSS
+    E       R  R    R  R    O   O   R  R        S
+    EEEEE   R   R   R   R    OOO    R   R   SSSS
+*/
 
-    errorHandler.printErrors();
-
-    return tree;
+void Parser::errorAt(Lexing::Tokens::Token token, std::string message, std::string hint, bool fatal) {
+    hadError = true;
+    if (fatal) hadFatalError = true;
+    errorHandler.compileError(std::move(message), std::move(hint), token);
 }
 
 void Parser::fatalErrorAtCurrent(std::string message) {

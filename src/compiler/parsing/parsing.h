@@ -63,6 +63,7 @@ namespace Parsing {
 
         std::vector<Stmt::Stmt *> parse();
         [[nodiscard]] bool hadParseError() const;
+        [[nodiscard]] bool hadFatalParseError() const;
 
         void registerPrefixParselet(PrefixParselet* parselet, Lexing::Tokens::TokenType type);
         void registerInfixParselet(InfixParselet* parselet, Lexing::Tokens::TokenType type);
