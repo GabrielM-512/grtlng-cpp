@@ -4,6 +4,7 @@
 #include <utility>
 
 #include "expressions.h"
+#include "../compiler.h"
 
 using namespace Parsing;
 
@@ -25,8 +26,18 @@ std::vector<Stmt::Stmt*> Parser::parse() {
 
     std::vector<Stmt::Stmt*> tree;
     while (!isAtEnd()) {
-        Stmt::Stmt* stmt = statement();
-        tree.push_back(stmt);
+        try {
+            Stmt::Stmt* stmt;
+
+            if (matchTypeIdent()) stmt = localDeclarationStatement();
+            else stmt = statement();
+
+            tree.push_back(stmt);
+        } catch (Compiler::CompileError& e) {
+            if (e.makeError) {
+                errorAt(e.token, e.message, "", false);
+            }
+        }
     }
 
     errorHandler.printErrors();
@@ -121,6 +132,34 @@ Lexing::Tokens::Token Parser::peek() const {
 
 bool Parser::isAtEnd() const {
     return currentToken >= tokens.size();
+}
+
+bool Parser::checkTypeIdent() const {
+
+    using namespace Lexing::Tokens;
+
+    switch (peek().type) {
+        case I8:
+        case I16:
+        case I32:
+        case I64:
+        case U8:
+        case U16:
+        case U32:
+        case U64:
+        case F32:
+        case F64:
+        case VOID:
+            return true;
+
+        default:
+            return false;
+    }
+}
+bool Parser::matchTypeIdent() {
+    bool result = checkTypeIdent();
+    if (result) advance();
+    return result;
 }
 
 

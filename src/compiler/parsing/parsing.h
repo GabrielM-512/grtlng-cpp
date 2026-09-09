@@ -42,6 +42,9 @@ namespace Parsing {
         Lexing::Tokens::Token advance();
         [[nodiscard]] Lexing::Tokens::Token peek() const;
 
+        [[nodiscard]] bool checkTypeIdent() const;
+        bool matchTypeIdent();
+
         [[nodiscard]] PrefixParselet* getPrefixParselet(Lexing::Tokens::TokenType type) const;
         [[nodiscard]] InfixParselet* getInfixParselet(Lexing::Tokens::TokenType type) const;
 
@@ -51,6 +54,7 @@ namespace Parsing {
         Stmt::Stmt* statement();
         Stmt::Stmt* printStatement();
         Stmt::Stmt* expressionStatement();
+        Stmt::Stmt* localDeclarationStatement();
         
         void errorAt(Lexing::Tokens::Token token, std::string message, std::string hint, bool fatal);
 
