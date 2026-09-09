@@ -1,5 +1,5 @@
 #include "environment.h"
-#include "interpreting.h"
+#include "runtimeException.h"
 
 using namespace Interpreting;
 
@@ -12,30 +12,30 @@ Environment::Environment(Environment *enclosing): enclosing(enclosing) {
 }
 
 
-Value::Value Environment::getVar(const std::string &name) const {
-    auto value = values.find(name);
+Value::Value Environment::getVar(const Lexing::Tokens::Token &token) const {
+    auto value = values.find(token.data.name);
     if (value == values.end()) {
-        if (enclosing == nullptr) throw RuntimeException("Unknown variable \"" + name + "\"");
-        return enclosing->getVar(name);
+        if (enclosing == nullptr) throw RuntimeException("Unknown variable \"" + std::string(token.data.name) + "\"", token);
+        return enclosing->getVar(token);
     }
 
     return value->second;
 }
 
-void Environment::setVar(const std::string& name, const Value::Value var) {
-    auto value = values.find(name);
+void Environment::setVar(const Lexing::Tokens::Token &token, const Value::Value var) {
+    auto value = values.find(token.data.name);
     if (value == values.end()) {
-        if (enclosing == nullptr) throw RuntimeException("Unknown variable \"" + name + "\"");
-        enclosing->setVar(name, var);
+        if (enclosing == nullptr) throw RuntimeException("Unknown variable \"" + std::string(token.data.name) + "\"", token);
+        enclosing->setVar(token, var);
     }
 
     value->second = var;
 }
 
-void Environment::createVar(const std::string& name, const Value::Value var) {
-    auto value = values.find(name);
+void Environment::createVar(const Lexing::Tokens::Token &token, const Value::Value var) {
+    auto value = values.find(token.data.name);
 
-    if (value != values.end()) throw RuntimeException("Redeclared variable \"" + name + "\"");
+    if (value != values.end()) throw RuntimeException("Redeclared variable \"" + std::string(token.data.name) + "\"", token);
 
-    values.insert({name, var});
+    values.insert({token.data.name, var});
 }
