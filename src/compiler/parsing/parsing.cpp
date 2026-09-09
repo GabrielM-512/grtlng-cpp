@@ -79,7 +79,7 @@ Lexing::Tokens::Token Parser::advance() {
         current = tokens[currentToken++];
         if (current.type != Lexing::Tokens::ERROR) break;
 
-        std::cerr << "Error on line " << current.line << ": " << current.data.name << std::endl;
+        errorAtCurrent(current.data.name);
     }
 
     return previous;
