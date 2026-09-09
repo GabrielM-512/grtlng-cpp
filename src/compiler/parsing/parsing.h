@@ -29,6 +29,7 @@ namespace Parsing {
         u32 currentToken;
 
         bool hadError;
+        bool hadFatalError;
 
         std::map<Lexing::Tokens::TokenType, PrefixParselet*> prefixTable;
         std::map<Lexing::Tokens::TokenType, InfixParselet*> infixTable;
@@ -46,8 +47,12 @@ namespace Parsing {
         [[nodiscard]] int getPrecedence() const;
         [[nodiscard]] int getPrecedence(Lexing::Tokens::TokenType type) const;
 
+        void errorAt(Lexing::Tokens::Token token, std::string message, std::string hint, bool fatal);
+
     public:
         bool consume(Lexing::Tokens::TokenType type, const std::string &message);
+        bool consume(Lexing::Tokens::TokenType type);
+        bool match(Lexing::Tokens::TokenType type);
 
         explicit Parser(std::vector<Lexing::Tokens::Token>& tokens, Error::ErrorHandler& handler);
         Expr::Expr* parse();
@@ -60,6 +65,16 @@ namespace Parsing {
         Expr::Expr* parseExprPrec();
         Expr::Expr* parseExprPrecRight();
         Expr::Expr* expression();
+
+        void fatalErrorAtCurrent(std::string message);
+        void fatalError(std::string message);
+        void errorAtCurrent(std::string message);
+        void error(std::string message);
+
+        void fatalErrorAtCurrent(std::string message, std::string hint);
+        void fatalError(std::string message, std::string hint);
+        void errorAtCurrent(std::string message, std::string hint);
+        void error(std::string message, std::string hint);
     };
 
 }

@@ -1,6 +1,7 @@
 #include "parsing.h"
 
 #include <iostream>
+#include <utility>
 
 #include "expressions.h"
 
@@ -17,6 +18,12 @@ Parser::Parser(std::vector<Lexing::Tokens::Token>& tokens, Error::ErrorHandler& 
     advance();
 
     Expressions::registerExpressionParselets(*this);
+}
+
+void Parser::errorAt(Lexing::Tokens::Token token, std::string message, std::string hint, bool fatal) {
+    hadError = true;
+    if (fatal) hadFatalError = true;
+    errorHandler.compileError(std::move(message), std::move(hint), token);
 }
 
 /*
@@ -87,8 +94,20 @@ bool Parser::consume(Lexing::Tokens::TokenType type, const std::string &message)
         if (!isAtEnd()) advance();
         return true;
     }
-    // TODO: proper error handling
-    std::cerr << "Error on line " << peek().line << ": " << message << std::endl;
+
+    errorAtCurrent("Expected " + Lexing::Tokens::Token::toString(type) + message + ", got " + current.toString() + " instead");
+    return false;
+}
+
+bool Parser::consume(Lexing::Tokens::TokenType type) {
+    return consume(type, "");
+}
+
+bool Parser::match(Lexing::Tokens::TokenType type) {
+    if (peek().type == type) {
+        advance();
+        return true;
+    }
     return false;
 }
 
@@ -106,9 +125,7 @@ Expr::Expr* Parser::parseExpression(int precedence) {
     PrefixParselet* prefix = getPrefixParselet(token.type);
 
     if (prefix == nullptr) {
-        // TODO: Proper error handling
-        std::cerr << "Error on line " << token.line << ": Expected expression at " << token.toString() << std::endl;
-        hadError = true;
+        errorAt(token, "Expected expression", "", false);
         return nullptr;
     }
 
@@ -144,4 +161,31 @@ bool Parser::hadParseError() const {
 
 Expr::Expr *Parser::parse() {
     return expression();
+}
+
+void Parser::fatalErrorAtCurrent(std::string message) {
+    errorAt(current, std::move(message), "", true);
+}
+void Parser::fatalError(std::string message) {
+    errorAt(previous, std::move(message), "", true);
+}
+void Parser::errorAtCurrent(std::string message) {
+    errorAt(current, std::move(message), "", false);
+}
+void Parser::error(std::string message) {
+    errorAt(previous, std::move(message), "", false);
+}
+
+
+void Parser::fatalErrorAtCurrent(std::string message, std::string hint) {
+    errorAt(current, std::move(message), std::move(hint), true);
+}
+void Parser::fatalError(std::string message, std::string hint) {
+    errorAt(previous, std::move(message), std::move(hint), true);
+}
+void Parser::errorAtCurrent(std::string message, std::string hint) {
+    errorAt(current, std::move(message), std::move(hint), false);
+}
+void Parser::error(std::string message, std::string hint) {
+    errorAt(previous, std::move(message), std::move(hint), false);
 }
