@@ -9,6 +9,7 @@
 namespace Stmt {
     struct Expression;
     struct Print;
+    struct VariableDeclaration;
 
     #define StmtVisitResults std::variant<std::monostate>
 
@@ -18,6 +19,7 @@ namespace Stmt {
 
         virtual StmtVisitResults visitExpressionStmt(Expression* stmt) = 0;
         virtual StmtVisitResults visitPrintStmt(Print* stmt) = 0;
+        virtual StmtVisitResults visitVariableDeclarationStmt(VariableDeclaration* stmt) = 0;
     };
 
     struct Stmt {
@@ -46,6 +48,22 @@ namespace Stmt {
 
         StmtVisitResults accept(StmtVisitor* visitor) override {
             return visitor->visitPrintStmt(this);
+        }
+    };
+
+    struct VariableDeclaration: Stmt {
+        Lexing::Tokens::TokenType dataType;
+        Lexing::Tokens::Token name;
+        Expr::Expr* value;
+
+        explicit VariableDeclaration(
+            Lexing::Tokens::TokenType dataType,
+            Lexing::Tokens::Token name,
+            Expr::Expr* value = nullptr
+        ): dataType(dataType), name(name), value(value) {}
+
+        StmtVisitResults accept(StmtVisitor* visitor) override {
+            return visitor->visitVariableDeclarationStmt(this);
         }
     };
 }

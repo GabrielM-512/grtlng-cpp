@@ -104,7 +104,8 @@ if __name__ == "__main__":
 
     define_ast(output_dir = "/home/gabriel/CLionProjects/grtlng-cpp/src/AST/stmt.h",
                base_class = "Stmt",
-               classes = ["Expression | Expr::Expr* expression",
-                          "Print      | Expr::Expr* expression"],
+               classes = ["Expression          | Expr::Expr* expression",
+                          "Print               | Expr::Expr* expression",
+                          "VariableDeclaration | Lexing::Tokens::TokenType dataType, Lexing::Tokens::Token name, Expr::Expr* value = nullptr"],
                visit_results = "std::monostate",
                includes="\"expr.h\"")
