@@ -3,5 +3,6 @@
 namespace Value {
     typedef double Value;
 
-    void printValue(Value& value);
+    void printValue(const Value& value);
+    bool isTruthy(const Value& value);
 }
