@@ -60,6 +60,27 @@ public:
     int getPrecedence() override {return precedence;}
 };
 
+class AssignmentParselet : public Parsing::InfixParselet {
+    int precedence;
+public:
+    AssignmentParselet(int precedence): precedence(precedence) {}
+
+    Expr::Expr* parse(Parsing::Parser& parser, Expr::Expr* left, Lexing::Token& token) override {
+        Expr::Expr* right = parser.parseExprPrecRight();
+
+        if(Expr::Identifier* target = dynamic_cast<Expr::Identifier*>(left)) {
+            Lexing::Token name = target->target;
+
+            return new Expr::Assign(name, right);
+        }
+
+        parser.errorAt(token, "Invalid assignment target", "", true);
+        return nullptr;
+    }
+
+    int getPrecedence() override {return precedence;}
+};
+
 
 /*
     PPPP      A     RRRR     SSSS   EEEEE   L       EEEEE   TTTTT           U   U   TTTTT   IIIII   L        SSSS
@@ -84,6 +105,8 @@ void Expressions::registerExpressionParselets(Parsing::Parser &parser) {
 
     registerUnaryParselet(parser, Lexing::PLUS);
     registerUnaryParselet(parser, Lexing::MINUS);
+
+    parser.registerInfixParselet(new AssignmentParselet(Parsing::Precedence::ASSIGNMENT), Lexing::EQUALS);
 
     registerBinaryParselet(parser, Lexing::PLUS, Parsing::Precedence::SUM);
     registerBinaryParselet(parser, Lexing::MINUS, Parsing::Precedence::SUM);
@@ -134,5 +157,5 @@ Expr::Expr* Parser::parseExprPrecRight() {
 }
 
 Expr::Expr* Parser::expression() {
-    return parseExpression(Precedence::ASSIGNMENT);
+    return parseExpression(Precedence::LIMIT);
 }

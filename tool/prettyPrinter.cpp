@@ -31,6 +31,11 @@ public:
         return expr->target.data.name;
     }
 
+    ExprVisitResults visitAssignExpr(Expr::Assign *expr) override {
+        return "( " + std::string(expr->name.data.name) + " = "
+                    + std::get<std::string> (expr->value->accept(this)) + " )";
+    }
+
     std::string print(Expr::Expr* node) {
         return std::get<std::string>(node->accept(this));
     }

@@ -51,3 +51,9 @@ ExprVisitResults Interpreter::visitNumberExpr(Expr::Number* expr) {
 ExprVisitResults Interpreter::visitIdentifierExpr(Expr::Identifier *expr) {
     return current->getVar(expr->target);
 }
+
+ExprVisitResults Interpreter::visitAssignExpr(Expr::Assign *expr) {
+    Value::Value value = evaluate(expr->value);
+    current->setVar(expr->name, value);
+    return value;
+}

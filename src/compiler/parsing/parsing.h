@@ -1,6 +1,7 @@
 #pragma once
 #include <map>
 
+#include "../compiler.h"
 #include "../lexing.h"
 #include "../../error.h"
 #include "../../AST/expr.h"
@@ -13,15 +14,16 @@ namespace Parsing {
 
     class Precedence {
     public:
-        static constexpr int ASSIGNMENT = 1;
-        static constexpr int LOGICAL_OR = 2;
-        static constexpr int LOGICAL_AND = 3;
-        static constexpr int EQUALITY = 4;
-        static constexpr int COMPARISON = 5;
-        static constexpr int SUM = 6;
-        static constexpr int PRODUCT = 7;
-        static constexpr int UNARY = 8;
-        static constexpr int CALL = 9;
+        static constexpr int LIMIT = 1;
+        static constexpr int ASSIGNMENT = 2;
+        static constexpr int LOGICAL_OR = 3;
+        static constexpr int LOGICAL_AND = 4;
+        static constexpr int EQUALITY = 5;
+        static constexpr int COMPARISON = 6;
+        static constexpr int SUM = 7;
+        static constexpr int PRODUCT = 8;
+        static constexpr int UNARY = 9;
+        static constexpr int CALL = 10;
     };
 
     class Parser {
@@ -77,15 +79,17 @@ namespace Parsing {
         Expr::Expr* parseExprPrecRight();
         Expr::Expr* expression();
 
-        void fatalErrorAtCurrent(std::string message);
-        void fatalError(std::string message);
-        void errorAtCurrent(std::string message);
-        void error(std::string message);
+        Compiler::CompileError errorAt(Lexing::Token token, std::string message, std::string hint, bool fatal);
 
-        void fatalErrorAtCurrent(std::string message, std::string hint);
-        void fatalError(std::string message, std::string hint);
-        void errorAtCurrent(std::string message, std::string hint);
-        void error(std::string message, std::string hint);
+        Compiler::CompileError fatalErrorAtCurrent(std::string message);
+        Compiler::CompileError fatalError(std::string message);
+        Compiler::CompileError errorAtCurrent(std::string message);
+        Compiler::CompileError error(std::string message);
+
+        Compiler::CompileError fatalErrorAtCurrent(std::string message, std::string hint);
+        Compiler::CompileError fatalError(std::string message, std::string hint);
+        Compiler::CompileError errorAtCurrent(std::string message, std::string hint);
+        Compiler::CompileError error(std::string message, std::string hint);
     };
 
 }

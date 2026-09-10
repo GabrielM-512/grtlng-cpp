@@ -110,7 +110,7 @@ bool Parser::consume(Lexing::TokenType type, const std::string &message) {
         return true;
     }
 
-    errorAtCurrent("Expected " + Lexing::Token::toString(type) + message + ", got " + current.toString() + " instead");
+    throw errorAtCurrent("Expected " + Lexing::Token::toString(type) + message + ", got " + current.toString() + " instead");
     return false;
 }
 
@@ -179,35 +179,37 @@ bool Parser::hadFatalParseError() const {
     EEEEE   R   R   R   R    OOO    R   R   SSSS
 */
 
-void Parser::errorAt(Lexing::Token token, std::string message, std::string hint, bool fatal) {
+Compiler::CompileError Parser::errorAt(Lexing::Token token, std::string message, std::string hint, bool fatal) {
     hadError = true;
     if (fatal) hadFatalError = true;
     errorHandler.compileError(std::move(message), std::move(hint), token);
+
+    return Compiler::CompileError(message, token, false);
 }
 
-void Parser::fatalErrorAtCurrent(std::string message) {
-    errorAt(current, std::move(message), "", true);
+Compiler::CompileError Parser::fatalErrorAtCurrent(std::string message) {
+    return errorAt(current, std::move(message), "", true);
 }
-void Parser::fatalError(std::string message) {
-    errorAt(previous, std::move(message), "", true);
+Compiler::CompileError Parser::fatalError(std::string message) {
+    return errorAt(previous, std::move(message), "", true);
 }
-void Parser::errorAtCurrent(std::string message) {
-    errorAt(current, std::move(message), "", false);
+Compiler::CompileError Parser::errorAtCurrent(std::string message) {
+    return errorAt(current, std::move(message), "", false);
 }
-void Parser::error(std::string message) {
-    errorAt(previous, std::move(message), "", false);
+Compiler::CompileError Parser::error(std::string message) {
+    return errorAt(previous, std::move(message), "", false);
 }
 
 
-void Parser::fatalErrorAtCurrent(std::string message, std::string hint) {
-    errorAt(current, std::move(message), std::move(hint), true);
+Compiler::CompileError Parser::fatalErrorAtCurrent(std::string message, std::string hint) {
+    return errorAt(current, std::move(message), std::move(hint), true);
 }
-void Parser::fatalError(std::string message, std::string hint) {
-    errorAt(previous, std::move(message), std::move(hint), true);
+Compiler::CompileError Parser::fatalError(std::string message, std::string hint) {
+    return errorAt(previous, std::move(message), std::move(hint), true);
 }
-void Parser::errorAtCurrent(std::string message, std::string hint) {
-    errorAt(current, std::move(message), std::move(hint), false);
+Compiler::CompileError Parser::errorAtCurrent(std::string message, std::string hint) {
+    return errorAt(current, std::move(message), std::move(hint), false);
 }
-void Parser::error(std::string message, std::string hint) {
-    errorAt(previous, std::move(message), std::move(hint), false);
+Compiler::CompileError Parser::error(std::string message, std::string hint) {
+    return errorAt(previous, std::move(message), std::move(hint), false);
 }

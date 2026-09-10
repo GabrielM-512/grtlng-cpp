@@ -12,6 +12,7 @@ namespace Expr {
     struct Unary;
     struct Number;
     struct Identifier;
+    struct Assign;
 
     #define ExprVisitResults std::variant<std::string, Value::Value>
 
@@ -23,6 +24,7 @@ namespace Expr {
         virtual ExprVisitResults visitUnaryExpr(Unary* expr) = 0;
         virtual ExprVisitResults visitNumberExpr(Number* expr) = 0;
         virtual ExprVisitResults visitIdentifierExpr(Identifier* expr) = 0;
+        virtual ExprVisitResults visitAssignExpr(Assign* expr) = 0;
     };
 
     struct Expr {
@@ -81,6 +83,20 @@ namespace Expr {
 
         ExprVisitResults accept(ExprVisitor* visitor) override {
             return visitor->visitIdentifierExpr(this);
+        }
+    };
+
+    struct Assign: Expr {
+        Lexing::Token name;
+        Expr* value;
+
+        explicit Assign(
+            Lexing::Token name,
+            Expr* value
+        ): name(name), value(value) {}
+
+        ExprVisitResults accept(ExprVisitor* visitor) override {
+            return visitor->visitAssignExpr(this);
         }
     };
 }
