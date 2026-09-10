@@ -10,6 +10,8 @@ namespace Stmt {
     struct Expression;
     struct Print;
     struct VariableDeclaration;
+    struct If;
+    struct While;
 
     #define StmtVisitResults std::variant<std::monostate>
 
@@ -20,6 +22,8 @@ namespace Stmt {
         virtual StmtVisitResults visitExpressionStmt(Expression* stmt) = 0;
         virtual StmtVisitResults visitPrintStmt(Print* stmt) = 0;
         virtual StmtVisitResults visitVariableDeclarationStmt(VariableDeclaration* stmt) = 0;
+        virtual StmtVisitResults visitIfStmt(If* stmt) = 0;
+        virtual StmtVisitResults visitWhileStmt(While* stmt) = 0;
     };
 
     struct Stmt {
@@ -64,6 +68,36 @@ namespace Stmt {
 
         StmtVisitResults accept(StmtVisitor* visitor) override {
             return visitor->visitVariableDeclarationStmt(this);
+        }
+    };
+
+    struct If: Stmt {
+        Expr::Expr* condition;
+        Stmt* thenBranch;
+        Stmt* elseBranch;
+
+        explicit If(
+            Expr::Expr* condition,
+            Stmt* thenBranch,
+            Stmt* elseBranch
+        ): condition(condition), thenBranch(thenBranch), elseBranch(elseBranch) {}
+
+        StmtVisitResults accept(StmtVisitor* visitor) override {
+            return visitor->visitIfStmt(this);
+        }
+    };
+
+    struct While: Stmt {
+        Expr::Expr* condition;
+        Stmt* body;
+
+        explicit While(
+            Expr::Expr* condition,
+            Stmt* body
+        ): condition(condition), body(body) {}
+
+        StmtVisitResults accept(StmtVisitor* visitor) override {
+            return visitor->visitWhileStmt(this);
         }
     };
 }

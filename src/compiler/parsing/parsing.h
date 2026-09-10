@@ -57,8 +57,9 @@ namespace Parsing {
         Stmt::Stmt* printStatement();
         Stmt::Stmt* expressionStatement();
         Stmt::Stmt* localDeclarationStatement();
-        
-        void errorAt(Lexing::Token token, std::string message, std::string hint, bool fatal);
+        Stmt::Stmt* ifStatement();
+        Stmt::Stmt* whileStatement();
+        Stmt::Stmt* forStatement();
 
     public:
         bool consume(Lexing::TokenType type, const std::string &message);

@@ -107,6 +107,8 @@ if __name__ == "__main__":
                base_class = "Stmt",
                classes = ["Expression          | Expr::Expr* expression",
                           "Print               | Expr::Expr* expression",
-                          "VariableDeclaration | Lexing::TokenType dataType, Lexing::Token name, Expr::Expr* value = nullptr"],
+                          "VariableDeclaration | Lexing::TokenType dataType, Lexing::Token name, Expr::Expr* value = nullptr",
+                          "If                  | Expr::Expr* condition, Stmt* thenBranch, Stmt* elseBranch",
+                          "While               | Expr::Expr* condition, Stmt* body"],
                visit_results = "std::monostate",
                includes="\"expr.h\"")

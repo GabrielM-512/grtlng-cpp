@@ -5,6 +5,9 @@ using namespace Parsing;
 
 Stmt::Stmt* Parser::statement() {
     if (match(Lexing::PRINT)) return printStatement();
+    if (match(Lexing::IF)) return ifStatement();
+    if (match(Lexing::WHILE)) return whileStatement();
+    if (match(Lexing::FOR)) return forStatement();
 
     return expressionStatement();
 }
@@ -23,9 +26,8 @@ Stmt::Stmt* Parser::expressionStatement() {
 
 Stmt::Stmt* Parser::localDeclarationStatement() {
     Lexing::TokenType dataType = previous.type;
-    if (!consume(Lexing::IDENTIFIER, " after data type")) {
-        throw Compiler::CompileError("", previous);
-    }
+    consume(Lexing::IDENTIFIER, " after data type");
+
     const Lexing::Token name = previous;
 
     Expr::Expr* value = nullptr;
@@ -37,4 +39,32 @@ Stmt::Stmt* Parser::localDeclarationStatement() {
     consume(Lexing::SEMICOLON, " after variable declaration");
 
     return new Stmt::VariableDeclaration(dataType, name, value);
+}
+
+Stmt::Stmt* Parser::ifStatement() {
+    consume(Lexing::LEFT_PAREN, " after \"if\"");
+    Expr::Expr* condition = expression();
+    consume(Lexing::RIGHT_PAREN, " after if condition");
+
+    Stmt::Stmt* thenBranch = statement();
+    Stmt::Stmt* elseBranch = nullptr;
+
+    if (match(Lexing::ELSE)) elseBranch = statement();
+
+    return new Stmt::If(condition, thenBranch, elseBranch);
+}
+
+Stmt::Stmt* Parser::whileStatement() {
+    consume(Lexing::LEFT_PAREN, " after \"while\"");
+    Expr::Expr* condition = expression();
+    consume(Lexing::RIGHT_PAREN, " after while condition");
+
+    Stmt::Stmt* body = statement();
+
+    return new Stmt::While(condition, body);
+}
+
+Stmt::Stmt* Parser::forStatement() {
+    // TODO
+    return nullptr;
 }

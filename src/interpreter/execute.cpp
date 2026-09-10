@@ -21,6 +21,24 @@ StmtVisitResults Interpreter::visitVariableDeclarationStmt(Stmt::VariableDeclara
     return std::monostate();
 }
 
+StmtVisitResults Interpreter::visitIfStmt(Stmt::If *stmt) {
+    if (Value::isTruthy(evaluate(stmt->condition)))
+        execute(stmt->thenBranch);
+    else if (stmt->elseBranch != nullptr)
+        execute(stmt->elseBranch);
+
+    return std::monostate();
+}
+
+StmtVisitResults Interpreter::visitWhileStmt(Stmt::While *stmt) {
+    while (Value::isTruthy(evaluate(stmt->condition))) {
+        execute(stmt->body);
+    }
+
+    return std::monostate();
+}
+
+
 void Interpreter::execute(Stmt::Stmt* stmt) {
     stmt->accept(this);
 }

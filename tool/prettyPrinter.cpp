@@ -1,7 +1,7 @@
 #include "prettyPrinter.h"
 #include "../src/AST/expr.h"
 
-class prettyPrinter : public Expr::ExprVisitor {
+class PrettyPrinter : public Expr::ExprVisitor {
 public:
 
     static std::string operatorString(Lexing::TokenType type) {
@@ -42,6 +42,6 @@ public:
 };
 
 std::string Printer::print(Expr::Expr *tree) {
-    prettyPrinter printer;
+    PrettyPrinter printer;
     return printer.print(tree);
 }
