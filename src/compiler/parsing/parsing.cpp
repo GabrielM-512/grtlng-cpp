@@ -8,14 +8,14 @@
 
 using namespace Parsing;
 
-Parser::Parser(std::vector<Lexing::Tokens::Token>& tokens, Error::ErrorHandler& handler) : tokens(tokens),
+Parser::Parser(std::vector<Lexing::Token>& tokens, Error::ErrorHandler& handler) : tokens(tokens),
     errorHandler(handler) {
     currentToken = 0;
     hadError = false;
     hadFatalError = false;
 
     current = tokens.at(0);
-    previous = (Lexing::Tokens::Token) {.type = Lexing::Tokens::ERROR, .line = 1, .position = 0, .data = {nullptr}};
+    previous = (Lexing::Token) {.type = Lexing::ERROR, .line = 1, .position = 0, .data = {nullptr}};
 
     advance();
 
@@ -53,26 +53,26 @@ std::vector<Stmt::Stmt*> Parser::parse() {
     P       A   A   R   R   SSSS    EEEEE   LLLLL   EEEEE     T     SSSS
 */
 
-void Parser::registerPrefixParselet(PrefixParselet* parselet, Lexing::Tokens::TokenType type) {
+void Parser::registerPrefixParselet(PrefixParselet* parselet, Lexing::TokenType type) {
     prefixTable.insert({type, parselet});
 }
-void Parser::registerInfixParselet(InfixParselet* parselet, Lexing::Tokens::TokenType type) {
+void Parser::registerInfixParselet(InfixParselet* parselet, Lexing::TokenType type) {
     infixTable.insert({type, parselet});
 }
 
-PrefixParselet* Parser::getPrefixParselet(Lexing::Tokens::TokenType type) const {
+PrefixParselet* Parser::getPrefixParselet(Lexing::TokenType type) const {
     auto parselet = prefixTable.find(type);
 
     return parselet == prefixTable.end() ? nullptr : parselet->second;
 
 }
-InfixParselet* Parser::getInfixParselet(Lexing::Tokens::TokenType type) const {
+InfixParselet* Parser::getInfixParselet(Lexing::TokenType type) const {
     auto parselet = infixTable.find(type);
 
     return parselet == infixTable.end() ? nullptr : parselet->second;
 }
 
-int Parser::getPrecedence(Lexing::Tokens::TokenType type) const {
+int Parser::getPrecedence(Lexing::TokenType type) const {
     InfixParselet* parselet = getInfixParselet(type);
     if (parselet != nullptr) return parselet->getPrecedence();
 
@@ -91,12 +91,12 @@ int Parser::getPrecedence() const {
      UUU      T     IIIII   LLLLL   SSSS
 */
 
-Lexing::Tokens::Token Parser::advance() {
+Lexing::Token Parser::advance() {
     previous = current;
     while (true) {
 
         current = tokens[currentToken++];
-        if (current.type != Lexing::Tokens::ERROR) break;
+        if (current.type != Lexing::ERROR) break;
 
         errorAtCurrent(current.data.name);
     }
@@ -104,21 +104,21 @@ Lexing::Tokens::Token Parser::advance() {
     return previous;
 }
 
-bool Parser::consume(Lexing::Tokens::TokenType type, const std::string &message) {
+bool Parser::consume(Lexing::TokenType type, const std::string &message) {
     if (peek().type == type) {
         if (!isAtEnd()) advance();
         return true;
     }
 
-    errorAtCurrent("Expected " + Lexing::Tokens::Token::toString(type) + message + ", got " + current.toString() + " instead");
+    errorAtCurrent("Expected " + Lexing::Token::toString(type) + message + ", got " + current.toString() + " instead");
     return false;
 }
 
-bool Parser::consume(Lexing::Tokens::TokenType type) {
+bool Parser::consume(Lexing::TokenType type) {
     return consume(type, "");
 }
 
-bool Parser::match(Lexing::Tokens::TokenType type) {
+bool Parser::match(Lexing::TokenType type) {
     if (peek().type == type) {
         advance();
         return true;
@@ -126,7 +126,7 @@ bool Parser::match(Lexing::Tokens::TokenType type) {
     return false;
 }
 
-Lexing::Tokens::Token Parser::peek() const {
+Lexing::Token Parser::peek() const {
     return current;
 }
 
@@ -136,7 +136,7 @@ bool Parser::isAtEnd() const {
 
 bool Parser::checkTypeIdent() const {
 
-    using namespace Lexing::Tokens;
+    using namespace Lexing;
 
     switch (peek().type) {
         case I8:
@@ -179,7 +179,7 @@ bool Parser::hadFatalParseError() const {
     EEEEE   R   R   R   R    OOO    R   R   SSSS
 */
 
-void Parser::errorAt(Lexing::Tokens::Token token, std::string message, std::string hint, bool fatal) {
+void Parser::errorAt(Lexing::Token token, std::string message, std::string hint, bool fatal) {
     hadError = true;
     if (fatal) hadFatalError = true;
     errorHandler.compileError(std::move(message), std::move(hint), token);

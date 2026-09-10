@@ -8,8 +8,8 @@
 
 static const char *filepath = "/home/gabriel/CLionProjects/grtlng-cpp/testing/partial/lexer/test.gl";
 
-void printTokenFile(const Lexing::Tokens::Token& token, FILE* output) {
-    using namespace Lexing::Tokens;
+void printTokenFile(const Lexing::Token& token, FILE* output) {
+    using namespace Lexing;
     fprintf(output, "{%d, %d, %d, {", token.type, token.line, token.position);
     switch (token.type) {
         case NUMBER:
@@ -27,19 +27,19 @@ void printTokenFile(const Lexing::Tokens::Token& token, FILE* output) {
     fprintf(output, "}},\n");
 }
 
-void printToken(const Lexing::Tokens::Token& token) {
+void printToken(const Lexing::Token& token) {
     printTokenFile(token, stdout);
 }
 
-void printTokenError(const Lexing::Tokens::Token& token) {
+void printTokenError(const Lexing::Token& token) {
     printTokenFile(token, stderr);
 }
 
 int main() {
     std::string file = fileIO::readFile(filepath);
-    std::vector<Lexing::Tokens::Token> tokens = Lexing::scan(file);
+    std::vector<Lexing::Token> tokens = Lexing::scan(file);
 
-    using namespace Lexing::Tokens;
+    using namespace Lexing;
     Token compareTarget[] = {
         {IDENTIFIER, 1, 0, {.name = (char*) "andy"}},
         {IDENTIFIER, 1, 5, {.name = (char*) "formless"}},

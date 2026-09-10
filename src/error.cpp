@@ -12,7 +12,7 @@ using namespace Error;
 
 #define MAX_ERROR_LINE_LENGTH 20
 
-void ErrorHandler::printErrorLine(const Lexing::Tokens::Token token) const {
+void ErrorHandler::printErrorLine(const Lexing::Token token) const {
     u32 start = token.position;
 
     while (start > 0 && source[start - 1] != '\n') start--;
@@ -40,7 +40,7 @@ void ErrorHandler::runtimeError(Interpreting::RuntimeException &error) {
     printErrorLine(error.token);
 }
 
-void ErrorHandler::compileError(std::string message, std::string hint, Lexing::Tokens::Token token) {
+void ErrorHandler::compileError(std::string message, std::string hint, Lexing::Token token) {
     CompileError error(std::move(message), std::move(hint), token);
     compileErrors.push_back(error);
 

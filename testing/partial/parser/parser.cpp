@@ -12,7 +12,7 @@ static const char *filepath = "/home/gabriel/CLionProjects/grtlng-cpp/testing/pa
 
 int main() {
     std::string file = fileIO::readFile(filepath);
-    std::vector<Lexing::Tokens::Token> tokens = Lexing::scan(file);
+    std::vector<Lexing::Token> tokens = Lexing::scan(file);
 
     Parsing::Parser parser(tokens);
     Expr::Expr* expr = parser.parse();

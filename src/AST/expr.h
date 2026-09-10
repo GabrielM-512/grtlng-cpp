@@ -32,12 +32,12 @@ namespace Expr {
 
     struct Binary: Expr {
         Expr* left;
-        Lexing::Tokens::TokenType operatorType;
+        Lexing::TokenType operatorType;
         Expr* right;
 
         explicit Binary(
             Expr* left = nullptr,
-            Lexing::Tokens::TokenType operatorType = Lexing::Tokens::ERROR,
+            Lexing::TokenType operatorType = Lexing::ERROR,
             Expr* right = nullptr
         ): left(left), operatorType(operatorType), right(right) {}
 
@@ -47,11 +47,11 @@ namespace Expr {
     };
 
     struct Unary: Expr {
-        Lexing::Tokens::TokenType operatorType;
+        Lexing::TokenType operatorType;
         Expr* right;
 
         explicit Unary(
-            Lexing::Tokens::TokenType operatorType = Lexing::Tokens::ERROR,
+            Lexing::TokenType operatorType = Lexing::ERROR,
             Expr* right = nullptr
         ): operatorType(operatorType), right(right) {}
 
@@ -73,10 +73,10 @@ namespace Expr {
     };
 
     struct Identifier: Expr {
-        const Lexing::Tokens::Token target;
+        const Lexing::Token target;
 
         explicit Identifier(
-            const Lexing::Tokens::Token target
+            const Lexing::Token target
         ): target(target) {}
 
         ExprVisitResults accept(ExprVisitor* visitor) override {

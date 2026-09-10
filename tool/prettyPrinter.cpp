@@ -4,11 +4,11 @@
 class prettyPrinter : public Expr::ExprVisitor {
 public:
 
-    static std::string operatorString(Lexing::Tokens::TokenType type) {
-        return Lexing::Tokens::Token::toString(type).substr(1, 1);
+    static std::string operatorString(Lexing::TokenType type) {
+        return Lexing::Token::toString(type).substr(1, 1);
     }
 
-    static std::string operatorString(Lexing::Tokens::Token token) {
+    static std::string operatorString(Lexing::Token token) {
         return operatorString(token.type);
     }
 

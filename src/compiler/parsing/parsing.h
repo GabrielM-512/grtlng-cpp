@@ -25,52 +25,52 @@ namespace Parsing {
     };
 
     class Parser {
-        std::vector<Lexing::Tokens::Token>& tokens;
-        Lexing::Tokens::Token current, previous;
+        std::vector<Lexing::Token>& tokens;
+        Lexing::Token current, previous;
         u32 currentToken;
 
         bool hadError;
         bool hadFatalError;
 
-        std::map<Lexing::Tokens::TokenType, PrefixParselet*> prefixTable;
-        std::map<Lexing::Tokens::TokenType, InfixParselet*> infixTable;
+        std::map<Lexing::TokenType, PrefixParselet*> prefixTable;
+        std::map<Lexing::TokenType, InfixParselet*> infixTable;
 
         Error::ErrorHandler& errorHandler;
 
 
         [[nodiscard]] bool isAtEnd() const;
-        Lexing::Tokens::Token advance();
-        [[nodiscard]] Lexing::Tokens::Token peek() const;
+        Lexing::Token advance();
+        [[nodiscard]] Lexing::Token peek() const;
 
         [[nodiscard]] bool checkTypeIdent() const;
         bool matchTypeIdent();
 
-        [[nodiscard]] PrefixParselet* getPrefixParselet(Lexing::Tokens::TokenType type) const;
-        [[nodiscard]] InfixParselet* getInfixParselet(Lexing::Tokens::TokenType type) const;
+        [[nodiscard]] PrefixParselet* getPrefixParselet(Lexing::TokenType type) const;
+        [[nodiscard]] InfixParselet* getInfixParselet(Lexing::TokenType type) const;
 
         [[nodiscard]] int getPrecedence() const;
-        [[nodiscard]] int getPrecedence(Lexing::Tokens::TokenType type) const;
+        [[nodiscard]] int getPrecedence(Lexing::TokenType type) const;
 
         Stmt::Stmt* statement();
         Stmt::Stmt* printStatement();
         Stmt::Stmt* expressionStatement();
         Stmt::Stmt* localDeclarationStatement();
         
-        void errorAt(Lexing::Tokens::Token token, std::string message, std::string hint, bool fatal);
+        void errorAt(Lexing::Token token, std::string message, std::string hint, bool fatal);
 
     public:
-        bool consume(Lexing::Tokens::TokenType type, const std::string &message);
-        bool consume(Lexing::Tokens::TokenType type);
-        bool match(Lexing::Tokens::TokenType type);
+        bool consume(Lexing::TokenType type, const std::string &message);
+        bool consume(Lexing::TokenType type);
+        bool match(Lexing::TokenType type);
 
-        explicit Parser(std::vector<Lexing::Tokens::Token>& tokens, Error::ErrorHandler& handler);
+        explicit Parser(std::vector<Lexing::Token>& tokens, Error::ErrorHandler& handler);
 
         std::vector<Stmt::Stmt *> parse();
         [[nodiscard]] bool hadParseError() const;
         [[nodiscard]] bool hadFatalParseError() const;
 
-        void registerPrefixParselet(PrefixParselet* parselet, Lexing::Tokens::TokenType type);
-        void registerInfixParselet(InfixParselet* parselet, Lexing::Tokens::TokenType type);
+        void registerPrefixParselet(PrefixParselet* parselet, Lexing::TokenType type);
+        void registerInfixParselet(InfixParselet* parselet, Lexing::TokenType type);
 
         Expr::Expr* parseExpression(int precedence);
         Expr::Expr* parseExprPrec();

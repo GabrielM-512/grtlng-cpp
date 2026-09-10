@@ -52,13 +52,13 @@ namespace Stmt {
     };
 
     struct VariableDeclaration: Stmt {
-        Lexing::Tokens::TokenType dataType;
-        Lexing::Tokens::Token name;
+        Lexing::TokenType dataType;
+        Lexing::Token name;
         Expr::Expr* value;
 
         explicit VariableDeclaration(
-            Lexing::Tokens::TokenType dataType,
-            Lexing::Tokens::Token name,
+            Lexing::TokenType dataType,
+            Lexing::Token name,
             Expr::Expr* value = nullptr
         ): dataType(dataType), name(name), value(value) {}
 

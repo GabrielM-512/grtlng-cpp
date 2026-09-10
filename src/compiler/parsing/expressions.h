@@ -5,14 +5,14 @@ class Parsing::PrefixParselet {
 public:
     virtual ~PrefixParselet() = default;
 
-    virtual Expr::Expr* parse(Parser& parser, Lexing::Tokens::Token& token) = 0;
+    virtual Expr::Expr* parse(Parser& parser, Lexing::Token& token) = 0;
 };
 
 class Parsing::InfixParselet {
 public:
     virtual ~InfixParselet() = default;
 
-    virtual Expr::Expr* parse(Parser& parser, Expr::Expr* left, Lexing::Tokens::Token& token) = 0;
+    virtual Expr::Expr* parse(Parser& parser, Expr::Expr* left, Lexing::Token& token) = 0;
     virtual int getPrecedence() = 0;
 };
 

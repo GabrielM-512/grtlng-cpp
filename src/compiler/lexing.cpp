@@ -2,7 +2,7 @@
 
 #include <cstring>
 
-using namespace Lexing::Tokens;
+using namespace Lexing;
 
 std::string Token::toString(TokenType tokenType) {
 

@@ -19,8 +19,8 @@ namespace Interpreting {
 
         ~Environment() = default;
 
-        Value::Value getVar(const Lexing::Tokens::Token &token) const;
-        void setVar(const Lexing::Tokens::Token &token, Value::Value var);
-        void createVar(const Lexing::Tokens::Token &token, Value::Value var);
+        Value::Value getVar(const Lexing::Token &token) const;
+        void setVar(const Lexing::Token &token, Value::Value var);
+        void createVar(const Lexing::Token &token, Value::Value var);
     };
 }

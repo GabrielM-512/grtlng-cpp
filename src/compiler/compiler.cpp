@@ -8,7 +8,7 @@
 Compiler::CompileResult Compiler::compile(const std::string& source, Error::ErrorHandler& errorHandler) {
     CompileResult result;
 
-    std::vector<Lexing::Tokens::Token> tokens = Lexing::scan(source);
+    std::vector<Lexing::Token> tokens = Lexing::scan(source);
 
     Parsing::Parser parser(tokens, errorHandler);
     result.tree = parser.parse();

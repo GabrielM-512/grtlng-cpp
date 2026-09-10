@@ -12,7 +12,7 @@ Environment::Environment(Environment *enclosing): enclosing(enclosing) {
 }
 
 
-Value::Value Environment::getVar(const Lexing::Tokens::Token &token) const {
+Value::Value Environment::getVar(const Lexing::Token &token) const {
     auto value = values.find(token.data.name);
     if (value == values.end()) {
         if (enclosing == nullptr) throw RuntimeException("Unknown variable \"" + std::string(token.data.name) + "\"", token);
@@ -22,7 +22,7 @@ Value::Value Environment::getVar(const Lexing::Tokens::Token &token) const {
     return value->second;
 }
 
-void Environment::setVar(const Lexing::Tokens::Token &token, const Value::Value var) {
+void Environment::setVar(const Lexing::Token &token, const Value::Value var) {
     auto value = values.find(token.data.name);
     if (value == values.end()) {
         if (enclosing == nullptr) throw RuntimeException("Unknown variable \"" + std::string(token.data.name) + "\"", token);
@@ -32,7 +32,7 @@ void Environment::setVar(const Lexing::Tokens::Token &token, const Value::Value 
     value->second = var;
 }
 
-void Environment::createVar(const Lexing::Tokens::Token &token, const Value::Value var) {
+void Environment::createVar(const Lexing::Token &token, const Value::Value var) {
     auto value = values.find(token.data.name);
 
     if (value != values.end()) throw RuntimeException("Redeclared variable \"" + std::string(token.data.name) + "\"", token);

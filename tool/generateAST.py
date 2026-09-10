@@ -94,10 +94,10 @@ if __name__ == "__main__":
     define_ast(output_dir="/home/gabriel/CLionProjects/grtlng-cpp/src/AST/expr.h",
                base_class="Expr",
                classes = [
-                  "Binary     | Expr* left = nullptr, Lexing::Tokens::TokenType operatorType = Lexing::Tokens::ERROR, Expr* right = nullptr",
-                  "Unary      | Lexing::Tokens::TokenType operatorType = Lexing::Tokens::ERROR, Expr* right = nullptr",
+                  "Binary     | Expr* left = nullptr, Lexing::TokenType operatorType = Lexing::ERROR, Expr* right = nullptr",
+                  "Unary      | Lexing::TokenType operatorType = Lexing::ERROR, Expr* right = nullptr",
                   "Number     | double value = 0",
-                  "Identifier | const Lexing::Tokens::Token target"
+                  "Identifier | const Lexing::Token target"
               ],
                visit_results= "std::string, Value::Value",
                includes = "\"../compiler/lexing.h\" | \"../value.h\"")
@@ -106,6 +106,6 @@ if __name__ == "__main__":
                base_class = "Stmt",
                classes = ["Expression          | Expr::Expr* expression",
                           "Print               | Expr::Expr* expression",
-                          "VariableDeclaration | Lexing::Tokens::TokenType dataType, Lexing::Tokens::Token name, Expr::Expr* value = nullptr"],
+                          "VariableDeclaration | Lexing::TokenType dataType, Lexing::Token name, Expr::Expr* value = nullptr"],
                visit_results = "std::monostate",
                includes="\"expr.h\"")

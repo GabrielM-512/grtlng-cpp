@@ -19,13 +19,13 @@ ExprVisitResults Interpreter::visitBinaryExpr(Expr::Binary *expr) {
     Value::Value right = evaluate(expr->right);
 
     switch (expr->operatorType) {
-        case Lexing::Tokens::PLUS:
+        case Lexing::PLUS:
             return left + right;
-        case Lexing::Tokens::MINUS:
+        case Lexing::MINUS:
             return left - right;
-        case Lexing::Tokens::STAR:
+        case Lexing::STAR:
             return left * right;
-        case Lexing::Tokens::SLASH:
+        case Lexing::SLASH:
             return left / right;
         default:
             return 0.0f;
@@ -35,9 +35,9 @@ ExprVisitResults Interpreter::visitBinaryExpr(Expr::Binary *expr) {
 ExprVisitResults Interpreter::visitUnaryExpr(Expr::Unary *expr) {
     Value::Value operand = evaluate(expr->right);
     switch (expr->operatorType) {
-        case Lexing::Tokens::PLUS:
+        case Lexing::PLUS:
             return operand;
-        case Lexing::Tokens::MINUS:
+        case Lexing::MINUS:
             return -operand;
         default:
             return 0.0;

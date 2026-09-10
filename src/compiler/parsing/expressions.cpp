@@ -10,21 +10,21 @@
 
 class IdentifierParselet : public Parsing::PrefixParselet {
 public:
-    Expr::Expr* parse(Parsing::Parser&, Lexing::Tokens::Token& token) override {
+    Expr::Expr* parse(Parsing::Parser&, Lexing::Token& token) override {
         return new Expr::Identifier(token);
     }
 };
 
 class NumberParselet : public Parsing::PrefixParselet {
 public:
-    Expr::Expr* parse(Parsing::Parser&, Lexing::Tokens::Token& token) override {
+    Expr::Expr* parse(Parsing::Parser&, Lexing::Token& token) override {
         return new Expr::Number(token.data.number);
     }
 };
 
 class UnaryParselet : public Parsing::PrefixParselet {
 public:
-    Expr::Expr* parse(Parsing::Parser& parser, Lexing::Tokens::Token& token) override {
+    Expr::Expr* parse(Parsing::Parser& parser, Lexing::Token& token) override {
         Expr::Expr* operand = parser.parseExprPrecRight();
         return new Expr::Unary(token.type, operand);
     }
@@ -32,9 +32,9 @@ public:
 
 class GroupingParselet : public Parsing::PrefixParselet {
 public:
-    Expr::Expr* parse (Parsing::Parser& parser, Lexing::Tokens::Token&) override {
+    Expr::Expr* parse (Parsing::Parser& parser, Lexing::Token&) override {
         Expr::Expr* node = parser.expression();
-        parser.consume(Lexing::Tokens::RIGHT_PAREN, "Expected ')'");
+        parser.consume(Lexing::RIGHT_PAREN, "Expected ')'");
 
         return node;
     }
@@ -53,7 +53,7 @@ class BinaryParselet : public Parsing::InfixParselet {
 public:
     BinaryParselet(int precedence): precedence(precedence) {}
 
-    Expr::Expr* parse(Parsing::Parser &parser, Expr::Expr *left, Lexing::Tokens::Token& token) override {
+    Expr::Expr* parse(Parsing::Parser &parser, Expr::Expr *left, Lexing::Token& token) override {
         Expr::Expr* right = parser.parseExprPrec();
         return new Expr::Binary(left, token.type, right);
     }
@@ -69,26 +69,26 @@ public:
     P       A   A   R   R   SSSS    EEEEE   LLLLL   EEEEE     T              UUU      T     IIIII   LLLLL   SSSS
 */
 
-void registerUnaryParselet(Parsing::Parser& parser, Lexing::Tokens::TokenType type) {
+void registerUnaryParselet(Parsing::Parser& parser, Lexing::TokenType type) {
     parser.registerPrefixParselet(new UnaryParselet(), type);
 }
 
-void registerBinaryParselet(Parsing::Parser& parser, Lexing::Tokens::TokenType type, int precedence) {
+void registerBinaryParselet(Parsing::Parser& parser, Lexing::TokenType type, int precedence) {
     parser.registerInfixParselet(new BinaryParselet(precedence), type);
 }
 
 void Expressions::registerExpressionParselets(Parsing::Parser &parser) {
-    parser.registerPrefixParselet(new IdentifierParselet(), Lexing::Tokens::IDENTIFIER);
-    parser.registerPrefixParselet(new NumberParselet(), Lexing::Tokens::NUMBER);
-    parser.registerPrefixParselet(new GroupingParselet(), Lexing::Tokens::LEFT_PAREN);
+    parser.registerPrefixParselet(new IdentifierParselet(), Lexing::IDENTIFIER);
+    parser.registerPrefixParselet(new NumberParselet(), Lexing::NUMBER);
+    parser.registerPrefixParselet(new GroupingParselet(), Lexing::LEFT_PAREN);
 
-    registerUnaryParselet(parser, Lexing::Tokens::PLUS);
-    registerUnaryParselet(parser, Lexing::Tokens::MINUS);
+    registerUnaryParselet(parser, Lexing::PLUS);
+    registerUnaryParselet(parser, Lexing::MINUS);
 
-    registerBinaryParselet(parser, Lexing::Tokens::PLUS, Parsing::Precedence::SUM);
-    registerBinaryParselet(parser, Lexing::Tokens::MINUS, Parsing::Precedence::SUM);
-    registerBinaryParselet(parser, Lexing::Tokens::SLASH, Parsing::Precedence::PRODUCT);
-    registerBinaryParselet(parser, Lexing::Tokens::STAR, Parsing::Precedence::PRODUCT);
+    registerBinaryParselet(parser, Lexing::PLUS, Parsing::Precedence::SUM);
+    registerBinaryParselet(parser, Lexing::MINUS, Parsing::Precedence::SUM);
+    registerBinaryParselet(parser, Lexing::SLASH, Parsing::Precedence::PRODUCT);
+    registerBinaryParselet(parser, Lexing::STAR, Parsing::Precedence::PRODUCT);
 }
 
 
@@ -103,7 +103,7 @@ void Expressions::registerExpressionParselets(Parsing::Parser &parser) {
 using namespace Parsing;
 
 Expr::Expr* Parser::parseExpression(int precedence) {
-    Lexing::Tokens::Token token = advance();
+    Lexing::Token token = advance();
 
     PrefixParselet* prefix = getPrefixParselet(token.type);
 

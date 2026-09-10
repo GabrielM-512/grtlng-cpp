@@ -4,37 +4,37 @@
 using namespace Parsing;
 
 Stmt::Stmt* Parser::statement() {
-    if (match(Lexing::Tokens::PRINT)) return printStatement();
+    if (match(Lexing::PRINT)) return printStatement();
 
     return expressionStatement();
 }
 
 Stmt::Stmt* Parser::printStatement() {
     Expr::Expr* expr = expression();
-    consume(Lexing::Tokens::SEMICOLON);
+    consume(Lexing::SEMICOLON);
     return new Stmt::Print(expr);
 }
 
 Stmt::Stmt* Parser::expressionStatement() {
     Expr::Expr* expr = expression();
-    consume(Lexing::Tokens::SEMICOLON);
+    consume(Lexing::SEMICOLON);
     return new Stmt::Expression(expr);
 }
 
 Stmt::Stmt* Parser::localDeclarationStatement() {
-    Lexing::Tokens::TokenType dataType = previous.type;
-    if (!consume(Lexing::Tokens::IDENTIFIER, " after data type")) {
+    Lexing::TokenType dataType = previous.type;
+    if (!consume(Lexing::IDENTIFIER, " after data type")) {
         throw Compiler::CompileError("", previous);
     }
-    const Lexing::Tokens::Token name = previous;
+    const Lexing::Token name = previous;
 
     Expr::Expr* value = nullptr;
 
-    if (match(Lexing::Tokens::EQUALS)) {
+    if (match(Lexing::EQUALS)) {
         value = expression();
     }
 
-    consume(Lexing::Tokens::SEMICOLON, " after variable declaration");
+    consume(Lexing::SEMICOLON, " after variable declaration");
 
     return new Stmt::VariableDeclaration(dataType, name, value);
 }
