@@ -59,25 +59,17 @@ std::string Token::toString(TokenType tokenType) {
         case WHILE: return "\"while\"";
         case FOR: return "\"for\"";
         case PRINT: return "\"print\"";
-        case FALSE:
-            break;
-        case TRUE:
-            break;
-        case PIPE_EQUALS:
-            break;
-        case I8:
-            break;
-        case U8:
-            break;
-        case F32:
-            break;
-        case F64:
-            break;
+        case FALSE: return "\"false\"";
+        case TRUE: return "\"true\"";
+        case PIPE_EQUALS: return "\"|=\"";
+        case I8: return "\"i8\"";
+        case U8: return "\"u8\"";
+        case F32: return "\"f32\"";
+        case F64: return "\"f64\"";
         case LAST:
             break;
     }
-
-    return "";
+    throw std::runtime_error("[" + std::string(__FILE_NAME__) + "]: Invalid TokenType: " + std::to_string(tokenType));
 }
 
 std::string Token::toString() const {
