@@ -149,7 +149,7 @@ char Lexer::peekNext() const {
 
 // generic/strings
 Token Lexer::makeToken(const TokenType type, const char* data, u16 beginningLine) const {
-    return (Token) {type, beginningLine, base, {.name = data}};
+    return (Token) {.type = type, .line = beginningLine, .position = base, .data = {.name = data}};
 }
 
 // for identifier tokens
@@ -159,7 +159,7 @@ Token Lexer::makeToken(const TokenType type, const char* data) const {
 
 // for number tokens
 Token Lexer::makeToken(const TokenType type, double number) const {
-    return (Token) {type, line, base, {.number = number}};
+    return (Token) {.type = type, .line = line, .position = base, .data = {.number = number}};
 }
 
 Token Lexer::noDataToken(const TokenType type) const {
@@ -167,11 +167,11 @@ Token Lexer::noDataToken(const TokenType type) const {
 }
 
 Token Lexer::errorToken(const char* message) const {
-    return (Token) {ERROR, line, base, {message}};
+    return (Token) {.type = ERROR, .line = line, .position = base, .data = {message}};
 }
 
 Token Lexer::errorToken(const char* message, u16 beginningLine) const {
-    return (Token) {ERROR, beginningLine, base, {message}};
+    return (Token) {.type = ERROR, .line = beginningLine, .position = base, .data = {message}};
 }
 
 // internals
@@ -195,7 +195,7 @@ Token Lexer::string() {
     while (peek() != '"' && !isAtEnd())
         if (advance() == '\n') line++;
 
-    if (isAtEnd()) return errorToken(static_cast<const char *>("Unterminated string"), start);
+    if (isAtEnd()) return errorToken("Unterminated string", start);
 
     advance();
 
@@ -432,7 +432,7 @@ bool Lexer::comment() {
             while (!(peek() == '*' && peekNext() == '/')) {
 
                 if (peek() == '\n') line++;
-                if (isAtEnd()) throw Lexing::ScanException("Unterminated comment");
+                if (isAtEnd()) throw ScanException("Unterminated comment");
                 advance();
             }
 

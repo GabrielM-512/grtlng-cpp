@@ -35,7 +35,7 @@ void ErrorHandler::printErrorLine(const Lexing::Token token) const {
     std::cerr << std::format("{:{}s}^ Here", "", arrowStart) << std::endl;
 }
 
-void ErrorHandler::runtimeError(Interpreting::RuntimeException &error) {
+void ErrorHandler::runtimeError(Interpreting::RuntimeException &error) const {
     std::cerr << "Runtime Exception on line " << error.token.line << ": " << error.message << std::endl;
     printErrorLine(error.token);
 }

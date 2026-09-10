@@ -21,6 +21,6 @@ namespace Error {
         void compileError(std::string message, std::string hint, Lexing::Token token);
         void printErrors();
 
-        void runtimeError(Interpreting::RuntimeException& error);
+        void runtimeError(Interpreting::RuntimeException& error) const;
     };
 }

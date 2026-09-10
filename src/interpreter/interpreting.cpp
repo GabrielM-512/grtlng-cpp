@@ -37,9 +37,9 @@ void Interpreter::interpret(Compiler::CompileResult& program) {
 }
 
 Value::Value Interpreting::interpret(Compiler::CompileResult& program, Error::ErrorHandler& handler) {
-    Interpreter interpreter;
-
+    
     try {
+        Interpreter interpreter;
         interpreter.interpret(program);
     } catch (RuntimeException& e) {
         handler.runtimeError(e);

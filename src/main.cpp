@@ -1,7 +1,6 @@
 #include <iostream>
 #include <sysexits.h>
 
-#include "../tool/prettyPrinter.h"
 #include "compiler/compiler.h"
 #include "interpreter/interpreting.h"
 #include "util/fileIO.h"
