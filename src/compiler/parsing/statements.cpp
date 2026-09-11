@@ -71,8 +71,51 @@ Stmt::Stmt* Parser::whileStatement() {
 }
 
 Stmt::Stmt* Parser::forStatement() {
-    // TODO
-    return nullptr;
+    // desugar for loop to while loop
+    consume(Lexing::LEFT_PAREN, " after \"while\"");
+    Stmt::Stmt* initialiser = nullptr;
+
+    if (!check(Lexing::SEMICOLON)) {
+        // initialiser
+        if (matchTypeIdent()) initialiser = localDeclarationStatement();
+        else initialiser = expressionStatement();
+    }
+
+    Expr::Expr* condition;
+
+    if(!check(Lexing::SEMICOLON)) {
+        // condition
+        condition = expression();
+    } else {
+        // always truthy
+        condition = new Expr::Number(1);
+    }
+
+    consume(Lexing::SEMICOLON, " after condition");
+
+
+    Expr::Expr* incrementer = nullptr;
+
+    if (!check(Lexing::RIGHT_PAREN)) {
+        incrementer = expression();
+    }
+
+    consume(Lexing::RIGHT_PAREN, " after incrementer clause");
+
+    Stmt::Stmt* body = statement();
+
+
+    if (incrementer != nullptr) {
+        body = new Stmt::Block({body, new Stmt::Expression(incrementer)});
+    }
+
+    body = new Stmt::While(condition, body);
+
+    if (initialiser != nullptr) {
+        body = new Stmt::Block({initialiser, body});
+    }
+
+    return body;
 }
 
 Stmt::Stmt* Parser::blockStatement() {
