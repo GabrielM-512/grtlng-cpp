@@ -151,5 +151,5 @@ if __name__ == "__main__":
                           "If                  | Expr::Expr* condition, Stmt* thenBranch, Stmt* elseBranch",
                           "While               | Expr::Expr* condition, Stmt* body",
                           "Block               | -std::vector<Stmt*> statements"],
-               visit_results = "std::monostate",
+               visit_results = "std::monostate, std::string",
                includes="\"expr.h\"")
