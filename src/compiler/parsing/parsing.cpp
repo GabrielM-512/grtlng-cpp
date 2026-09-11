@@ -105,7 +105,7 @@ Lexing::Token Parser::advance() {
 }
 
 bool Parser::consume(Lexing::TokenType type, const std::string &message) {
-    if (peek().type == type) {
+    if (check(type)) {
         if (!isAtEnd()) advance();
         return true;
     }
@@ -119,11 +119,15 @@ bool Parser::consume(Lexing::TokenType type) {
 }
 
 bool Parser::match(Lexing::TokenType type) {
-    if (peek().type == type) {
+    if (check(type)) {
         advance();
         return true;
     }
     return false;
+}
+
+bool Parser::check(Lexing::TokenType type) const {
+    return peek().type == type;
 }
 
 Lexing::Token Parser::peek() const {

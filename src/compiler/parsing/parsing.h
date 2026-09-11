@@ -65,6 +65,7 @@ namespace Parsing {
         bool consume(Lexing::TokenType type, const std::string &message);
         bool consume(Lexing::TokenType type);
         bool match(Lexing::TokenType type);
+        [[nodiscard]] bool check(Lexing::TokenType type) const;
 
         explicit Parser(std::vector<Lexing::Token>& tokens, Error::ErrorHandler& handler);
 
