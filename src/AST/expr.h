@@ -7,14 +7,14 @@
 #include "../compiler/lexing.h" 
 #include  "../value.h"
 
+    using ExprVisitResults = std::variant<std::string, Value::Value>;
+
 namespace Expr {
     struct Binary;
     struct Unary;
     struct Number;
     struct Identifier;
     struct Assign;
-
-    #define ExprVisitResults std::variant<std::string, Value::Value>
 
     class ExprVisitor {
     public:

@@ -6,6 +6,8 @@
 
 #include "expr.h"
 
+    using StmtVisitResults = std::variant<std::monostate, std::string>;
+
 namespace Stmt {
     struct Expression;
     struct Print;
@@ -13,8 +15,6 @@ namespace Stmt {
     struct If;
     struct While;
     struct Block;
-
-    #define StmtVisitResults std::variant<std::monostate>
 
     class StmtVisitor {
     public:

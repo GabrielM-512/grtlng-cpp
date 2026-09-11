@@ -80,13 +80,13 @@ def define_subclass(base_class : str, new_class : str) -> str:
 
 
 def define_visit_results(base_class : str, visit_results : str) -> str:
-    output = f"    #define {base_class}VisitResults std::variant<"
+    output = f"using {base_class}VisitResults = std::variant<"
 
     for result in visit_results.split("|"):
         name = result.strip()
         output += name + ", "
 
-    output = output[:-2] + ">"
+    output = output[:-2] + ">;"
 
     return output
 
@@ -98,13 +98,13 @@ def define_ast(output_dir : str, base_class : str, classes : list[str], visit_re
         for include in includes.split("|"):
             output += f"#include {include}\n"
 
+    output += "\n" + define_visit_results(base_class, visit_results) + "\n"
+
     output += f"\nnamespace {base_class} " + '{\n'
 
     for new_class in classes:
         name = new_class.split("|")[0].strip()
         output += "    struct " + name + ";\n" # forward declare classes
-
-    output += "\n" + define_visit_results(base_class, visit_results) + "\n"
 
     output += (f"\n    class {base_class}Visitor " + "{\n" +
                 "    public:\n" +
