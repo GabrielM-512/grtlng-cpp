@@ -18,15 +18,19 @@ ExprVisitResults Interpreter::visitBinaryExpr(Expr::Binary *expr) {
     Value::Value left = evaluate(expr->left);
     Value::Value right = evaluate(expr->right);
 
+#define OPERATION(type, op) case type: return left op right
+
     switch (expr->operatorType) {
-        case Lexing::PLUS:
-            return left + right;
-        case Lexing::MINUS:
-            return left - right;
-        case Lexing::STAR:
-            return left * right;
-        case Lexing::SLASH:
-            return left / right;
+        OPERATION(Lexing::PLUS, +);
+        OPERATION(Lexing::MINUS, -);
+        OPERATION(Lexing::STAR, *);
+        OPERATION(Lexing::SLASH, /);
+
+        case Lexing::MORE: return left > right ? 1.0 : 0.0f;
+        case Lexing::MORE_EQUALS: return left >= right ? 1.0 : 0.0f;
+        case Lexing::LESS: return left < right ? 1.0 : 0.0f;
+        case Lexing::LESS_EQUALS: return left <= right ? 1.0 : 0.0f;
+
         default:
             return 0.0f;
     }

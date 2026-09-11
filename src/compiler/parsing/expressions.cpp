@@ -112,6 +112,11 @@ void Expressions::registerExpressionParselets(Parsing::Parser &parser) {
     registerBinaryParselet(parser, Lexing::MINUS, Parsing::Precedence::SUM);
     registerBinaryParselet(parser, Lexing::SLASH, Parsing::Precedence::PRODUCT);
     registerBinaryParselet(parser, Lexing::STAR, Parsing::Precedence::PRODUCT);
+
+    registerBinaryParselet(parser, Lexing::LESS, Parsing::Precedence::COMPARISON);
+    registerBinaryParselet(parser, Lexing::LESS_EQUALS, Parsing::Precedence::COMPARISON);
+    registerBinaryParselet(parser, Lexing::MORE, Parsing::Precedence::COMPARISON);
+    registerBinaryParselet(parser, Lexing::MORE_EQUALS, Parsing::Precedence::COMPARISON);
 }
 
 
