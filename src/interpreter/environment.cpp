@@ -24,12 +24,14 @@ Value::Value Environment::getVar(const Lexing::Token &token) const {
 
 void Environment::setVar(const Lexing::Token &token, const Value::Value var) {
     auto value = values.find(token.data.name);
-    if (value == values.end()) {
-        if (enclosing == nullptr) throw RuntimeException("Unknown variable \"" + std::string(token.data.name) + "\"", token);
-        enclosing->setVar(token, var);
+
+    if (value != values.end()) {
+        value->second = var;
+        return;
     }
 
-    value->second = var;
+    if (enclosing == nullptr) throw RuntimeException("Unknown variable \"" + std::string(token.data.name) + "\"", token);
+    enclosing->setVar(token, var);
 }
 
 void Environment::createVar(const Lexing::Token &token, const Value::Value var) {
