@@ -149,6 +149,7 @@ if __name__ == "__main__":
                           "Print               | Expr::Expr* expression",
                           "VariableDeclaration | Lexing::TokenType dataType, Lexing::Token name, Expr::Expr* value = nullptr",
                           "If                  | Expr::Expr* condition, Stmt* thenBranch, Stmt* elseBranch",
-                          "While               | Expr::Expr* condition, Stmt* body"],
+                          "While               | Expr::Expr* condition, Stmt* body",
+                          "Block               | -std::vector<Stmt*> statements"],
                visit_results = "std::monostate",
                includes="\"expr.h\"")

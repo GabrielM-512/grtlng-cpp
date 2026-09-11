@@ -12,6 +12,7 @@ namespace Stmt {
     struct VariableDeclaration;
     struct If;
     struct While;
+    struct Block;
 
     #define StmtVisitResults std::variant<std::monostate>
 
@@ -24,6 +25,7 @@ namespace Stmt {
         virtual StmtVisitResults visitVariableDeclarationStmt(VariableDeclaration* stmt) = 0;
         virtual StmtVisitResults visitIfStmt(If* stmt) = 0;
         virtual StmtVisitResults visitWhileStmt(While* stmt) = 0;
+        virtual StmtVisitResults visitBlockStmt(Block* stmt) = 0;
     };
 
     struct Stmt {
@@ -98,6 +100,21 @@ namespace Stmt {
 
         StmtVisitResults accept(StmtVisitor* visitor) override {
             return visitor->visitWhileStmt(this);
+        }
+    };
+
+    struct Block: Stmt {
+        std::vector<Stmt*> statements;
+
+        explicit Block() {}
+
+
+        explicit Block(
+            std::vector<Stmt*> statements
+        ): statements(statements) {}
+
+        StmtVisitResults accept(StmtVisitor* visitor) override {
+            return visitor->visitBlockStmt(this);
         }
     };
 }

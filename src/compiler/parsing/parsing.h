@@ -53,6 +53,8 @@ namespace Parsing {
         [[nodiscard]] int getPrecedence() const;
         [[nodiscard]] int getPrecedence(Lexing::TokenType type) const;
 
+        Stmt::Stmt* declaration();
+
         Stmt::Stmt* statement();
         Stmt::Stmt* printStatement();
         Stmt::Stmt* expressionStatement();
@@ -60,6 +62,7 @@ namespace Parsing {
         Stmt::Stmt* ifStatement();
         Stmt::Stmt* whileStatement();
         Stmt::Stmt* forStatement();
+        Stmt::Stmt* blockStatement();
 
     public:
         bool consume(Lexing::TokenType type, const std::string &message);

@@ -8,8 +8,14 @@ Stmt::Stmt* Parser::statement() {
     if (match(Lexing::IF)) return ifStatement();
     if (match(Lexing::WHILE)) return whileStatement();
     if (match(Lexing::FOR)) return forStatement();
+    if (match(Lexing::LEFT_BRACE)) return blockStatement();
 
     return expressionStatement();
+}
+
+Stmt::Stmt* Parser::declaration() {
+    if (checkTypeIdent()) return localDeclarationStatement();
+    return statement();
 }
 
 Stmt::Stmt* Parser::printStatement() {
@@ -67,4 +73,18 @@ Stmt::Stmt* Parser::whileStatement() {
 Stmt::Stmt* Parser::forStatement() {
     // TODO
     return nullptr;
+}
+
+Stmt::Stmt* Parser::blockStatement() {
+    std::vector<Stmt::Stmt*> contents;
+    while (!match(Lexing::RIGHT_BRACE)) {
+        if (check(Lexing::END_OF_FILE)) {
+            error("Unterminated block");
+            break;
+        }
+        Stmt::Stmt* stmt = declaration();
+        contents.push_back(stmt);
+    }
+
+    return new Stmt::Block(contents);
 }

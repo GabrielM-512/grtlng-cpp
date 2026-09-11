@@ -34,6 +34,7 @@ namespace Interpreting {
         StmtVisitResults visitVariableDeclarationStmt(Stmt::VariableDeclaration *stmt) override;
         StmtVisitResults visitIfStmt(Stmt::If *stmt) override;
         StmtVisitResults visitWhileStmt(Stmt::While *stmt) override;
+        StmtVisitResults visitBlockStmt(Stmt::Block *stmt) override;
     };
 
     Value::Value interpret(Compiler::CompileResult& program, Error::ErrorHandler& handler);

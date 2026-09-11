@@ -38,6 +38,16 @@ StmtVisitResults Interpreter::visitWhileStmt(Stmt::While *stmt) {
     return std::monostate();
 }
 
+StmtVisitResults Interpreter::visitBlockStmt(Stmt::Block *stmt) {
+    beginEnvironment();
+
+    for (Stmt::Stmt* currentStmt : stmt->statements) {
+        execute(currentStmt);
+    }
+
+    return std::monostate();
+}
+
 
 void Interpreter::execute(Stmt::Stmt* stmt) {
     stmt->accept(this);
