@@ -2,41 +2,81 @@
 Classes:
     [ClassName] | [type + name] = [default], [type + name] = [default], ... [type + name] = [default]
 
+    a type preceded by a dash (-) means there is one Constructor without that parameter.
+    The parameter will be standard-initialised.
+
 """
 
+class Subclass:
+    def __init__(self, definition : str, base_class : str):
+        self.name : str =                   definition.split("|")[0].strip()
+
+        optionals = []
+        args = []
+
+        arg_defs = definition.split("|")[1].split(",")
+
+        if len(arg_defs) != 0:
+            for arg in arg_defs:
+                arg = arg.strip()
+                if len(arg) == 0: continue
+                if arg[0] == "-": optionals.append(arg.strip("-"))
+                else:             args.append(arg)
+
+
+
+        self.optionals = optionals
+        self.args = args
+
+        self.base_class : str = base_class
+
+    def define_constructor(self, parameters : list[str]) -> str:
+        output = f"\n        explicit {self.name}("
+
+        for arg in parameters:
+            output += f"\n            {arg},"
+
+        if len(parameters) != 0:
+            output = output[:-1] + "\n        "  # remove trailing comma
+
+        output += ")"
+
+        if len(parameters) > 0:
+            output += ":"
+
+            for arg in parameters:
+                identifier = arg.split(" = ")[0].strip().split(" ")[-1]
+                output += f" {identifier}({identifier}),"
+
+        if len(parameters) != 0:
+            output = output[:-1]  # remove trailing comma
+
+        output += " {}\n\n"
+
+        return output
+
+
+    def define_class(self) -> str:
+        output = f"\n\n    struct {self.name}: {self.base_class} " + "{\n"
+
+        for arg in self.args + self.optionals: # fields
+            output += f"        {arg.split("=")[0].strip()};\n"
+
+        output += self.define_constructor(self.args)
+        if len(self.optionals) > 0: output += self.define_constructor(self.args + self.optionals)
+
+        output += (f"        {self.base_class}VisitResults accept({self.base_class}Visitor* visitor) override " + "{\n" +
+                   f"            return visitor->visit{self.name}{self.base_class}(this);\n" +
+                   "        }\n")
+
+        output += "    };"  # close class
+
+        return output
+
+
 def define_subclass(base_class : str, new_class : str) -> str:
-    name = new_class.split("|")[0].strip()
-    args = new_class.split("|")[1].split(",")
-
-    for i in range(len(args)):
-        args[i] = args[i].strip()
-
-    output = f"\n\n    struct {name}: {base_class} " + "{\n"
-
-    for arg in args:
-        output += f"        {arg.split("=")[0].strip()};\n"
-
-    output += f"\n        explicit {name}(" # constructor
-
-    for arg in args:
-        output += f"\n            {arg},"
-
-    output = output[:-1] + "\n        ):" # remove trailing comma
-
-    for arg in args:
-        identifier = arg.split(" = ")[0].strip().split(" ")[-1]
-        output += f" {identifier}({identifier}),"
-
-    output = output [:-1] + " {}\n\n" # remove trailing comma
-
-    output += (f"        {base_class}VisitResults accept({base_class}Visitor* visitor) override " + "{\n" +
-               f"            return visitor->visit{name}{base_class}(this);\n" +
-               "        }\n")
-
-
-    output += "    };" # close class
-
-    return output
+    subclass : Subclass = Subclass(new_class, base_class)
+    return subclass.define_class()
 
 
 def define_visit_results(base_class : str, visit_results : str) -> str:
