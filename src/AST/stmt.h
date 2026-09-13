@@ -6,7 +6,7 @@
 
 #include "expr.h"
 
-    using StmtVisitResults = std::variant<std::monostate, std::string>;
+using StmtVisitResults = std::variant<std::monostate, std::string>;
 
 namespace Stmt {
     struct Expression;
