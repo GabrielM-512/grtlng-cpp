@@ -1,10 +1,12 @@
 #include "prettyPrinter.h"
 
 #include <format>
+#include <iostream>
 
 #include "../src/AST/expr.h"
 
 class PrettyPrinter : public Expr::ExprVisitor, Stmt::StmtVisitor {
+    int tabs = 0;
 public:
 
     static std::string operatorString(Lexing::TokenType type) {
@@ -20,7 +22,7 @@ public:
     }
 
     std::string statement(Stmt::Stmt* stmt) {
-        return std::get<std::string> (stmt->accept(this));
+        return std::format("{:{}s}", "", tabs) + std::get<std::string> (stmt->accept(this));
     }
 
     ExprVisitResults visitBinaryExpr(Expr::Binary* expr) override {
@@ -47,27 +49,43 @@ public:
                     + expression(expr->value) + " )";
     }
 
+    ExprVisitResults visitCallExpr(Expr::Call *expr) override {
+        std::string string = expression(expr->callee) + "(";
+
+        for (Expr::Expr* arg : expr->args) {
+            string.append(expression(arg) + ", ");
+        }
+
+        string = string.substr(0, string.size() - 2) + ")";
+
+        return string;
+    }
+
 
     StmtVisitResults visitExpressionStmt(Stmt::Expression *stmt) override {
         return "[EXPR] " + expression(stmt->expression);
     }
 
     StmtVisitResults visitBlockStmt(Stmt::Block *stmt) override {
-        std::string output = "{ ";
+        std::string output = "{\n";
+
+        tabs += 4;
 
         for (Stmt::Stmt* current : stmt->statements) {
             output.append(statement(current) + "\n");
         }
 
-        return output;
+        tabs -= 4;
+
+        return output + std::format("{:{}s}", "", tabs) + "}";
     }
 
     StmtVisitResults visitIfStmt(Stmt::If *stmt) override {
-        std::string output = "IF (" + expression(stmt->condition) + ")\n"
+        std::string output = "IF (" + expression(stmt->condition) + ")\n    "
         + statement(stmt->thenBranch);
 
-        if (stmt->elseBranch == nullptr) output.append("\n NO ELSE");
-        else output.append("ELSE\n" + statement(stmt->elseBranch));
+        if (stmt->elseBranch == nullptr) output.append(std::format("\n{:{}s}NO ELSE", "", tabs));
+        else output.append(std::format("\n{:{}s}ELSE\n", "", tabs) + "    " + statement(stmt->elseBranch));
 
         return output;
     }
@@ -82,7 +100,7 @@ public:
     }
 
     StmtVisitResults visitVariableDeclarationStmt(Stmt::VariableDeclaration *stmt) override {
-        return "Declare Variable '}" + std::string(stmt->name.data.name) + "' of type " + Lexing::Token::toString(stmt->dataType) +
+        return "Declare Variable '" + std::string(stmt->name.data.name) + "' of type " + Lexing::Token::toString(stmt->dataType) +
             (stmt->value == nullptr ? " without value" : " with value = " + expression(stmt->value));
     }
 
