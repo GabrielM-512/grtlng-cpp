@@ -9,11 +9,14 @@ public:
 };
 
 class Parsing::InfixParselet {
+    int precedence;
 public:
     virtual ~InfixParselet() = default;
 
+    InfixParselet(int precedence) : precedence(precedence) {}
+
     virtual Expr::Expr* parse(Parser& parser, Expr::Expr* left, Lexing::Token& token) = 0;
-    virtual int getPrecedence() = 0;
+    [[nodiscard]] int getPrecedence() const {return precedence;}
 };
 
 namespace Expressions {

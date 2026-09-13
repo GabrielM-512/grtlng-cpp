@@ -49,21 +49,18 @@ public:
 */
 
 class BinaryParselet : public Parsing::InfixParselet {
-    int precedence;
 public:
-    BinaryParselet(int precedence): precedence(precedence) {}
+    BinaryParselet(int precedence) : InfixParselet(precedence) {}
 
     Expr::Expr* parse(Parsing::Parser &parser, Expr::Expr *left, Lexing::Token& token) override {
         Expr::Expr* right = parser.parseExprPrec();
         return new Expr::Binary(left, token.type, right);
     }
-    int getPrecedence() override {return precedence;}
 };
 
 class AssignmentParselet : public Parsing::InfixParselet {
-    int precedence;
 public:
-    AssignmentParselet(int precedence): precedence(precedence) {}
+    AssignmentParselet(int precedence): InfixParselet(precedence) {}
 
     Expr::Expr* parse(Parsing::Parser& parser, Expr::Expr* left, Lexing::Token& token) override {
         Expr::Expr* right = parser.parseExprPrecRight();
