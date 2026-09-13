@@ -50,13 +50,14 @@ public:
     }
 
     ExprVisitResults visitCallExpr(Expr::Call *expr) override {
-        std::string string = "( " + expression(expr->callee) + "(";
+        std::string string = std::string("( ") + expression(expr->callee) + std::string("( ");
 
         for (Expr::Expr* arg : expr->args) {
             string.append(expression(arg) + ", ");
         }
+        if (!expr->args.empty()) string = string.substr(0, string.size() - 2);
 
-        string = string.substr(0, string.size() - 2) + ") )";
+        string += " ) )";
 
         return string;
     }
