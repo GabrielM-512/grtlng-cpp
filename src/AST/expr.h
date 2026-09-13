@@ -7,7 +7,7 @@
 #include "../compiler/lexing.h" 
 #include  "../value.h"
 
-    using ExprVisitResults = std::variant<std::string, Value::Value>;
+using ExprVisitResults = std::variant<std::string, Value::Value>;
 
 namespace Expr {
     struct Binary;
@@ -15,6 +15,7 @@ namespace Expr {
     struct Number;
     struct Identifier;
     struct Assign;
+    struct Call;
 
     class ExprVisitor {
     public:
@@ -25,6 +26,7 @@ namespace Expr {
         virtual ExprVisitResults visitNumberExpr(Number* expr) = 0;
         virtual ExprVisitResults visitIdentifierExpr(Identifier* expr) = 0;
         virtual ExprVisitResults visitAssignExpr(Assign* expr) = 0;
+        virtual ExprVisitResults visitCallExpr(Call* expr) = 0;
     };
 
     struct Expr {
@@ -97,6 +99,20 @@ namespace Expr {
 
         ExprVisitResults accept(ExprVisitor* visitor) override {
             return visitor->visitAssignExpr(this);
+        }
+    };
+
+    struct Call: Expr {
+        Expr* callee;
+        std::vector<Expr*> args;
+
+        explicit Call(
+            Expr* callee,
+            std::vector<Expr*> args
+        ): callee(callee), args(args) {}
+
+        ExprVisitResults accept(ExprVisitor* visitor) override {
+            return visitor->visitCallExpr(this);
         }
     };
 }

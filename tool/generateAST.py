@@ -138,7 +138,8 @@ if __name__ == "__main__":
                   "Unary      | Lexing::TokenType operatorType = Lexing::ERROR, Expr* right = nullptr",
                   "Number     | double value = 0",
                   "Identifier | const Lexing::Token target",
-                  "Assign     | Lexing::Token name, Expr* value"
+                  "Assign     | Lexing::Token name, Expr* value",
+                  "Call       | Expr* callee, std::vector<Expr*> args"
               ],
                visit_results= "std::string, Value::Value",
                includes = "\"../compiler/lexing.h\" | \"../value.h\"")

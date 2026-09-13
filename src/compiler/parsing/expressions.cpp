@@ -74,8 +74,25 @@ public:
         parser.errorAt(token, "Invalid assignment target", "", true);
         return nullptr;
     }
+};
 
-    int getPrecedence() override {return precedence;}
+class CallParselet : public Parsing::InfixParselet {
+public:
+    CallParselet(int precedence): InfixParselet(precedence) {}
+
+    Expr::Expr* parse(Parsing::Parser &parser, Expr::Expr *left, Lexing::Token &) override {
+        std::vector<Expr::Expr*> args;
+
+        if (!parser.check(Lexing::RIGHT_PAREN)) {
+            do {
+                args.push_back(parser.expression());
+            } while (parser.match(Lexing::COMMA));
+        }
+
+        parser.consume(Lexing::RIGHT_PAREN, " after call arguments");
+
+        return new Expr::Call(left, args);
+    }
 };
 
 
@@ -104,6 +121,7 @@ void Expressions::registerExpressionParselets(Parsing::Parser &parser) {
     registerUnaryParselet(parser, Lexing::MINUS);
 
     parser.registerInfixParselet(new AssignmentParselet(Parsing::Precedence::ASSIGNMENT), Lexing::EQUALS);
+    parser.registerInfixParselet(new CallParselet(Parsing::Precedence::CALL), Lexing::LEFT_PAREN);
 
     registerBinaryParselet(parser, Lexing::PLUS, Parsing::Precedence::SUM);
     registerBinaryParselet(parser, Lexing::MINUS, Parsing::Precedence::SUM);
