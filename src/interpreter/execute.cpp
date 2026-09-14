@@ -38,6 +38,26 @@ StmtVisitResults Interpreter::visitWhileStmt(Stmt::While *stmt) {
     return std::monostate();
 }
 
+StmtVisitResults Interpreter::executeBlock(Stmt::Block *stmt, Environment *environment) {
+    Environment* savedEnvironment = current;
+
+    current = environment;
+
+    for (Stmt::Stmt* currentStmt : stmt->statements) {
+        try {
+            execute(currentStmt);
+        } catch (ReturnException &e) {
+            current = savedEnvironment;
+            throw e;
+        }
+    }
+
+    current = savedEnvironment;
+
+    return std::monostate();
+
+}
+
 StmtVisitResults Interpreter::visitBlockStmt(Stmt::Block *stmt) {
     beginEnvironment();
 
@@ -45,7 +65,24 @@ StmtVisitResults Interpreter::visitBlockStmt(Stmt::Block *stmt) {
         execute(currentStmt);
     }
 
+    endEnvironment();
+
     return std::monostate();
+}
+
+StmtVisitResults Interpreter::visitFunctionStmt(Stmt::Function *stmt) {
+    //std::string name, std::vector<Stmt::VariableDeclaration*> params, Stmt::Block* body
+    Value::Function* function = new Value::Function(stmt->name.data.name, stmt->params, stmt->body);
+
+    global.createVar(function->getName(), VALUE_CALLABLE(function));
+
+    return std::monostate();
+}
+
+StmtVisitResults Interpreter::visitReturnStmt(Stmt::Return *stmt) {
+    Value::Value returnValue = evaluate(stmt->value);
+
+    throw ReturnException(returnValue);
 }
 
 

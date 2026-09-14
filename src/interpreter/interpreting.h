@@ -8,7 +8,6 @@
 namespace Interpreting {
 
     class Interpreter : public Expr::ExprVisitor, public Stmt::StmtVisitor {
-        Environment global;
         Environment *current;
 
         void beginEnvironment();
@@ -21,9 +20,13 @@ namespace Interpreting {
         Interpreter();
         ~Interpreter() override;
 
-        void interpret(Compiler::CompileResult& program);
+        Environment global;
+
+        int interpret(Compiler::CompileResult& program);
 
         void addGlobalValue(const std::string& name, Value::Value value);
+
+        StmtVisitResults executeBlock(Stmt::Block *stmt, Environment *environment);
 
         ExprVisitResults visitBinaryExpr(Expr::Binary *expr) override;
         ExprVisitResults visitUnaryExpr(Expr::Unary *expr) override;
@@ -38,6 +41,14 @@ namespace Interpreting {
         StmtVisitResults visitIfStmt(Stmt::If *stmt) override;
         StmtVisitResults visitWhileStmt(Stmt::While *stmt) override;
         StmtVisitResults visitBlockStmt(Stmt::Block *stmt) override;
+        StmtVisitResults visitFunctionStmt(Stmt::Function *stmt) override;
+        StmtVisitResults visitReturnStmt(Stmt::Return *stmt) override;
+    };
+
+    class ReturnException : public std::runtime_error {
+    public:
+        Value::Value value;
+        ReturnException(Value::Value value) : runtime_error(""), value(value) {}
     };
 
     f64 interpret(Compiler::CompileResult& program, Error::ErrorHandler& handler);

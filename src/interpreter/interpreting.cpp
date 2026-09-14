@@ -37,17 +37,23 @@ Interpreter::~Interpreter() {
     }
 }
 
-void Interpreter::interpret(Compiler::CompileResult& program) {
+int Interpreter::interpret(Compiler::CompileResult& program) {
     for (Stmt::Stmt* stmt : program.tree) {
         execute(stmt);
     }
+
+    std::vector<Value::Value> inputs;
+
+    Value::Value returnValue = AS_CALLABLE(global.getVar("main"))->call(this, inputs);
+    return (int) AS_NUM(returnValue);
 }
 
 f64 Interpreting::interpret(Compiler::CompileResult& program, Error::ErrorHandler& handler) {
-    
+    int returnValue;
+
     try {
         Interpreter interpreter;
-        interpreter.interpret(program);
+        returnValue = interpreter.interpret(program);
     } catch (RuntimeException& e) {
         if (e.token.type != Lexing::ERROR) {
             handler.runtimeError(e);
@@ -57,6 +63,6 @@ f64 Interpreting::interpret(Compiler::CompileResult& program, Error::ErrorHandle
         exit(EX_DATAERR);
     }
 
-    return 0;
+    return returnValue;
 
 }
