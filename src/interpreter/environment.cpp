@@ -34,7 +34,7 @@ void Environment::setVar(const std::string &name, const Value::Value var) {
     enclosing->setVar(name, var);
 }
 
-void Environment::createVar(const std::string name, const Value::Value var) {
+void Environment::createVar(const std::string& name, const Value::Value var) {
     auto value = values.find(name);
 
     if (value != values.end()) throw RuntimeException("Redeclared variable \"" + std::string(name) + "\"");

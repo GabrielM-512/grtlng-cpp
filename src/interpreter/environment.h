@@ -13,13 +13,15 @@ namespace Interpreting {
     public:
         Environment* enclosing;
 
+        Environment (const Environment&) = delete;
         Environment();
-        Environment(Environment *enclosing);
+
+        explicit Environment(Environment *enclosing);
 
         ~Environment() = default;
 
         Value::Value getVar(const std::string &name) const;
         void setVar(const std::string &name, Value::Value var);
-        void createVar(std::string name, Value::Value var);
+        void createVar(const std::string& name, Value::Value var);
     };
 }
