@@ -74,6 +74,16 @@ ExprVisitResults Interpreter::visitAssignExpr(Expr::Assign *expr) {
     return value;
 }
 
-ExprVisitResults Interpreter::visitCallExpr(Expr::Call *) {
-    return VALUE_NUM(0);
+ExprVisitResults Interpreter::visitCallExpr(Expr::Call *expr) {
+    Value::Value callee = evaluate(expr->callee);
+
+    if (!IS_CALLABLE(callee)) throw RuntimeException("Can only call functions.");
+
+    std::vector<Value::Value> args;
+
+    for (Expr::Expr* arg : expr->args) {
+        args.push_back(evaluate(arg));
+    }
+
+    return AS_CALLABLE(callee)->call(this, args);
 }
