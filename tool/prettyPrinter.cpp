@@ -101,8 +101,32 @@ public:
     }
 
     StmtVisitResults visitVariableDeclarationStmt(Stmt::VariableDeclaration *stmt) override {
-        return "Declare Variable '" + std::string(stmt->name.data.name) + "' of type " + Lexing::Token::toString(stmt->dataType) +
+        std::string dataType = Lexing::Token::toString(stmt->dataType);
+        dataType = dataType.substr(1, dataType.size() - 1);
+
+        return "Declare Variable '" + std::string(stmt->name.data.name) + "' of type " + dataType +
             (stmt->value == nullptr ? " without value" : " with value = " + expression(stmt->value));
+    }
+
+    StmtVisitResults visitFunctionStmt(Stmt::Function *stmt) override {
+        std::string output = std::string(stmt->name.data.name) + "(";
+
+        for (Stmt::VariableDeclaration* param : stmt->params) {
+            output += Lexing::Token::toString(param->dataType) + " " + param->name.data.name + ", ";
+        }
+
+        if (!stmt->params.empty())
+            output = output.substr(0, output.size() - 2);
+
+        output += ")\n";
+
+        output += statement(stmt->body);
+
+        return output;
+    }
+
+    StmtVisitResults visitReturnStmt(Stmt::Return *stmt) override {
+        return "RETURN " + expression(stmt->value);
     }
 
     std::string print(const std::vector<Stmt::Stmt*>& tree) {
