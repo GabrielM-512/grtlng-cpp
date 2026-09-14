@@ -17,7 +17,7 @@ StmtVisitResults Interpreter::visitVariableDeclarationStmt(Stmt::VariableDeclara
 
     if (stmt->value != nullptr) val = evaluate(stmt->value);
 
-    current->createVar(stmt->name, val);
+    current->createVar(stmt->name.data.name, val);
     return std::monostate();
 }
 

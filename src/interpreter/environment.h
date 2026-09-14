@@ -2,7 +2,6 @@
 
 #include <string>
 #include <unordered_map>
-#include "../compiler/lexing.h"
 
 
 #include "../value.h"
@@ -19,8 +18,8 @@ namespace Interpreting {
 
         ~Environment() = default;
 
-        Value::Value getVar(const Lexing::Token &token) const;
-        void setVar(const Lexing::Token &token, Value::Value var);
-        void createVar(const Lexing::Token &token, Value::Value var);
+        Value::Value getVar(const std::string &name) const;
+        void setVar(const std::string &name, Value::Value var);
+        void createVar(std::string name, Value::Value var);
     };
 }

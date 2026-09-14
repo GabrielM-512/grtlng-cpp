@@ -12,32 +12,32 @@ Environment::Environment(Environment *enclosing): enclosing(enclosing) {
 }
 
 
-Value::Value Environment::getVar(const Lexing::Token &token) const {
-    auto value = values.find(token.data.name);
+Value::Value Environment::getVar(const std::string &name) const {
+    auto value = values.find(name);
     if (value == values.end()) {
-        if (enclosing == nullptr) throw RuntimeException("Unknown variable \"" + std::string(token.data.name) + "\"", token);
-        return enclosing->getVar(token);
+        if (enclosing == nullptr) throw RuntimeException("Unknown variable \"" + std::string(name) + "\"");
+        return enclosing->getVar(name);
     }
 
     return value->second;
 }
 
-void Environment::setVar(const Lexing::Token &token, const Value::Value var) {
-    auto value = values.find(token.data.name);
+void Environment::setVar(const std::string &name, const Value::Value var) {
+    auto value = values.find(name);
 
     if (value != values.end()) {
         value->second = var;
         return;
     }
 
-    if (enclosing == nullptr) throw RuntimeException("Unknown variable \"" + std::string(token.data.name) + "\"", token);
-    enclosing->setVar(token, var);
+    if (enclosing == nullptr) throw RuntimeException("Unknown variable \"" + std::string(name) + "\"");
+    enclosing->setVar(name, var);
 }
 
-void Environment::createVar(const Lexing::Token &token, const Value::Value var) {
-    auto value = values.find(token.data.name);
+void Environment::createVar(const std::string name, const Value::Value var) {
+    auto value = values.find(name);
 
-    if (value != values.end()) throw RuntimeException("Redeclared variable \"" + std::string(token.data.name) + "\"", token);
+    if (value != values.end()) throw RuntimeException("Redeclared variable \"" + std::string(name) + "\"");
 
-    values.insert({token.data.name, var});
+    values.insert({name, var});
 }

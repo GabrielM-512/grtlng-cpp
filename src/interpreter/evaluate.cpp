@@ -56,12 +56,21 @@ ExprVisitResults Interpreter::visitNumberExpr(Expr::Number* expr) {
 }
 
 ExprVisitResults Interpreter::visitIdentifierExpr(Expr::Identifier *expr) {
-    return current->getVar(expr->target);
+    try {
+        return current->getVar(expr->target.data.name);
+    } catch (RuntimeException& e) {
+        throw RuntimeException(e.message, expr->target);
+    }
 }
 
 ExprVisitResults Interpreter::visitAssignExpr(Expr::Assign *expr) {
     Value::Value value = evaluate(expr->value);
-    current->setVar(expr->name, value);
+    try {
+        current->setVar(expr->name.data.name, value);
+    } catch (RuntimeException& e) {
+        throw RuntimeException(e.message, expr->name);
+    }
+
     return value;
 }
 
