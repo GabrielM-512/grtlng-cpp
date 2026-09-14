@@ -19,10 +19,16 @@ void Interpreter::endEnvironment() {
     current = restore;
 }
 
+void Interpreter::addGlobalValue(const std::string& name, Value::Value value) {
+    global.createVar(name, value);
+}
+
 
 Interpreter::Interpreter() {
     global = Environment();
     current = &global;
+
+    Value::defineNativeFunctions(this);
 }
 
 Interpreter::~Interpreter() {

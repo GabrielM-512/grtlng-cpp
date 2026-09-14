@@ -23,6 +23,8 @@ namespace Interpreting {
 
         void interpret(Compiler::CompileResult& program);
 
+        void addGlobalValue(const std::string& name, Value::Value value);
+
         ExprVisitResults visitBinaryExpr(Expr::Binary *expr) override;
         ExprVisitResults visitUnaryExpr(Expr::Unary *expr) override;
         ExprVisitResults visitNumberExpr(Expr::Number* expr) override;
