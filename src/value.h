@@ -58,22 +58,24 @@ namespace Value {
         Callable(std::string name, std::vector<Stmt::VariableDeclaration*> params): Obj(CALLABLE),
             name(std::move(name)), params(std::move(params)) {}
 
-        std::string getName() const {return name;}
+        [[nodiscard]] std::string getName() const {return name;}
 
         [[nodiscard]] int getArity() const {return (int) params.size();}
         virtual Value call(Interpreting::Interpreter* interpreter, std::vector<Value>& args) = 0;
 
     };
-/*
+
     class Function : public Callable {
 
         Stmt::Block* body;
-
+    public:
         Function(std::string name, std::vector<Stmt::VariableDeclaration*> params, Stmt::Block* body): Callable(std::move(name), std::move(params)),
             body(body) {}
 
+        Value call(Interpreting::Interpreter *interpreter, std::vector<Value> &args) override;
+
     };
-    */
+
 
     void defineNativeFunctions(Interpreting::Interpreter* interpreter);
 

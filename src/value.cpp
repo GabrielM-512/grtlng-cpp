@@ -46,6 +46,22 @@ void Value::defineNativeFunctions(Interpreting::Interpreter* interpreter) {
     defineNativeFn(interpreter, "clock", clockNative);
 }
 
+Value::Value Value::Function::call(Interpreting::Interpreter *interpreter, std::vector<Value> &args) {
+    try {
+        Interpreting::Environment environment(&interpreter->global);
+
+        for (u64 i = 0; i < params.size(); i++) {
+            environment.createVar(params.at(i)->name.data.name, args.at(i));
+        }
+
+        interpreter->executeBlock(this->body, &environment);
+
+        return (Value) {.type = NUMBER, .as = {}};
+    } catch (Interpreting::ReturnException& e) {
+        return e.value;
+    }
+}
+
 /*
      OOO    BBBB        J   EEEEE     CCC   TTTTT           H   H     A     N   N   DDDD    L       IIIII   N   N    GGG
     O   O   B   B       J   E        C        T             H   H    A A    NN  N   D   D   L         I     NN  N   G
