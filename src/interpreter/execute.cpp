@@ -13,7 +13,7 @@ StmtVisitResults Interpreter::visitExpressionStmt(Stmt::Expression *stmt) {
 }
 
 StmtVisitResults Interpreter::visitVariableDeclarationStmt(Stmt::VariableDeclaration *stmt) {
-    Value::Value val = 0;
+    Value::Value val = VALUE_NUM(0);
 
     if (stmt->value != nullptr) val = evaluate(stmt->value);
 

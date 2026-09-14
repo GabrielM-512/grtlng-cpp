@@ -1,5 +1,6 @@
 #include "interpreting.h"
 
+#include <iostream>
 #include <sysexits.h>
 
 #include "environment.h"
@@ -36,13 +37,17 @@ void Interpreter::interpret(Compiler::CompileResult& program) {
     }
 }
 
-Value::Value Interpreting::interpret(Compiler::CompileResult& program, Error::ErrorHandler& handler) {
+f64 Interpreting::interpret(Compiler::CompileResult& program, Error::ErrorHandler& handler) {
     
     try {
         Interpreter interpreter;
         interpreter.interpret(program);
     } catch (RuntimeException& e) {
-        handler.runtimeError(e);
+        if (e.token.type != Lexing::ERROR) {
+            handler.runtimeError(e);
+        } else {
+            std::cerr << "Internal error: " << e.message << std::endl;
+        }
         exit(EX_DATAERR);
     }
 

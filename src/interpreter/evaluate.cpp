@@ -15,10 +15,13 @@ Value::Value Interpreter::evaluate(Expr::Expr* expr) {
 */
 
 ExprVisitResults Interpreter::visitBinaryExpr(Expr::Binary *expr) {
-    Value::Value left = evaluate(expr->left);
-    Value::Value right = evaluate(expr->right);
+    Value::Value leftValue = evaluate(expr->left);
+    Value::Value rightValue = evaluate(expr->right);
 
-#define OPERATION(type, op) case type: return left op right
+    double left = AS_NUM(leftValue);
+    double right = AS_NUM(rightValue);
+
+#define OPERATION(type, op) case type: return VALUE_NUM(left op right)
 
     switch (expr->operatorType) {
         OPERATION(Lexing::PLUS, +);
@@ -26,30 +29,30 @@ ExprVisitResults Interpreter::visitBinaryExpr(Expr::Binary *expr) {
         OPERATION(Lexing::STAR, *);
         OPERATION(Lexing::SLASH, /);
 
-        case Lexing::MORE: return left > right ? 1.0 : 0.0f;
-        case Lexing::MORE_EQUALS: return left >= right ? 1.0 : 0.0f;
-        case Lexing::LESS: return left < right ? 1.0 : 0.0f;
-        case Lexing::LESS_EQUALS: return left <= right ? 1.0 : 0.0f;
+        case Lexing::MORE: return VALUE_NUM(left > right ? 1.0 : 0.0f);
+        case Lexing::MORE_EQUALS: return VALUE_NUM(left >= right ? 1.0 : 0.0f);
+        case Lexing::LESS: return VALUE_NUM(left < right ? 1.0 : 0.0f);
+        case Lexing::LESS_EQUALS: return VALUE_NUM(left <= right ? 1.0 : 0.0f);
 
         default:
-            return 0.0f;
+            return VALUE_NUM(0);
     }
 }
 
 ExprVisitResults Interpreter::visitUnaryExpr(Expr::Unary *expr) {
-    Value::Value operand = evaluate(expr->right);
+    double operand = AS_NUM(evaluate(expr->right));
     switch (expr->operatorType) {
         case Lexing::PLUS:
-            return operand;
+            return VALUE_NUM(operand);
         case Lexing::MINUS:
-            return -operand;
+            return VALUE_NUM(-operand);
         default:
-            return 0.0;
+            return VALUE_NUM(0);
     }
 }
 
 ExprVisitResults Interpreter::visitNumberExpr(Expr::Number* expr) {
-    return expr->value;
+    return VALUE_NUM(expr->value);
 }
 
 ExprVisitResults Interpreter::visitIdentifierExpr(Expr::Identifier *expr) {
@@ -60,4 +63,8 @@ ExprVisitResults Interpreter::visitAssignExpr(Expr::Assign *expr) {
     Value::Value value = evaluate(expr->value);
     current->setVar(expr->name, value);
     return value;
+}
+
+ExprVisitResults Interpreter::visitCallExpr(Expr::Call *) {
+    return VALUE_NUM(0);
 }

@@ -28,6 +28,7 @@ namespace Interpreting {
         ExprVisitResults visitNumberExpr(Expr::Number* expr) override;
         ExprVisitResults visitIdentifierExpr(Expr::Identifier *expr) override;
         ExprVisitResults visitAssignExpr(Expr::Assign *expr) override;
+        ExprVisitResults visitCallExpr(Expr::Call *expr) override;
 
         StmtVisitResults visitPrintStmt(Stmt::Print *stmt) override;
         StmtVisitResults visitExpressionStmt(Stmt::Expression *stmt) override;
@@ -37,5 +38,5 @@ namespace Interpreting {
         StmtVisitResults visitBlockStmt(Stmt::Block *stmt) override;
     };
 
-    Value::Value interpret(Compiler::CompileResult& program, Error::ErrorHandler& handler);
+    f64 interpret(Compiler::CompileResult& program, Error::ErrorHandler& handler);
 }
