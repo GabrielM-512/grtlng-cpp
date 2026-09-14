@@ -78,7 +78,7 @@ void printObject(const Value::Obj* obj) {
     switch (obj->type) {
         case Value::CALLABLE: {
             auto callable = dynamic_cast<const Value::Callable*> (obj);
-            std::cout << "<fn \"" << callable->getName() << "\" at " << obj << ">" << std::endl;
+            std::cout << "<fn \"" << callable->getName() << "\" at " << obj << ">\n";
         }
 
     }
@@ -87,7 +87,7 @@ void printObject(const Value::Obj* obj) {
 void Value::printValue(const Value& value) {
     switch (value.type) {
         case NUMBER:
-            std::cout << AS_NUM(value) << std::endl;
+            std::cout << AS_NUM(value) << "\n";
             break;
         case OBJECT:
             printObject(value.as.object);
