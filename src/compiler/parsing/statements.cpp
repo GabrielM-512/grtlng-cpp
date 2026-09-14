@@ -14,7 +14,7 @@ Stmt::Stmt* Parser::statement() {
 }
 
 Stmt::Stmt* Parser::declaration() {
-    if (checkTypeIdent()) return localDeclarationStatement();
+    if (matchTypeIdent()) return localDeclarationStatement();
     return statement();
 }
 
@@ -30,12 +30,7 @@ Stmt::Stmt* Parser::expressionStatement() {
     return new Stmt::Expression(expr);
 }
 
-Stmt::Stmt* Parser::localDeclarationStatement() {
-    Lexing::TokenType dataType = previous.type;
-    consume(Lexing::IDENTIFIER, " after data type");
-
-    const Lexing::Token name = previous;
-
+Stmt::Stmt* Parser::variableDeclaration(Lexing::TokenType dataType, const Lexing::Token& name) {
     Expr::Expr* value = nullptr;
 
     if (match(Lexing::EQUALS)) {
@@ -45,6 +40,15 @@ Stmt::Stmt* Parser::localDeclarationStatement() {
     consume(Lexing::SEMICOLON, " after variable declaration");
 
     return new Stmt::VariableDeclaration(dataType, name, value);
+}
+
+Stmt::Stmt* Parser::localDeclarationStatement() {
+    Lexing::TokenType dataType = previous.type;
+    consume(Lexing::IDENTIFIER, " after data type");
+
+    const Lexing::Token name = previous;
+
+    return variableDeclaration(dataType, name);
 }
 
 Stmt::Stmt* Parser::ifStatement() {

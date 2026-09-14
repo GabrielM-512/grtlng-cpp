@@ -53,6 +53,11 @@ namespace Parsing {
         [[nodiscard]] int getPrecedence() const;
         [[nodiscard]] int getPrecedence(Lexing::TokenType type) const;
 
+        Stmt::Stmt* variableDeclaration(Lexing::TokenType dataType, const Lexing::Token& name);
+
+        Stmt::Stmt* functionDeclaration(Lexing::TokenType dataType, const Lexing::Token& name);
+        std::vector<Stmt::VariableDeclaration*> parseParameters();
+
         Stmt::Stmt* declaration();
 
         Stmt::Stmt* statement();
