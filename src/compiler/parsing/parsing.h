@@ -59,21 +59,21 @@ namespace Parsing {
         std::vector<Stmt::VariableDeclaration*> parseParameters();
 
         Stmt::Stmt* declaration();
+        Stmt::Stmt* globalDeclaration();
 
         Stmt::Stmt* statement();
 
         Stmt::Print *printStatement();
-
         Stmt::Expression *expressionStatement();
-
         Stmt::VariableDeclaration *localDeclarationStatement();
-
         Stmt::If *ifStatement();
-
         Stmt::While *whileStatement();
         Stmt::Stmt* forStatement();
-
         Stmt::Block *blockStatement();
+
+        Stmt::Return *returnStatement();
+
+        void synchronise(bool isGlobal);
 
     public:
         bool consume(Lexing::TokenType type, const std::string &message);

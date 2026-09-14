@@ -15,6 +15,8 @@ namespace Stmt {
     struct If;
     struct While;
     struct Block;
+    struct Function;
+    struct Return;
 
     class StmtVisitor {
     public:
@@ -26,6 +28,8 @@ namespace Stmt {
         virtual StmtVisitResults visitIfStmt(If* stmt) = 0;
         virtual StmtVisitResults visitWhileStmt(While* stmt) = 0;
         virtual StmtVisitResults visitBlockStmt(Block* stmt) = 0;
+        virtual StmtVisitResults visitFunctionStmt(Function* stmt) = 0;
+        virtual StmtVisitResults visitReturnStmt(Return* stmt) = 0;
     };
 
     struct Stmt {
@@ -115,6 +119,36 @@ namespace Stmt {
 
         StmtVisitResults accept(StmtVisitor* visitor) override {
             return visitor->visitBlockStmt(this);
+        }
+    };
+
+    struct Function: Stmt {
+        Lexing::TokenType dataType;
+        Lexing::Token name;
+        std::vector<VariableDeclaration*> params;
+        Block* body;
+
+        explicit Function(
+            Lexing::TokenType dataType,
+            Lexing::Token name,
+            std::vector<VariableDeclaration*> params,
+            Block* body
+        ): dataType(dataType), name(name), params(params), body(body) {}
+
+        StmtVisitResults accept(StmtVisitor* visitor) override {
+            return visitor->visitFunctionStmt(this);
+        }
+    };
+
+    struct Return: Stmt {
+        Expr::Expr* value;
+
+        explicit Return(
+            Expr::Expr* value
+        ): value(value) {}
+
+        StmtVisitResults accept(StmtVisitor* visitor) override {
+            return visitor->visitReturnStmt(this);
         }
     };
 }

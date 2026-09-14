@@ -27,16 +27,14 @@ std::vector<Stmt::Stmt*> Parser::parse() {
     std::vector<Stmt::Stmt*> tree;
     while (!isAtEnd()) {
         try {
-            Stmt::Stmt* stmt;
-
-            if (matchTypeIdent()) stmt = localDeclarationStatement();
-            else stmt = statement();
+            Stmt::Stmt* stmt = globalDeclaration();
 
             tree.push_back(stmt);
         } catch (Compiler::CompileError& e) {
             if (e.makeError) {
                 errorAt(e.token, e.message, "", false);
             }
+            synchronise(true);
         }
     }
 
@@ -173,6 +171,31 @@ bool Parser::hadParseError() const {
 
 bool Parser::hadFatalParseError() const {
     return hadFatalError;
+}
+
+void Parser::synchronise(bool isGlobal) {
+    advance();
+
+    while (!isAtEnd()) {
+        if (previous.type == Lexing::SEMICOLON && !isGlobal) return;
+
+        switch (peek().type) {
+            case Lexing::FOR:
+            case Lexing::IF:
+            case Lexing::WHILE:
+            case Lexing::PRINT:
+            case Lexing::RETURN:
+                if (!isGlobal) return;
+                break;
+
+            default:
+                break;
+        }
+
+        if (checkTypeIdent()) return;
+
+        advance();
+    }
 }
 
 /*

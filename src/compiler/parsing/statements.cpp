@@ -9,6 +9,7 @@ Stmt::Stmt* Parser::statement() {
     if (match(Lexing::WHILE)) return whileStatement();
     if (match(Lexing::FOR)) return forStatement();
     if (match(Lexing::LEFT_BRACE)) return blockStatement();
+    if (match(Lexing::RETURN)) return returnStatement();
 
     return expressionStatement();
 }
@@ -45,6 +46,10 @@ Stmt::VariableDeclaration *Parser::variableDeclaration(Lexing::TokenType dataTyp
 Stmt::VariableDeclaration *Parser::localDeclarationStatement() {
     Lexing::TokenType dataType = previous.type;
     consume(Lexing::IDENTIFIER, " after data type");
+
+    if (match(Lexing::LEFT_PAREN)) {
+        throw error("Expected \"=\" or \";\", got \"(\" instead)", "Function declarations are only allowed in the global scope");
+    }
 
     const Lexing::Token name = previous;
 
@@ -134,4 +139,14 @@ Stmt::Block *Parser::blockStatement() {
     }
 
     return new Stmt::Block(contents);
+}
+
+Stmt::Return *Parser::returnStatement() {
+    Expr::Expr* value = nullptr;
+
+    if (!check(Lexing::SEMICOLON))
+        value = expression();
+
+    consume(Lexing::SEMICOLON, " after return value");
+    return new Stmt::Return(value);
 }
