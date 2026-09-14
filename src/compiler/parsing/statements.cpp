@@ -18,19 +18,19 @@ Stmt::Stmt* Parser::declaration() {
     return statement();
 }
 
-Stmt::Stmt* Parser::printStatement() {
+Stmt::Print *Parser::printStatement() {
     Expr::Expr* expr = expression();
     consume(Lexing::SEMICOLON);
     return new Stmt::Print(expr);
 }
 
-Stmt::Stmt* Parser::expressionStatement() {
+Stmt::Expression *Parser::expressionStatement() {
     Expr::Expr* expr = expression();
     consume(Lexing::SEMICOLON);
     return new Stmt::Expression(expr);
 }
 
-Stmt::Stmt* Parser::variableDeclaration(Lexing::TokenType dataType, const Lexing::Token& name) {
+Stmt::VariableDeclaration *Parser::variableDeclaration(Lexing::TokenType dataType, const Lexing::Token &name) {
     Expr::Expr* value = nullptr;
 
     if (match(Lexing::EQUALS)) {
@@ -42,7 +42,7 @@ Stmt::Stmt* Parser::variableDeclaration(Lexing::TokenType dataType, const Lexing
     return new Stmt::VariableDeclaration(dataType, name, value);
 }
 
-Stmt::Stmt* Parser::localDeclarationStatement() {
+Stmt::VariableDeclaration *Parser::localDeclarationStatement() {
     Lexing::TokenType dataType = previous.type;
     consume(Lexing::IDENTIFIER, " after data type");
 
@@ -51,7 +51,7 @@ Stmt::Stmt* Parser::localDeclarationStatement() {
     return variableDeclaration(dataType, name);
 }
 
-Stmt::Stmt* Parser::ifStatement() {
+Stmt::If *Parser::ifStatement() {
     consume(Lexing::LEFT_PAREN, " after \"if\"");
     Expr::Expr* condition = expression();
     consume(Lexing::RIGHT_PAREN, " after if condition");
@@ -64,7 +64,7 @@ Stmt::Stmt* Parser::ifStatement() {
     return new Stmt::If(condition, thenBranch, elseBranch);
 }
 
-Stmt::Stmt* Parser::whileStatement() {
+Stmt::While *Parser::whileStatement() {
     consume(Lexing::LEFT_PAREN, " after \"while\"");
     Expr::Expr* condition = expression();
     consume(Lexing::RIGHT_PAREN, " after while condition");
@@ -122,7 +122,7 @@ Stmt::Stmt* Parser::forStatement() {
     return body;
 }
 
-Stmt::Stmt* Parser::blockStatement() {
+Stmt::Block *Parser::blockStatement() {
     std::vector<Stmt::Stmt*> contents;
     while (!match(Lexing::RIGHT_BRACE)) {
         if (check(Lexing::END_OF_FILE)) {

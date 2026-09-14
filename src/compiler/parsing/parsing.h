@@ -53,7 +53,7 @@ namespace Parsing {
         [[nodiscard]] int getPrecedence() const;
         [[nodiscard]] int getPrecedence(Lexing::TokenType type) const;
 
-        Stmt::Stmt* variableDeclaration(Lexing::TokenType dataType, const Lexing::Token& name);
+        Stmt::VariableDeclaration *variableDeclaration(Lexing::TokenType dataType, const Lexing::Token &name);
 
         Stmt::Stmt* functionDeclaration(Lexing::TokenType dataType, const Lexing::Token& name);
         std::vector<Stmt::VariableDeclaration*> parseParameters();
@@ -61,13 +61,19 @@ namespace Parsing {
         Stmt::Stmt* declaration();
 
         Stmt::Stmt* statement();
-        Stmt::Stmt* printStatement();
-        Stmt::Stmt* expressionStatement();
-        Stmt::Stmt* localDeclarationStatement();
-        Stmt::Stmt* ifStatement();
-        Stmt::Stmt* whileStatement();
+
+        Stmt::Print *printStatement();
+
+        Stmt::Expression *expressionStatement();
+
+        Stmt::VariableDeclaration *localDeclarationStatement();
+
+        Stmt::If *ifStatement();
+
+        Stmt::While *whileStatement();
         Stmt::Stmt* forStatement();
-        Stmt::Stmt* blockStatement();
+
+        Stmt::Block *blockStatement();
 
     public:
         bool consume(Lexing::TokenType type, const std::string &message);
