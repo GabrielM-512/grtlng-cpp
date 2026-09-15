@@ -14,6 +14,7 @@ add_executable(parser_partial
         /home/gabriel/CLionProjects/grtlng-cpp/src/compiler/parsing/expressions.h
         /home/gabriel/CLionProjects/grtlng-cpp/src/compiler/parsing/expressions.cpp
         /home/gabriel/CLionProjects/grtlng-cpp/src/compiler/parsing/statements.cpp
+        /home/gabriel/CLionProjects/grtlng-cpp/src/compiler/parsing/globalScope.cpp
         /home/gabriel/CLionProjects/grtlng-cpp/src/util/fileIO.h
         /home/gabriel/CLionProjects/grtlng-cpp/src/util/fileIO.cpp
         /home/gabriel/CLionProjects/grtlng-cpp/tool/prettyPrinter.h
