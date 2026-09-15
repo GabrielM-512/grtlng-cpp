@@ -22,6 +22,7 @@ ExprVisitResults Interpreter::visitBinaryExpr(Expr::Binary *expr) {
     double right = AS_NUM(rightValue);
 
 #define OPERATION(type, op) case type: return VALUE_NUM(left op right)
+#define BOOL_OPERATION(type, op) case type: return VALUE_NUM(left op right ? 1.0 : 0.0f)
 
     switch (expr->operatorType) {
         OPERATION(Lexing::PLUS, +);
@@ -29,10 +30,14 @@ ExprVisitResults Interpreter::visitBinaryExpr(Expr::Binary *expr) {
         OPERATION(Lexing::STAR, *);
         OPERATION(Lexing::SLASH, /);
 
-        case Lexing::MORE: return VALUE_NUM(left > right ? 1.0 : 0.0f);
-        case Lexing::MORE_EQUALS: return VALUE_NUM(left >= right ? 1.0 : 0.0f);
-        case Lexing::LESS: return VALUE_NUM(left < right ? 1.0 : 0.0f);
-        case Lexing::LESS_EQUALS: return VALUE_NUM(left <= right ? 1.0 : 0.0f);
+        BOOL_OPERATION(Lexing::MORE, >);
+        BOOL_OPERATION(Lexing::MORE_EQUALS, >=);
+        BOOL_OPERATION(Lexing::LESS, <);
+        BOOL_OPERATION(Lexing::LESS_EQUALS, <=);
+
+        BOOL_OPERATION(Lexing::EQUALS_EQUALS, ==);
+        BOOL_OPERATION(Lexing::BANG_EQUALS, !=);
+
 
         default:
             return VALUE_NUM(0);
