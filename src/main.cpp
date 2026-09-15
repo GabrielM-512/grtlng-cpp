@@ -6,11 +6,13 @@
 
 #include "argvParse.h"
 
+//#define CATCH_ERRORS
 
 int main(const int argc, char* argv[]) {
     argvParse::ProgramArgs compileFlags = argvParse::parse(argc, argv);
-
+#ifdef CATCH_ERRORS
     try {
+#endif
         std::string file = fileIO::readFile(compileFlags.filePath);
 
         Error::ErrorHandler handler(file);
@@ -29,11 +31,11 @@ int main(const int argc, char* argv[]) {
         }
 
         return 0;
-
+#ifdef CATCH_ERRORS
     } catch (std::exception& e) {
         std::cerr << "Error: " << e.what() << std::endl;
         return 1;
     }
-
+#endif
     return 0;
 }
