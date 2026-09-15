@@ -25,7 +25,7 @@ public:
 class UnaryParselet : public Parsing::PrefixParselet {
 public:
     Expr::Expr* parse(Parsing::Parser& parser, Lexing::Token& token) override {
-        Expr::Expr* operand = parser.parseExprPrecRight();
+        Expr::Expr* operand = parser.parseExpression(Parsing::Precedence::UNARY - 1);
         return new Expr::Unary(token.type, operand);
     }
 };
