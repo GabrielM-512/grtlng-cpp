@@ -46,9 +46,9 @@ StmtVisitResults Interpreter::executeBlock(Stmt::Block *stmt, Environment *envir
     for (Stmt::Stmt* currentStmt : stmt->statements) {
         try {
             execute(currentStmt);
-        } catch (ReturnException &e) {
+        } catch (std::runtime_error&) {
             current = savedEnvironment;
-            throw e;
+            throw;
         }
     }
 
