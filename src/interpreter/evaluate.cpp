@@ -40,7 +40,7 @@ ExprVisitResults Interpreter::visitBinaryExpr(Expr::Binary *expr) {
 
 
         default:
-            return VALUE_NUM(0);
+            throw RuntimeException("Unknown Binary expression operator " + Lexing::Token::toString(expr->operatorType));
     }
 }
 
