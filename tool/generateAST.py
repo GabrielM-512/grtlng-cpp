@@ -139,9 +139,9 @@ if __name__ == "__main__":
                   "Number     | double value = 0",
                   "Identifier | const Lexing::Token target",
                   "Assign     | Lexing::Token name, Expr* value",
-                  "Call       | Expr* callee, std::vector<Expr*> args"
+                  "Call       | Expr* callee, std::vector<Expr*> args, Lexing::Token paren"
               ],
-               visit_results= "std::string, Value::Value",
+               visit_results= "std::string, Value::Value, std::monostate",
                includes = "\"../compiler/lexing.h\" | \"../value.h\"")
 
     define_ast(output_dir = "/home/gabriel/CLionProjects/grtlng-cpp/src/AST/stmt.h",

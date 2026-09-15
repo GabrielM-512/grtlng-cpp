@@ -7,7 +7,7 @@
 #include "../compiler/lexing.h" 
 #include  "../value.h"
 
-using ExprVisitResults = std::variant<std::string, Value::Value>;
+using ExprVisitResults = std::variant<std::string, Value::Value, std::monostate>;
 
 namespace Expr {
     struct Binary;
@@ -105,11 +105,13 @@ namespace Expr {
     struct Call: Expr {
         Expr* callee;
         std::vector<Expr*> args;
+        Lexing::Token paren;
 
         explicit Call(
             Expr* callee,
-            std::vector<Expr*> args
-        ): callee(callee), args(args) {}
+            std::vector<Expr*> args,
+            Lexing::Token paren
+        ): callee(callee), args(args), paren(paren) {}
 
         ExprVisitResults accept(ExprVisitor* visitor) override {
             return visitor->visitCallExpr(this);

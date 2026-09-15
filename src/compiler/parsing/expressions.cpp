@@ -112,7 +112,7 @@ class CallParselet : public Parsing::InfixParselet {
 public:
     CallParselet(int precedence): InfixParselet(precedence) {}
 
-    Expr::Expr* parse(Parsing::Parser &parser, Expr::Expr *left, Lexing::Token &) override {
+    Expr::Expr* parse(Parsing::Parser &parser, Expr::Expr *left, Lexing::Token &token) override {
         std::vector<Expr::Expr*> args;
 
         if (!parser.check(Lexing::RIGHT_PAREN)) {
@@ -123,7 +123,7 @@ public:
 
         parser.consume(Lexing::RIGHT_PAREN, " after call arguments");
 
-        return new Expr::Call(left, args);
+        return new Expr::Call(left, args, token);
     }
 };
 
