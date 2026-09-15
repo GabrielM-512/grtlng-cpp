@@ -20,7 +20,13 @@ Stmt::Stmt* Parser::declaration() {
 }
 
 Stmt::Print *Parser::printStatement() {
-    Expr::Expr* expr = expression();
+    Expr::Expr* expr = nullptr;
+    if (check(Lexing::SEMICOLON)) {
+        fatalErrorAtCurrent("Expected expression");
+    } else {
+        expr = expression();
+    }
+
     consume(Lexing::SEMICOLON);
     return new Stmt::Print(expr);
 }
