@@ -17,7 +17,10 @@ int main(const int argc, char* argv[]) {
 
         Compiler::CompileResult program = Compiler::compile(file, handler);
 
-        if (!program.success) return 1;
+        if (!program.success) {
+            handler.printErrors();
+            return 1;
+        }
 
         if (compileFlags.interpret) {
             double result = Interpreting::interpret(program, handler);

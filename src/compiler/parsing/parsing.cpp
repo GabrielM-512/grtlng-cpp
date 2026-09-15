@@ -38,8 +38,6 @@ std::vector<Stmt::Stmt*> Parser::parse() {
         }
     }
 
-    errorHandler.printErrors();
-
     return tree;
 }
 
