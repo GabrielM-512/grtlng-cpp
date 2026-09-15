@@ -48,7 +48,7 @@ Stmt::VariableDeclaration *Parser::localDeclarationStatement() {
     consume(Lexing::IDENTIFIER, " after data type");
 
     if (match(Lexing::LEFT_PAREN)) {
-        throw error("Expected \"=\" or \";\", got \"(\" instead)", "Function declarations are only allowed in the global scope");
+        throw error("Unexpected '(' in local variable declaration", "Function declarations are only permitted in the global scope");
     }
 
     const Lexing::Token name = previous;
@@ -131,7 +131,7 @@ Stmt::Block *Parser::blockStatement() {
     std::vector<Stmt::Stmt*> contents;
     while (!match(Lexing::RIGHT_BRACE)) {
         if (check(Lexing::END_OF_FILE)) {
-            error("Unterminated block");
+            errorAtCurrent("Unterminated block");
             break;
         }
         Stmt::Stmt* stmt = declaration();

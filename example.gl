@@ -1,5 +1,5 @@
 i32 main() {
-    for (u16 i = 1; i < 30; i++) {
+    for (u16 i = 1; i < 30; i += 1) {
         i64 a = fib(i);
         print a;
     }
@@ -8,7 +8,7 @@ i32 main() {
 
     while (i <= fib(15)) {
         print i / fib(15);
-        i++;
+        i += 1;
     }
 
 }
