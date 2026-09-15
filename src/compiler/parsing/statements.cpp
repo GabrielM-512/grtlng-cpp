@@ -84,7 +84,7 @@ Stmt::Stmt* Parser::forStatement() {
     consume(Lexing::LEFT_PAREN, " after \"while\"");
     Stmt::Stmt* initialiser = nullptr;
 
-    if (!check(Lexing::SEMICOLON)) {
+    if (!match(Lexing::SEMICOLON)) {
         // initialiser
         if (matchTypeIdent()) initialiser = localDeclarationStatement();
         else initialiser = expressionStatement();
