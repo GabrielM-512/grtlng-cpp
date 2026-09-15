@@ -151,6 +151,7 @@ void Expressions::registerExpressionParselets(Parsing::Parser &parser) {
 
     registerUnaryParselet(parser, Lexing::PLUS);
     registerUnaryParselet(parser, Lexing::MINUS);
+    registerUnaryParselet(parser, Lexing::BANG);
 
     parser.registerInfixParselet(new AssignmentParselet(Parsing::Precedence::ASSIGNMENT), Lexing::EQUALS);
     parser.registerInfixParselet(new RelativeAssignmentParselet(Parsing::Precedence::ASSIGNMENT), Lexing::PLUS_EQUALS);

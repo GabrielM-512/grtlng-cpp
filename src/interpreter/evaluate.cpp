@@ -45,12 +45,15 @@ ExprVisitResults Interpreter::visitBinaryExpr(Expr::Binary *expr) {
 }
 
 ExprVisitResults Interpreter::visitUnaryExpr(Expr::Unary *expr) {
-    double operand = AS_NUM(evaluate(expr->right));
+    Value::Value operand = evaluate(expr->right);
+    double operandNum = AS_NUM(operand);
     switch (expr->operatorType) {
         case Lexing::PLUS:
-            return VALUE_NUM(operand);
+            return VALUE_NUM(operandNum);
         case Lexing::MINUS:
-            return VALUE_NUM(-operand);
+            return VALUE_NUM(-operandNum);
+        case Lexing::BANG:
+            return VALUE_NUM(!Value::isTruthy(operand) ? 1.0 : 0.0);
         default:
             throw RuntimeException("Unknown Unary expression operator " + Lexing::Token::toString(expr->operatorType));
     }
