@@ -34,6 +34,8 @@ add_executable(grtlng_cpp
         src/compiler/parsing/statements.cpp
         src/interpreter/execute.cpp
         src/compiler/parsing/globalScope.cpp
+        src/argvParse.cpp
+        src/argvParse.h
 )
 
 target_compile_options(grtlng_cpp

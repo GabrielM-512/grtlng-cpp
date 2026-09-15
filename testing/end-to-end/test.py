@@ -195,7 +195,7 @@ def run_test(test : Test, config : Config) -> Result:
 
     time_start = time.localtime()
     try:
-        finished_test = subprocess.run([config.interpreter, "-i", test.path], capture_output=True, timeout=3)
+        finished_test = subprocess.run([config.interpreter, "-ci", test.path], capture_output=True, timeout=3)
     except TimeoutExpired:
         return Result(False, make_error_message(test, time_start, True))
 

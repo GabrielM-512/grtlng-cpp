@@ -1,33 +1,14 @@
 #include <iostream>
-#include <sysexits.h>
 
 #include "compiler/compiler.h"
 #include "interpreter/interpreting.h"
 #include "util/fileIO.h"
 
-struct parseFlags {
-    bool interpret;
-    char *filePath;
+#include "argvParse.h"
 
-    bool flagsOK;
-};
-
-parseFlags parseArgs(const int argc, char* argv[]) {
-    parseFlags flags = {.interpret = true, .filePath = nullptr, .flagsOK = true};
-
-    if (argc != 2) {
-        std::cerr << "Improper Usage" << std::endl << "  Proper usage: ./grtlng <input_file>";
-        flags.flagsOK = false;
-    }
-
-    flags.filePath = argv[1];
-
-    return flags;
-}
 
 int main(const int argc, char* argv[]) {
-    parseFlags compileFlags;
-    if (!(compileFlags = parseArgs(argc, argv)).flagsOK) exit(EX_USAGE);
+    argvParse::ProgramArgs compileFlags = argvParse::parse(argc, argv);
 
     try {
         std::string file = fileIO::readFile(compileFlags.filePath);
@@ -38,9 +19,13 @@ int main(const int argc, char* argv[]) {
 
         if (!program.success) return 1;
 
-        double result = Interpreting::interpret(program, handler);
+        if (compileFlags.interpret) {
+            double result = Interpreting::interpret(program, handler);
 
-        return (int) result;
+            return (int) result;
+        }
+
+        return 0;
 
     } catch (std::exception& e) {
         std::cerr << "Error: " << e.what() << std::endl;
