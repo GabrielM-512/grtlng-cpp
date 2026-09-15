@@ -48,20 +48,24 @@ void Value::defineNativeFunctions(Interpreting::Interpreter* interpreter) {
 }
 
 Value::Value Value::Function::call(Interpreting::Interpreter *interpreter, std::vector<Value> &args) {
+    if (args.size() != params.size()) {
+        throw Interpreting::RuntimeException(std::format("Function \"{:s}\" expected {} arguments, got {} instead", name, params.size(), args.size()));
+    }
+
+    Interpreting::Environment environment(&interpreter->global);
+
+    for (u64 i = 0; i < params.size(); i++) {
+        if (params.at(i)->name.data.name[0] != '\0')
+            environment.createVar(params.at(i)->name.data.name, args.at(i));
+    }
+
     try {
-        Interpreting::Environment environment(&interpreter->global);
-
-        for (u64 i = 0; i < params.size(); i++) {
-            if (params.at(i)->name.data.name[0] != '\0')
-                environment.createVar(params.at(i)->name.data.name, args.at(i));
-        }
-
         interpreter->executeBlock(this->body, &environment);
-
-        return (Value) {.type = NUMBER, .as = {}};
     } catch (Interpreting::ReturnException& e) {
         return e.value;
     }
+
+    return (Value) {.type = NUMBER, .as = {}};
 }
 
 /*
