@@ -18,8 +18,13 @@ std::vector<Stmt::VariableDeclaration*> Parser::parseParameters() {
 
             Lexing::TokenType dataType = previous.type;
 
-            consume(Lexing::IDENTIFIER, " after parameter type");
-            Lexing::Token name = previous;
+            Lexing::Token name = current;
+
+            name.data.name = "";
+
+            if (match(Lexing::IDENTIFIER)) {
+                name = previous;
+            }
 
             params.push_back(new Stmt::VariableDeclaration(dataType, name, nullptr));
 

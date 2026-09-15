@@ -1,5 +1,6 @@
 #include "value.h"
 
+#include <cstring>
 #include <utility>
 
 #include "iostream"
@@ -51,7 +52,8 @@ Value::Value Value::Function::call(Interpreting::Interpreter *interpreter, std::
         Interpreting::Environment environment(&interpreter->global);
 
         for (u64 i = 0; i < params.size(); i++) {
-            environment.createVar(params.at(i)->name.data.name, args.at(i));
+            if (params.at(i)->name.data.name[0] != '\0')
+                environment.createVar(params.at(i)->name.data.name, args.at(i));
         }
 
         interpreter->executeBlock(this->body, &environment);
