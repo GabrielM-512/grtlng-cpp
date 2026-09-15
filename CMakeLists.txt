@@ -36,13 +36,15 @@ add_executable(grtlng_cpp
         src/compiler/parsing/globalScope.cpp
         src/argvParse.cpp
         src/argvParse.h
+        src/compiler/resolving.cpp
+        src/compiler/resolving.h
 )
 
 target_compile_options(grtlng_cpp
         PUBLIC -Wall
         PUBLIC -Wextra
         PUBLIC -Werror
-        PUBLIC -Ofast
+        #PUBLIC -Ofast
 )
 
 

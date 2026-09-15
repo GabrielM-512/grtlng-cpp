@@ -3,6 +3,7 @@
 #include <iostream>
 
 #include "lexing.h"
+#include "resolving.h"
 #include "parsing/parsing.h"
 
 Compiler::CompileResult Compiler::compile(const std::string& source, Error::ErrorHandler& errorHandler) {
@@ -14,6 +15,11 @@ Compiler::CompileResult Compiler::compile(const std::string& source, Error::Erro
     result.tree = parser.parse();
 
     if (parser.hadParseError()) result.success = false;
+
+    if (parser.hadFatalParseError()) return result;
+
+
+    Resolving::resolve(result, errorHandler);
 
     return result;
 }
