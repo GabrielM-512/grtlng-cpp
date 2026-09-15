@@ -52,7 +52,7 @@ ExprVisitResults Interpreter::visitUnaryExpr(Expr::Unary *expr) {
         case Lexing::MINUS:
             return VALUE_NUM(-operand);
         default:
-            return VALUE_NUM(0);
+            throw RuntimeException("Unknown Unary expression operator " + Lexing::Token::toString(expr->operatorType));
     }
 }
 
