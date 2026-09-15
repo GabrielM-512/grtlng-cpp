@@ -66,6 +66,9 @@
       "testfile": "function/local.gl",
       "stderr": "function/local_stderr"
     },
+    "function.nameless_parameter": {
+      "testfile": "function/nameless_parameter.gl"
+    },
     "print.missing_argument": {
       "testfile": "print/missing_argument.gl",
       "stderr": "print/missing_argument_stderr"
