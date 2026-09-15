@@ -71,8 +71,40 @@ public:
             return new Expr::Assign(name, right);
         }
 
-        parser.errorAt(token, "Invalid assignment target", "", true);
-        return nullptr;
+        throw parser.errorAt(token, "Invalid assignment target", "", false);
+    }
+};
+
+class RelativeAssignmentParselet : public Parsing::InfixParselet {
+public:
+    RelativeAssignmentParselet(int precedence): InfixParselet(precedence) {}
+
+    Expr::Expr* parse(Parsing::Parser &parser, Expr::Expr *left, Lexing::Token &token) override {
+        Expr::Expr* right = parser.parseExprPrecRight();
+
+        Lexing::TokenType argument;
+
+        switch (token.type) {
+            case Lexing::PLUS_EQUALS: argument = Lexing::PLUS; break;
+            case Lexing::MINUS_EQUALS: argument = Lexing::MINUS; break;
+            case Lexing::STAR_EQUALS: argument = Lexing::STAR; break;
+            case Lexing::SLASH_EQUALS: argument = Lexing::SLASH; break;
+
+            default:
+                argument = Lexing::ERROR; // unreachable
+        }
+
+        if(Expr::Identifier* target = dynamic_cast<Expr::Identifier*>(left)) {
+            Lexing::Token name = target->target;
+
+            // ReSharper disable once CppLocalVariableMightNotBeInitialized
+            Expr::Binary *value = new Expr::Binary(left, argument, right);
+
+            return new Expr::Assign(name, value);
+        }
+
+        throw parser.errorAt(token, "Invalid assignment target", "", false);
+
     }
 };
 
@@ -121,6 +153,11 @@ void Expressions::registerExpressionParselets(Parsing::Parser &parser) {
     registerUnaryParselet(parser, Lexing::MINUS);
 
     parser.registerInfixParselet(new AssignmentParselet(Parsing::Precedence::ASSIGNMENT), Lexing::EQUALS);
+    parser.registerInfixParselet(new RelativeAssignmentParselet(Parsing::Precedence::ASSIGNMENT), Lexing::PLUS_EQUALS);
+    parser.registerInfixParselet(new RelativeAssignmentParselet(Parsing::Precedence::ASSIGNMENT), Lexing::MINUS_EQUALS);
+    parser.registerInfixParselet(new RelativeAssignmentParselet(Parsing::Precedence::ASSIGNMENT), Lexing::STAR_EQUALS);
+    parser.registerInfixParselet(new RelativeAssignmentParselet(Parsing::Precedence::ASSIGNMENT), Lexing::SLASH_EQUALS);
+
     parser.registerInfixParselet(new CallParselet(Parsing::Precedence::CALL), Lexing::LEFT_PAREN);
 
     registerBinaryParselet(parser, Lexing::PLUS, Parsing::Precedence::SUM);
