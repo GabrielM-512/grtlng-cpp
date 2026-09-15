@@ -26,6 +26,15 @@ class UnaryParselet : public Parsing::PrefixParselet {
 public:
     Expr::Expr* parse(Parsing::Parser& parser, Lexing::Token& token) override {
         Expr::Expr* operand = parser.parseExpression(Parsing::Precedence::UNARY - 1);
+
+
+        if (token.type == Lexing::MINUS) {
+            if (auto number = dynamic_cast<Expr::Number*>(operand)) {
+                number->value = -number->value;
+                return number;
+            }
+        }
+
         return new Expr::Unary(token.type, operand);
     }
 };
