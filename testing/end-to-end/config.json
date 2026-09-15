@@ -69,6 +69,10 @@
     "function.nameless_parameter": {
       "testfile": "function/nameless_parameter.gl"
     },
+    "function.scoped_vars": {
+      "testfile": "function/scoped_vars.gl",
+      "stderr": "function/scoped_vars_stderr"
+    },
     "print.missing_argument": {
       "testfile": "print/missing_argument.gl",
       "stderr": "print/missing_argument_stderr"

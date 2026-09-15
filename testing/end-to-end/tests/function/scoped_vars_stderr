@@ -1,0 +1,3 @@
+Encountered error on line 11: Unknown symbol "test"
+[11]        print test;
+                  ^ Here

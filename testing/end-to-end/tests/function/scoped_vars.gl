@@ -1,0 +1,12 @@
+i16 main() {
+    one();
+}
+
+void one() {
+    i16 test = 5;
+    two();
+}
+
+void two() {
+    print test;
+}
