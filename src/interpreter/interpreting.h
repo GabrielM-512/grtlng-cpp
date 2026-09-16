@@ -34,6 +34,7 @@ namespace Interpreting {
         ExprVisitResults visitIdentifierExpr(Expr::Identifier *expr) override;
         ExprVisitResults visitAssignExpr(Expr::Assign *expr) override;
         ExprVisitResults visitCallExpr(Expr::Call *expr) override;
+        ExprVisitResults visitLogicalExpr(Expr::Logical *expr) override;
 
         StmtVisitResults visitPrintStmt(Stmt::Print *stmt) override;
         StmtVisitResults visitExpressionStmt(Stmt::Expression *stmt) override;

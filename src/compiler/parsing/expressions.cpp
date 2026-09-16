@@ -136,6 +136,16 @@ public:
     }
 };
 
+class LogicParselet : public Parsing::InfixParselet {
+public:
+    LogicParselet(int precedence): InfixParselet(precedence) {}
+
+    Expr::Expr *parse(Parsing::Parser &parser, Expr::Expr *left, Lexing::Token &token) override {
+        Expr::Expr* right = parser.parseExprPrec();
+        return new Expr::Logical(left, token.type, right);
+    }
+};
+
 
 /*
     PPPP      A     RRRR     SSSS   EEEEE   L       EEEEE   TTTTT           U   U   TTTTT   IIIII   L        SSSS
@@ -183,6 +193,8 @@ void Expressions::registerExpressionParselets(Parsing::Parser &parser) {
     registerBinaryParselet(parser, Lexing::EQUALS_EQUALS, Parsing::Precedence::EQUALITY);
     registerBinaryParselet(parser, Lexing::BANG_EQUALS, Parsing::Precedence::EQUALITY);
 
+    parser.registerInfixParselet(new LogicParselet(Parsing::Precedence::LOGICAL_AND), Lexing::AMP_AMP);
+    parser.registerInfixParselet(new LogicParselet(Parsing::Precedence::LOGICAL_OR), Lexing::PIPE_PIPE);
 }
 
 

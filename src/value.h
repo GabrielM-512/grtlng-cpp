@@ -86,6 +86,8 @@ namespace Value {
 
 #define VALUE_NUM(number) ((Value::Value) {.type = Value::NUMBER, .as = {.num = (number)}})
 #define VALUE_CALLABLE(callable) ((Value::Value) {.type = Value::OBJECT, .as = {.object = callable}})
+#define VALUE_TRUE (VALUE_NUM(1))
+#define VALUE_FALSE (VALUE_NUM(0))
 
 #define IS_NUM(value) ((value).type == NUMBER)
 #define IS_CALLABLE(value) (Value::isObjType((value), Value::CALLABLE))

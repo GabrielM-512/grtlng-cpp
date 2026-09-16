@@ -16,6 +16,7 @@ namespace Expr {
     struct Identifier;
     struct Assign;
     struct Call;
+    struct Logical;
 
     class ExprVisitor {
     public:
@@ -27,6 +28,7 @@ namespace Expr {
         virtual ExprVisitResults visitIdentifierExpr(Identifier* expr) = 0;
         virtual ExprVisitResults visitAssignExpr(Assign* expr) = 0;
         virtual ExprVisitResults visitCallExpr(Call* expr) = 0;
+        virtual ExprVisitResults visitLogicalExpr(Logical* expr) = 0;
     };
 
     struct Expr {
@@ -115,6 +117,22 @@ namespace Expr {
 
         ExprVisitResults accept(ExprVisitor* visitor) override {
             return visitor->visitCallExpr(this);
+        }
+    };
+
+    struct Logical: Expr {
+        Expr* left;
+        Lexing::TokenType operatorType;
+        Expr* right;
+
+        explicit Logical(
+            Expr* left,
+            Lexing::TokenType operatorType,
+            Expr* right
+        ): left(left), operatorType(operatorType), right(right) {}
+
+        ExprVisitResults accept(ExprVisitor* visitor) override {
+            return visitor->visitLogicalExpr(this);
         }
     };
 }

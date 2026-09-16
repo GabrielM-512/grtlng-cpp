@@ -123,6 +123,12 @@ public:
         return std::monostate();
     }
 
+    ExprVisitResults visitLogicalExpr(Expr::Logical *expr) override {
+        expression(expr->left);
+        expression(expr->right);
+        return std::monostate();
+    }
+
 /*
      SSSS   TTTTT     A     TTTTT   EEEEE   M   M   EEEEE   N   N   TTTTT    SSSS
     S         T      A A      T     E       MM MM   E       NN  N     T     S

@@ -95,3 +95,20 @@ ExprVisitResults Interpreter::visitCallExpr(Expr::Call *expr) {
 
     return AS_CALLABLE(callee)->call(this, args);
 }
+
+ExprVisitResults Interpreter::visitLogicalExpr(Expr::Logical *expr) {
+    Value::Value left = evaluate(expr->left);
+
+    switch (expr->operatorType) {
+        case Lexing::AMP_AMP:
+            if (!Value::isTruthy(left)) return VALUE_FALSE;
+            break;
+        case Lexing::PIPE_PIPE:
+            if (Value::isTruthy(left)) return VALUE_TRUE;
+            break;
+        default:
+            break; //unreachable
+    }
+
+    return Value::isTruthy(evaluate(expr->right)) ? VALUE_TRUE : VALUE_FALSE;
+}

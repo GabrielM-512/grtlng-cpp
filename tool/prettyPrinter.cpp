@@ -62,6 +62,10 @@ public:
         return string;
     }
 
+    ExprVisitResults visitLogicalExpr(Expr::Logical *expr) override {
+        return "( " + expression(expr->left) + operatorString(expr->operatorType) + expression(expr->right) + " )";
+    }
+
 
     StmtVisitResults visitExpressionStmt(Stmt::Expression *stmt) override {
         return "[EXPR] " + expression(stmt->expression);

@@ -139,7 +139,8 @@ if __name__ == "__main__":
                   "Number     | double value = 0",
                   "Identifier | const Lexing::Token target",
                   "Assign     | Lexing::Token name, Expr* value",
-                  "Call       | Expr* callee, std::vector<Expr*> args, Lexing::Token paren"
+                  "Call       | Expr* callee, std::vector<Expr*> args, Lexing::Token paren",
+                  "Logical    | Expr* left, Lexing::TokenType operatorType, Expr* right"
               ],
                visit_results= "std::string, Value::Value, std::monostate",
                includes = "\"../compiler/lexing.h\" | \"../value.h\"")
