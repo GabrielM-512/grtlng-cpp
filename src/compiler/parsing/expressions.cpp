@@ -49,6 +49,13 @@ public:
     }
 };
 
+class BoolParselet : public Parsing::PrefixParselet {
+public:
+    Expr::Expr *parse(Parsing::Parser &, Lexing::Token &token) override {
+        return new Expr::Number(token.type == Lexing::TRUE ? 1 : 0);
+    }
+};
+
 /*
     IIIII   N   N   FFFFF   IIIII   X   X
       I     NN  N   F         I      X X
@@ -195,6 +202,9 @@ void Expressions::registerExpressionParselets(Parsing::Parser &parser) {
 
     parser.registerInfixParselet(new LogicParselet(Parsing::Precedence::LOGICAL_AND), Lexing::AMP_AMP);
     parser.registerInfixParselet(new LogicParselet(Parsing::Precedence::LOGICAL_OR), Lexing::PIPE_PIPE);
+
+    parser.registerPrefixParselet(new BoolParselet(), Lexing::TRUE);
+    parser.registerPrefixParselet(new BoolParselet(), Lexing::FALSE);
 }
 
 
