@@ -18,6 +18,10 @@ namespace Stmt {
     struct Block;
 }
 
+namespace Resolving {
+    class Scope;
+}
+
 namespace Value {
 
     class Obj;
@@ -78,6 +82,7 @@ namespace Value {
 
 
     void defineNativeFunctions(Interpreting::Interpreter* interpreter);
+    void defineNativesResolver(Resolving::Scope* scope);
 
 #define VALUE_NUM(number) ((Value::Value) {.type = Value::NUMBER, .as = {.num = (number)}})
 #define VALUE_CALLABLE(callable) ((Value::Value) {.type = Value::OBJECT, .as = {.object = callable}})

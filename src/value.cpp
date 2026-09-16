@@ -8,6 +8,8 @@
 #include "interpreter/runtimeException.h"
 #include "interpreter/interpreting.h"
 
+#include "compiler/resolving.h"
+
 /*
     N   N     A     TTTTT   IIIII   V   V   EEEEE           FFFFF   U   U   N   N     CCC   TTTTT   IIIII    OOO    N   N    SSSS
     NN  N    A A      T       I     V   V   E               F       U   U   NN  N    C        T       I     O   O   NN  N   S
@@ -46,6 +48,17 @@ void defineNativeFn(Interpreting::Interpreter* interpreter, const std::string& n
 void Value::defineNativeFunctions(Interpreting::Interpreter* interpreter) {
     defineNativeFn(interpreter, "clock", clockNative);
 }
+
+void defineNativeResolver(Resolving::Scope* scope, const char* name) {
+    scope->createVar(name);
+    scope->activateVar(name);
+}
+
+void Value::defineNativesResolver(Resolving::Scope *scope) {
+    defineNativeResolver(scope, "clock");
+}
+
+
 
 Value::Value Value::Function::call(Interpreting::Interpreter *interpreter, std::vector<Value> &args) {
     if (args.size() != params.size()) {

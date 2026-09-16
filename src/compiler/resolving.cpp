@@ -6,41 +6,6 @@
 
 using namespace Resolving;
 
-class Scope {
-    std::unordered_map<std::string, bool> symbols;
-public:
-    Scope* enclosing;
-
-    Scope(const Scope&) = delete;
-
-    Scope(): enclosing(nullptr) {}
-
-    Scope(Scope* enclosing, const Scope& base): enclosing(enclosing) {
-        for (auto current : base.symbols) {
-            symbols.insert(current);
-        }
-    }
-
-    Scope(Scope* enclosing): enclosing(enclosing) {}
-    ~Scope() = default;
-
-    bool hasVar(const std::string& name) const {
-        return symbols.contains(name);
-    }
-
-    void createVar(const std::string& name) {
-        symbols.insert({name, false});
-    }
-
-    void activateVar(const std::string& name) {
-        symbols.find(name)->second = true;
-    }
-
-    bool isActivated(const std::string& name) const {
-        return symbols.find(name)->second;
-    }
-};
-
 class Resolver : public Expr::ExprVisitor, public Stmt::StmtVisitor {
     Compiler::CompileResult& tree;
     Error::ErrorHandler &handler;
@@ -96,14 +61,17 @@ class Resolver : public Expr::ExprVisitor, public Stmt::StmtVisitor {
     }
 
 public:
-    Resolver(Compiler::CompileResult& tree, Error::ErrorHandler &handler) : tree(tree), handler(handler) {current = new Scope();}
+    Resolver(Compiler::CompileResult& tree, Error::ErrorHandler &handler) : tree(tree), handler(handler) {
+        current = new Scope();
+        Value::defineNativesResolver(current);
+    }
 
 /*
-    EEEEE   X   X   PPPP    RRRR    EEEEE    SSSS    SSSS    III     OOO    N   N    SSSS
+    EEEEE   X   X   PPPP    RRRR    EEEEE    SSSS    SSSS   IIIII    OOO    N   N    SSSS
     E        X X    P   P   R   R   E       S       S        III    O   O   NN  N   S
     EEEEE     X     PPPP    RRRR    EEEEE    SSS     SSS     III    O   O   N N N    SSS
     E        X X    P       R  R    E           S       S    III    O   O   N  NN       S
-    EEEEE   X   X   P       R   R   EEEEE   SSSS    SSSS     III     OOO    N   N   SSSS
+    EEEEE   X   X   P       R   R   EEEEE   SSSS    SSSS    IIIII    OOO    N   N   SSSS
 */
 
     ExprVisitResults visitAssignExpr(Expr::Assign *expr) override {
