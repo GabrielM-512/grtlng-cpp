@@ -106,7 +106,7 @@ public:
 
     StmtVisitResults visitVariableDeclarationStmt(Stmt::VariableDeclaration *stmt) override {
         std::string dataType = Lexing::Token::toString(stmt->dataType);
-        dataType = dataType.substr(1, dataType.size() - 1);
+        dataType = dataType.substr(1, dataType.size() - 2);
 
         return "Declare Variable '" + std::string(stmt->name.data.name) + "' of type " + dataType +
             (stmt->value == nullptr ? " without value" : " with value = " + expression(stmt->value));
