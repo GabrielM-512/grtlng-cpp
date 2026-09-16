@@ -54,6 +54,10 @@
       "testfile": "for/return_inside.gl",
       "stdout": "for/return_inside_stdout"
     },
+    "for.scope": {
+      "testfile": "for/scope.gl",
+      "stdout": "for/scope_stdout"
+    },
     "function.body_block": {
       "testfile": "function/body_must_be_block.gl",
       "stderr": "function/body_must_be_block_stderr"

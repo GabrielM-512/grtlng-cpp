@@ -1,0 +1,30 @@
+i16 main() {
+    i16 i = 15;
+    
+    // New variable is in inner scope.
+    for (i16 i = 0; i < 1; i += 1) {
+        print i; // expect: 0
+        
+        // Loop body is in second inner scope.
+        i16 i = -1;
+        print i; // expect: -1
+    }
+    
+    print i; // loop didn't effect outer variable
+    
+    
+    {
+        // New variable shadows outer variable.
+        for (i16 i = 0; i > 0; i = i + 1) {}
+        
+        // Goes out of scope after loop.
+        i16 i = -15;
+        print i; // expect: -15
+        
+        // Can reuse an existing variable.
+        for (i = 0; i < 1; i = i + 1) {
+            print i; // expect: 0
+        }
+    }
+
+}
