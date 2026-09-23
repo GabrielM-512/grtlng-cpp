@@ -80,7 +80,8 @@ StmtVisitResults Interpreter::visitFunctionStmt(Stmt::Function *stmt) {
 }
 
 StmtVisitResults Interpreter::visitReturnStmt(Stmt::Return *stmt) {
-    Value::Value returnValue = evaluate(stmt->value);
+    Value::Value returnValue = VALUE_NUM(0);
+    if (stmt->value != nullptr) returnValue = evaluate(stmt->value);
 
     throw ReturnException(returnValue);
 }
