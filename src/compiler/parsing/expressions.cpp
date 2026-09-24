@@ -43,7 +43,7 @@ class GroupingParselet : public Parsing::PrefixParselet {
 public:
     Expr::Expr* parse (Parsing::Parser& parser, Lexing::Token&) override {
         Expr::Expr* node = parser.expression();
-        parser.consume(Lexing::RIGHT_PAREN, "Expected ')'");
+        parser.consume(Lexing::RIGHT_PAREN);
 
         return node;
     }
