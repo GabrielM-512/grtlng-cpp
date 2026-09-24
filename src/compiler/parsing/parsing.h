@@ -95,17 +95,17 @@ namespace Parsing {
         Expr::Expr* parseExprPrecRight();
         Expr::Expr* expression();
 
-        Compiler::CompileError errorAt(Lexing::Token token, std::string message, std::string hint, bool fatal);
+        Compiler::CompileError errorAt(Lexing::Token token, const std::string& message, std::string hint, bool fatal);
 
-        Compiler::CompileError fatalErrorAtCurrent(std::string message);
-        Compiler::CompileError fatalError(std::string message);
-        Compiler::CompileError errorAtCurrent(std::string message);
-        Compiler::CompileError error(std::string message);
+        Compiler::CompileError fatalErrorAtCurrent(const std::string& message);
+        Compiler::CompileError fatalError(const std::string& message);
+        Compiler::CompileError errorAtCurrent(const std::string& message);
+        Compiler::CompileError error(const std::string& message);
 
-        Compiler::CompileError fatalErrorAtCurrent(std::string message, std::string hint);
-        Compiler::CompileError fatalError(std::string message, std::string hint);
-        Compiler::CompileError errorAtCurrent(std::string message, std::string hint);
-        Compiler::CompileError error(std::string message, std::string hint);
+        Compiler::CompileError fatalErrorAtCurrent(const std::string& message, std::string hint);
+        Compiler::CompileError fatalError(const std::string& message, std::string hint);
+        Compiler::CompileError errorAtCurrent(const std::string& message, std::string hint);
+        Compiler::CompileError error(const std::string& message, std::string hint);
     };
 
 }
