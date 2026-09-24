@@ -115,7 +115,7 @@ public:
     StmtVisitResults visitFunctionStmt(Stmt::Function *stmt) override {
         std::string output = std::string(stmt->name.data.name) + "(";
 
-        for (Stmt::VariableDeclaration* param : stmt->params) {
+        for (const Stmt::VariableDeclaration* param : stmt->params) {
             output += Lexing::Token::toString(param->dataType) + " " + param->name.data.name + ", ";
         }
 
@@ -144,7 +144,7 @@ public:
     }
 };
 
-std::string Printer::print(std::vector<Stmt::Stmt*> tree) {
+std::string Printer::print(const std::vector<Stmt::Stmt*>& tree) {
     PrettyPrinter printer;
     return printer.print(tree);
 }
