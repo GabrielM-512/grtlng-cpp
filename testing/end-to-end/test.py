@@ -72,13 +72,12 @@ class Result:
 
 def parse_flags() -> Flags:
     config_file = sys.argv[1]
-    processing : str
+    processing : str = ""
 
     match sys.argv[2]:
         case "single" | "multi":
             processing = sys.argv[2]
         case _:
-            processing = ""
             error(f"sys.argv[2] (single / multicore processing) was given unexpected value. Expected \"single\" or \"multi\", got {sys.argv[2]}")
             exit(os.EX_USAGE)
 
@@ -101,20 +100,21 @@ def read_config(path : str) -> Config:
         error(f"Test configuration file {pathfile.absolute()} does not exist")
         exit(os.EX_DATAERR)
 
-    tests: dict[str, dict[str, str]]
 
     with open(pathfile.absolute(), "r") as f:
         json_input = f.read()
 
-        if len(json_input) == 0:
-            error(f"Configuration file {pathfile.absolute()} was empty")
-            exit(os.EX_DATAERR)
+    if len(json_input) == 0:
+        error(f"Configuration file {pathfile.absolute()} was empty")
+        exit(os.EX_DATAERR)
 
-        try:
-            tests = json.loads(json_input)
-        except json.JSONDecodeError as e:
-            error(f"Configuration file {pathfile.absolute()} was malformed on line {e.lineno}:\n  {e.msg}")
-            exit(os.EX_DATAERR)
+    tests: dict[str, dict[str, str]] = {}
+
+    try:
+        tests = json.loads(json_input)
+    except json.JSONDecodeError as e:
+        error(f"Configuration file {pathfile.absolute()} was malformed on line {e.lineno}:\n  {e.msg}")
+        exit(os.EX_DATAERR)
 
     return Config(tests)
 
