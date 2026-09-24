@@ -81,7 +81,7 @@ public:
     Expr::Expr* parse(Parsing::Parser& parser, Expr::Expr* left, Lexing::Token& token) override {
         Expr::Expr* right = parser.parseExprPrecRight();
 
-        if(Expr::Identifier* target = dynamic_cast<Expr::Identifier*>(left)) {
+        if(const auto target = dynamic_cast<Expr::Identifier*>(left)) {
             Lexing::Token name = target->target;
 
             return new Expr::Assign(name, right);
@@ -110,11 +110,11 @@ public:
                 argument = Lexing::ERROR; // unreachable
         }
 
-        if(Expr::Identifier* target = dynamic_cast<Expr::Identifier*>(left)) {
+        if(const auto target = dynamic_cast<Expr::Identifier*>(left)) {
             Lexing::Token name = target->target;
 
             // ReSharper disable once CppLocalVariableMightNotBeInitialized
-            Expr::Binary *value = new Expr::Binary(left, argument, right);
+            const auto value = new Expr::Binary(left, argument, right);
 
             return new Expr::Assign(name, value);
         }
