@@ -9,13 +9,10 @@
 using namespace Parsing;
 
 Parser::Parser(std::vector<Lexing::Token>& tokens, Error::ErrorHandler& handler) : tokens(tokens),
-    errorHandler(handler) {
+    current(tokens.at(0)), previous(),  errorHandler(handler) {
     currentToken = 0;
     hadError = false;
     hadFatalError = false;
-
-    current = tokens.at(0);
-    previous = (Lexing::Token) {.type = Lexing::ERROR, .line = 1, .position = 0, .data = {nullptr}};
 
     advance();
 
