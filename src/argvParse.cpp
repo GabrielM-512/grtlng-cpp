@@ -10,13 +10,20 @@ error_t parse_opt (int key, char *arg, argp_state *state) {
     auto arguments = static_cast<ProgramArgs *>(state->input);
 
     switch (key) {
-        case 'c':
+        case 'c': {
             if (strcmp(arg, "i") == 0) {
                 arguments->interpret = true;
             } else {
                 argp_failure(state, EX_USAGE, EINVAL, "Bad option \"%s\" to -c\nExpected options: i", arg);
             }
             break;
+        }
+
+        case 'd': {
+            arguments->decompile = true;
+            break;
+        }
+
         case ARGP_KEY_ARG: {
             if (arguments->filePath == nullptr) {
                 arguments->filePath = (char*) malloc(strlen(arg));
@@ -47,6 +54,7 @@ ProgramArgs argvParse::parse(int argc, char* argv[]) {
 
     static argp_option options[] = {
         {.name = "compile-mode", .key = 'c', .arg = "type", .flags = 0, .doc = "[-c=<value>] The mode of the compiler. Possible options: i (interpret program)", .group = 0},
+        {.name = nullptr, .key = 'd', .arg = nullptr, .flags = 0, .doc = "[-d] Whether to decompile the bytecode before execution. Only valid when used in combination with -ci.", .group = 0},
         {.name = nullptr, .key = 0, .arg = nullptr, .flags = 0, .doc = nullptr, .group = 0} // last entry
     };
 
