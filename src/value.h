@@ -44,6 +44,7 @@ namespace Value {
     };
 
     bool isObjType(const Value& val, ObjectType type);
+    bool equality(Value a, Value b);
 
     class Obj {
     public:

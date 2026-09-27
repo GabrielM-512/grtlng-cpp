@@ -93,6 +93,32 @@ bool Value::isObjType(const Value& val, ObjectType type) {
     return val.type == OBJECT && val.as.object->type == type;
 }
 
+bool objsEqual(const Value::Obj* a, const Value::Obj* b) {
+    if (a->type != b->type) return false;
+
+    switch (a->type) {
+        case Value::CALLABLE: {
+            auto fnA = static_cast<const Value::Callable*>(a);
+            auto fnB = static_cast<const Value::Callable*>(b);
+
+            return fnA->getArity() == fnB->getArity() && fnA->getName() == fnB->getName();
+        }
+    }
+
+    return false;
+}
+
+bool Value::equality(Value a, Value b) {
+    if (a.type != b.type) return false;
+
+    switch (a.type) {
+        case NUMBER: return AS_NUM(a) == AS_NUM(b);
+        case OBJECT: return objsEqual(a.as.object, b.as.object);
+    }
+
+    return false;
+}
+
 void printObject(const Value::Obj* obj) {
     switch (obj->type) {
         case Value::CALLABLE: {
