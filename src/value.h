@@ -96,5 +96,6 @@ namespace Value {
 #define AS_CALLABLE(value) ((Value::Callable*)(value).as.object)
 
     void printValue(const Value& value);
+    std::string getValueString(const Value& value);
     bool isTruthy(const Value& value);
 }

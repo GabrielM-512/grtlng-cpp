@@ -104,13 +104,29 @@ void printObject(const Value::Obj* obj) {
 }
 
 void Value::printValue(const Value& value) {
+    std::cout << getValueString(value) << std::endl;
+}
+
+std::string getObjectString(const Value::Obj* obj) {
+    switch (obj->type) {
+        case Value::CALLABLE: {
+            auto callable = dynamic_cast<const Value::Callable*> (obj);
+            return "<fn \"" + callable->getName() + "\"";
+        }
+        default:
+            return "UNKNOWN OBJECT TYPE";
+
+    }
+}
+
+std::string Value::getValueString(const Value& value) {
     switch (value.type) {
         case NUMBER:
-            std::cout << AS_NUM(value) << "\n";
-            break;
+            return std::to_string(AS_NUM(value));
         case OBJECT:
-            printObject(value.as.object);
-            break;
+            return getObjectString(value.as.object);
+        default:
+            return "UNKNOWN VALUE TYPE";
     }
 }
 
