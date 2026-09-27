@@ -84,7 +84,7 @@ namespace Value {
     void defineNativeFunctions(Interpreting::Interpreter* interpreter);
     void defineNativesResolver(Resolving::Scope* scope);
 
-#define VALUE_NUM(number) ((Value::Value) {.type = Value::NUMBER, .as = {.num = (number)}})
+#define VALUE_NUM(number) ((Value::Value) {.type = Value::NUMBER, .as = {.num = static_cast<double>(number)}})
 #define VALUE_CALLABLE(callable) ((Value::Value) {.type = Value::OBJECT, .as = {.object = (callable)}})
 #define VALUE_TRUE (VALUE_NUM(1))
 #define VALUE_FALSE (VALUE_NUM(0))
