@@ -20,19 +20,19 @@ add_executable(grtlng_cpp
         src/compiler/parsing/expressions.h
         tool/prettyPrinter.cpp
         tool/prettyPrinter.h
-        src/interpreter/interpreting.cpp
-        src/interpreter/interpreting.h
+        src/interpreter/AST/interpreting.cpp
+        src/interpreter/AST/interpreting.h
         src/value.cpp
         src/value.h
-        src/interpreter/environment.cpp
-        src/interpreter/environment.h
+        src/interpreter/AST/environment.cpp
+        src/interpreter/AST/environment.h
         src/AST/stmt.h
-        src/interpreter/evaluate.cpp
+        src/interpreter/AST/evaluate.cpp
         src/error.cpp
         src/error.h
         src/interpreter/runtimeException.h
         src/compiler/parsing/statements.cpp
-        src/interpreter/execute.cpp
+        src/interpreter/AST/execute.cpp
         src/compiler/parsing/globalScope.cpp
         src/argvParse.cpp
         src/argvParse.h

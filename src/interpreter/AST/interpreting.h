@@ -1,9 +1,9 @@
 #pragma once
 #include "environment.h"
-#include "../AST/expr.h"
-#include "../AST/stmt.h"
-#include "../error.h"
-#include "../compiler/compiler.h"
+#include "../../AST/expr.h"
+#include "../../AST/stmt.h"
+#include "../../error.h"
+#include "../../compiler/compiler.h"
 
 namespace Interpreting {
 

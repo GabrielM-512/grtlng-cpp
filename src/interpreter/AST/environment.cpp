@@ -1,5 +1,5 @@
 #include "environment.h"
-#include "runtimeException.h"
+#include "../runtimeException.h"
 
 using namespace Interpreting;
 

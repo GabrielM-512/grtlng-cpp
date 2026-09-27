@@ -4,8 +4,8 @@
 #include <sysexits.h>
 
 #include "environment.h"
-#include "../error.h"
-#include "../compiler/compiler.h"
+#include "../../error.h"
+#include "../../compiler/compiler.h"
 
 using namespace Interpreting;
 

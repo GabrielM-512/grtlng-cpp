@@ -6,7 +6,7 @@
 #include "iostream"
 #include "compiler/lexing.h"
 #include "interpreter/runtimeException.h"
-#include "interpreter/interpreting.h"
+#include "interpreter/AST/interpreting.h"
 
 #include "compiler/resolving.h"
 

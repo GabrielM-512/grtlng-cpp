@@ -1,7 +1,7 @@
 #include <iostream>
 
 #include "compiler/compiler.h"
-#include "interpreter/interpreting.h"
+#include "interpreter/AST/interpreting.h"
 #include "util/fileIO.h"
 
 #include "argvParse.h"
