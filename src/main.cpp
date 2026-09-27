@@ -1,7 +1,7 @@
 #include <iostream>
 
 #include "compiler/compiler.h"
-#include "interpreter/AST/interpreting.h"
+#include "interpreter/bytecode/interpreting.h"
 #include "util/fileIO.h"
 
 #include "argvParse.h"
@@ -25,7 +25,7 @@ int main(const int argc, char* argv[]) {
         }
 
         if (compileFlags.interpret) {
-            double result = Interpreting::interpret(program, handler);
+            double result = Bytecode::interpret(program, compileFlags.decompile);
 
             return (int) result;
         }

@@ -38,6 +38,12 @@ add_executable(grtlng_cpp
         src/argvParse.h
         src/compiler/resolving.cpp
         src/compiler/resolving.h
+        src/interpreter/bytecode/interpreting.cpp
+        src/interpreter/bytecode/interpreting.h
+        src/interpreter/bytecode/compiler.cpp
+        src/interpreter/bytecode/compiler.h
+        src/interpreter/bytecode/decompile.cpp
+        src/interpreter/bytecode/decompile.h
 )
 
 target_compile_options(grtlng_cpp
