@@ -10,9 +10,6 @@ struct Local {
     i32 depth;
 };
 
-static Expr::Number zeroExpr(0.0);
-static Stmt::Return zeroReturn(&zeroExpr);
-
 class BytecodeCompiler : public Stmt::StmtVisitor, public Expr::ExprVisitor{
     Bytecode::Program program {};
     std::unordered_map<std::string, u16> globals;
@@ -120,6 +117,10 @@ public:
                 createGlobal(func->name.data.name);
 
                 if (!dynamic_cast<Stmt::Return*>(func->body->statements.back())) {
+
+                    static Expr::Number zeroExpr(0.0);
+                    static Stmt::Return zeroReturn(&zeroExpr);
+
                     func->body->statements.push_back(&zeroReturn);
                 }
 
