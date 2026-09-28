@@ -256,8 +256,38 @@ public:
         return std::monostate();
     }
 
-    ExprVisitResults visitLogicalExpr(Expr::Logical *) override {
-        throw CompileError("Unimplemented Expression Type: Logical");
+    ExprVisitResults visitLogicalExpr(Expr::Logical *expr) override {
+        Bytecode::Operation jumpType;
+        Bytecode::Operation first, second;
+
+        if (expr->operatorType == Lexing::AMP_AMP) {
+            jumpType = Bytecode::JUMP_FALSE;
+            first = Bytecode::TRUE;
+            second = Bytecode::FALSE;
+        } else if (expr->operatorType == Lexing::PIPE_PIPE) {
+            jumpType = Bytecode::JUMP_TRUE;
+            first = Bytecode::FALSE;
+            second = Bytecode::TRUE;
+        } else throw CompileError("Invalid logical expression operator: " + Lexing::Token::toString(expr->operatorType));
+
+        compileExpression(expr->left);
+        u64 aJump = emitJump(jumpType);
+
+        emitByte(Bytecode::POP);
+        compileExpression(expr->right);
+        u64 bJump = emitJump(jumpType);
+
+        emitBytes(Bytecode::POP, first);
+        u64 firstJump = emitJump(Bytecode::JUMP);
+
+        patchJump(aJump);
+        patchJump(bJump);
+
+        emitBytes(Bytecode::POP, second);
+
+        patchJump(firstJump);
+
+        return std::monostate();
     }
 
     ExprVisitResults visitNumberExpr(Expr::Number *expr) override {
