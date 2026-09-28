@@ -87,6 +87,34 @@ class BytecodeCompiler : public Stmt::StmtVisitor, public Expr::ExprVisitor{
         return -1;
     }
 
+    void beginScope() {
+        scopeDepth++;
+    }
+
+    void endScope() {
+        // remove current scoped vars
+        while (!locals.empty() && locals.back().depth == scopeDepth) {
+            locals.pop_back();
+        }
+
+        scopeDepth--;
+
+    }
+
+    u32 countCurrentScopeVars() {
+        if (locals.empty()) return 0;
+
+        u32 count = 0;
+
+        for (i64 i = locals.size() - 1; i >= 0; i--) {
+            if (locals.at(i).depth != scopeDepth) break;
+
+            count++;
+        }
+
+        return count;
+    }
+
     void loadNamedVariable(const std::string& name) {
         i32 index = resolveGlobal(name);
         Bytecode::Operation op = Bytecode::LOAD_GLOBAL;
@@ -241,10 +269,23 @@ public:
 
 
 
-    StmtVisitResults visitBlockStmt(Stmt::Block *) override {
-        scopeDepth++;
-        throw CompileError("Unimplemented Statement type: Block");
-        scopeDepth--;
+    StmtVisitResults visitBlockStmt(Stmt::Block *stmt) override {
+        beginScope();
+
+        for (Stmt::Stmt* current : stmt->statements) {
+            compileStmt(current);
+        }
+
+        u8 popCount = countCurrentScopeVars();
+
+        if (popCount > 0) {
+            if (popCount == 1) emitByte(Bytecode::POP);
+            else emitBytes(Bytecode::POP_N, popCount);
+        }
+
+        endScope();
+
+        return std::monostate();
     }
 
     StmtVisitResults visitExpressionStmt(Stmt::Expression *stmt) override {
