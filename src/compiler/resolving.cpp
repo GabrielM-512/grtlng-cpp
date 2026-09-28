@@ -20,7 +20,7 @@ class Resolver : public Expr::ExprVisitor, public Stmt::StmtVisitor {
         stmt->accept(this);
     }
 
-    Scope* findScope(const std::string& name) {
+    [[nodiscard]] Scope* findScope(const std::string& name) const {
         Scope* searching = current;
 
         while (true) {
@@ -42,20 +42,20 @@ class Resolver : public Expr::ExprVisitor, public Stmt::StmtVisitor {
         current = saved;
     }
 
-    bool varExists(const std::string& name) {
+    [[nodiscard]] bool varExists(const std::string& name) const {
         return findScope(name) != nullptr;
     }
 
-    bool varActivated(const std::string& name) {
+    [[nodiscard]] bool varActivated(const std::string& name) const {
         return findScope(name)->isActivated(name);
     }
 
-    void activateVar(const std::string& name) {
+    void activateVar(const std::string& name) const {
         Scope* location = findScope(name);
         location->activateVar(name);
     }
 
-    void error(std::string message, Lexing::Token token) {
+    void error(std::string message, Lexing::Token token) const {
         handler.compileError(std::move(message), "", token);
         tree.success = false;
     }
@@ -136,7 +136,7 @@ public:
         S     T     A   A     T     E       M   M   E       N  NN     T         S
     SSSS      T     A   A     T     EEEEE   M   M   EEEEE   N   N     T     SSSS
 */
-    void resolveBlock(Stmt::Block* stmt, Scope* base) {
+    void resolveBlock(const Stmt::Block* stmt, const Scope* base) {
         if (base == nullptr) current = new Scope(current);
         else current = new Scope(current, *base);
 

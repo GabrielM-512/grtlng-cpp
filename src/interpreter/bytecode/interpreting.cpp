@@ -24,7 +24,7 @@ class VM {
         return stack[--sp];
     }
     
-    Value::Value peek(u16 dist) {
+    [[nodiscard]] Value::Value peek(u16 dist) const {
         return stack[sp - dist - 1];
     }
     

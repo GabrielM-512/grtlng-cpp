@@ -4,7 +4,7 @@
 
 using namespace Decompile;
 
-[[nodiscard]] u64 i8Instruction(u64 offset, const std::string& instruction, std::vector<u8>& code) {
+[[nodiscard]] u64 i8Instruction(u64 offset, const std::string& instruction, const std::vector<u8>& code) {
 
     i8 value = std::bit_cast<i8>(code.at(offset + 1));
 
@@ -13,7 +13,7 @@ using namespace Decompile;
     return offset + 2;
 }
 
-[[nodiscard]] u64 u8Instruction(u64 offset, const std::string& instruction, std::vector<u8>& code) {
+[[nodiscard]] u64 u8Instruction(u64 offset, const std::string& instruction, const std::vector<u8>& code) {
     u8 value = code.at(offset + 1);
     std::cout << instruction << " | " << (int) value << std::endl;
 

@@ -78,7 +78,7 @@ class BytecodeCompiler : public Stmt::StmtVisitor, public Expr::ExprVisitor{
      * @param name name of the variable to resolve
      * @return The stack slot index of the variable if found, -1 otherwise
      */
-    i16 resolveLocal(const std::string& name) {
+    i16 resolveLocal(const std::string& name) const {
 
         for (i16 i = locals.size() - 1; i >= 0; i--) {
             if (locals.at(i).name == name) return i;
@@ -101,7 +101,7 @@ class BytecodeCompiler : public Stmt::StmtVisitor, public Expr::ExprVisitor{
 
     }
 
-    u32 countCurrentScopeVars() {
+    u32 countCurrentScopeVars() const {
         if (locals.empty()) return 0;
 
         u32 count = 0;
