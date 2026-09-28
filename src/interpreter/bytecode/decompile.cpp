@@ -107,6 +107,26 @@ void Decompile::decompile(Bytecode::Program program) {
                 break;
             }
 
+            case Bytecode::LESS: {
+                offset = simpleInstruction(offset, "LESS");
+                break;
+            }
+
+            case Bytecode::MORE: {
+                offset = simpleInstruction(offset, "MORE");
+                break;
+            }
+
+            case Bytecode::LESS_EQUALS: {
+                offset = simpleInstruction(offset, "LESS_EQUALS");
+                break;
+            }
+
+            case Bytecode::MORE_EQUALS: {
+                offset = simpleInstruction(offset, "MORE_EQUALS");
+                break;
+            }
+
             case Bytecode::POP: {
                 offset = simpleInstruction(offset, "POP");
                 break;
@@ -169,6 +189,11 @@ void Decompile::decompile(Bytecode::Program program) {
 
             case Bytecode::JUMP_TRUE: {
                 offset = u16Instruction(offset, "JUMP_TRUE", program.code);
+                break;
+            }
+
+            case Bytecode::LOOP: {
+                offset = u16Instruction(offset, "LOOP", program.code);
                 break;
             }
 
