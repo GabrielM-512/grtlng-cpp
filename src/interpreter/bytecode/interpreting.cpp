@@ -156,13 +156,15 @@ public:
 
                 case JUMP_FALSE: {
                     u16 distance = READ_SHORT();
-                    if (!Value::isTruthy(peek(0))) ip += distance;
+                    if (!Value::isTruthy(peek(0)))
+                        ip += distance;
                     break;
                 }
 
                 case JUMP_TRUE: {
                     u16 distance = READ_SHORT();
-                    if (Value::isTruthy(peek(0))) ip += distance;
+                    if (Value::isTruthy(peek(0)))
+                        ip += distance;
                     break;
                 }
 
