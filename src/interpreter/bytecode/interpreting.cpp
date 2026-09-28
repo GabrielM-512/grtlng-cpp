@@ -68,6 +68,13 @@ public:
                 case NEGATE: push(VALUE_NUM(-AS_NUM(pop()))); break;
                 case NOT: push(VALUE_BOOL(!Value::isTruthy(pop()))); break;
 
+                case EQUALS: {
+                    Value::Value b = pop();
+                    Value::Value a = pop();
+                    push(VALUE_BOOL(Value::equality(a, b)));
+                    break;
+                }
+
                 case POP: {
                     pop();
                     break;

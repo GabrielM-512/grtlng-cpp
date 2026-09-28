@@ -15,6 +15,8 @@ namespace Bytecode {
         NEGATE,
         NOT,
 
+        EQUALS,
+
         POP,
         POP_N,
 

@@ -202,18 +202,20 @@ public:
         compileExpression(expr->left);
         compileExpression(expr->right);
 
-        Bytecode::Operation op;
 
         switch (expr->operatorType) {
-            case Lexing::PLUS: op = Bytecode::ADD; break;
-            case Lexing::MINUS: op = Bytecode::SUBTRACT; break;
-            case Lexing::STAR: op = Bytecode::MULTIPLY; break;
-            case Lexing::SLASH: op = Bytecode::DIVIDE; break;
+            case Lexing::PLUS: emitByte(Bytecode::ADD); break;
+            case Lexing::MINUS: emitByte(Bytecode::SUBTRACT); break;
+            case Lexing::STAR: emitByte(Bytecode::MULTIPLY); break;
+            case Lexing::SLASH: emitByte(Bytecode::DIVIDE); break;
 
-            default: op = static_cast<Bytecode::Operation>(0);
+            case Lexing::EQUALS_EQUALS: emitByte(Bytecode::EQUALS); break;
+            case Lexing::BANG_EQUALS: emitBytes(Bytecode::EQUALS, Bytecode::NOT); break;
+
+            default:
+                throw CompileError("Invalid binary token " + Lexing::Token::toString(expr->operatorType));
         }
 
-        emitByte(op);
         return std::monostate();
     }
 
