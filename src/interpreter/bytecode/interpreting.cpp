@@ -75,6 +75,19 @@ public:
                     break;
                 }
 
+#define COMPARE(OPERATOR) do {\
+                    f64 b = AS_NUM(pop());\
+                    f64 a = AS_NUM(pop());\
+                    Value::Value result = VALUE_BOOL(a OPERATOR b); \
+                    push(result);\
+                } while(false)
+
+
+                case LESS: COMPARE(<); break;
+                case MORE: COMPARE(>); break;
+                case LESS_EQUALS: COMPARE(<=); break;
+                case MORE_EQUALS: COMPARE(>=); break;
+
                 case POP: {
                     pop();
                     break;

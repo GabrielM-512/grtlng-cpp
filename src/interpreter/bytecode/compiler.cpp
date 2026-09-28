@@ -212,6 +212,11 @@ public:
             case Lexing::EQUALS_EQUALS: emitByte(Bytecode::EQUALS); break;
             case Lexing::BANG_EQUALS: emitBytes(Bytecode::EQUALS, Bytecode::NOT); break;
 
+            case Lexing::LESS: emitByte(Bytecode::LESS); break;
+            case Lexing::LESS_EQUALS: emitByte(Bytecode::LESS_EQUALS); break;
+            case Lexing::MORE: emitByte(Bytecode::MORE); break;
+            case Lexing::MORE_EQUALS: emitByte(Bytecode::MORE_EQUALS); break;
+
             default:
                 throw CompileError("Invalid binary token " + Lexing::Token::toString(expr->operatorType));
         }

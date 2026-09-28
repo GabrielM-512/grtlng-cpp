@@ -16,6 +16,10 @@ namespace Bytecode {
         NOT,
 
         EQUALS,
+        LESS,
+        MORE,
+        LESS_EQUALS,
+        MORE_EQUALS,
 
         POP,
         POP_N,
