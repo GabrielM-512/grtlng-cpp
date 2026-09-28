@@ -4,18 +4,28 @@
 
 using namespace Decompile;
 
+void printOffsetInstruction(u64 offset, const std::string& instruction, bool pipe) {
+    std::string message = std::format("0x{:04X} | ", offset) + instruction;
+    if (pipe) message +=  " | ";
+
+    std::cout << message;
+}
+
 [[nodiscard]] u64 i8Instruction(u64 offset, const std::string& instruction, const std::vector<u8>& code) {
 
     i8 value = std::bit_cast<i8>(code.at(offset + 1));
 
-    std::cout << instruction << " | " << (int) value << std::endl;
+    printOffsetInstruction(offset, instruction, true);
+    std::cout << (int) value << std::endl;
 
     return offset + 2;
 }
 
 [[nodiscard]] u64 u8Instruction(u64 offset, const std::string& instruction, const std::vector<u8>& code) {
     u8 value = code.at(offset + 1);
-    std::cout << instruction << " | " << (int) value << std::endl;
+
+    printOffsetInstruction(offset, instruction, true);
+    std::cout << (int) value << std::endl;
 
     return offset + 2;
 }
@@ -24,7 +34,8 @@ using namespace Decompile;
     u16 value = (u16)(code[offset + 1] << 8);
     value |= code[offset + 2];
 
-    std::cout << instruction << " | " << value << std::endl;
+    printOffsetInstruction(offset, instruction, true);
+    std::cout << value << std::endl;
 
     return offset + 3;
 }
@@ -33,13 +44,15 @@ using namespace Decompile;
     u8 index = program.code.at(offset + 1);
     Value::Value value = program.constants.at(index);
 
-    std::cout << instruction << " | " << (int) index << " | " << Value::getValueString(value) << std::endl;
+    printOffsetInstruction(offset, instruction, true);
+    std::cout << (int) index << " | " << Value::getValueString(value) << std::endl;
 
     return offset + 2;
 }
 
 [[nodiscard]] u64 simpleInstruction(u64 offset, const std::string& instruction) {
-    std::cout << instruction << std::endl;
+    printOffsetInstruction(offset, instruction, false);
+    std::cout << std::endl;
     return offset + 1;
 }
 
