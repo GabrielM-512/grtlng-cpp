@@ -33,7 +33,7 @@ namespace Bytecode {
         std::vector<u8> code;
         std::vector<u16> lines;
         std::vector<Value::Value> constants;
-        u16 globalCount;
+        u16 globalCount {};
     };
 
     i32 interpret(const Compiler::CompileResult &ast, bool decompile);
