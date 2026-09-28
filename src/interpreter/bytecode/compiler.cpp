@@ -60,6 +60,10 @@ class BytecodeCompiler : public Stmt::StmtVisitor, public Expr::ExprVisitor{
         locals.push_back((Local) {.name = name, .depth = scopeDepth});
     }
 
+    /**
+     * @param name name of the variable to resolve
+     * @return the globals array list index of the variable if found, -1 otherwise
+     */
     i32 resolveGlobal(const std::string& name) {
         auto var = globals.find(name);
 
@@ -70,6 +74,10 @@ class BytecodeCompiler : public Stmt::StmtVisitor, public Expr::ExprVisitor{
         return var->second;
     }
 
+    /**
+     * @param name name of the variable to resolve
+     * @return The stack slot index of the variable if found, -1 otherwise
+     */
     i16 resolveLocal(const std::string& name) {
 
         for (i16 i = locals.size() - 1; i >= 0; i--) {
