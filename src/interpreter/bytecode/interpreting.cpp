@@ -73,6 +73,12 @@ public:
                     break;
                 }
 
+                case POP_N: {
+                    u8 count = READ_BYTE();
+                    sp -= count;
+                    break;
+                }
+
                 case LOAD_I8: {
 
                     i8 value = std::bit_cast<i8>(READ_BYTE()); // TODO: check if this can be replaced with a manual bit cast and if that would be faster

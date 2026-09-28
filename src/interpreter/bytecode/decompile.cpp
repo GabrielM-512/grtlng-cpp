@@ -85,6 +85,11 @@ void Decompile::decompile(Bytecode::Program program) {
                 break;
             }
 
+            case Bytecode::POP_N: {
+                offset = u8Instruction(offset, "POP_N", program.code);
+                break;
+            }
+
             case Bytecode::LOAD_I8: {
                 offset = i8Instruction(offset, "LOAD_I8", program.code);
                 break;

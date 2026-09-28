@@ -16,6 +16,7 @@ namespace Bytecode {
         NOT,
 
         POP,
+        POP_N,
 
         LOAD_I8,
         FALSE,
