@@ -331,8 +331,28 @@ public:
         return std::monostate();
     }
 
-    StmtVisitResults visitIfStmt(Stmt::If *) override {
-        throw CompileError("Unimplemented Statement type: If");
+    StmtVisitResults visitIfStmt(Stmt::If *stmt) override {
+        compileExpression(stmt->condition);
+
+        u64 elseJump = emitJump(Bytecode::JUMP_FALSE);
+
+        compileStmt(stmt->thenBranch);
+
+
+        if (stmt->elseBranch != nullptr) {
+            u64 thenJump = emitJump(Bytecode::JUMP);
+            patchJump(elseJump);
+
+            compileStmt(stmt->elseBranch);
+
+            patchJump(thenJump);
+        } else {
+            patchJump(elseJump);
+        }
+
+        emitByte(Bytecode::POP); // pop the condition
+
+        return std::monostate();
     }
 
     StmtVisitResults visitPrintStmt(Stmt::Print *stmt) override {
