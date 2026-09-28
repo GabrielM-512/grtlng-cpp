@@ -36,7 +36,9 @@ namespace Bytecode {
 
         JUMP,
         JUMP_FALSE,
-        JUMP_TRUE
+        JUMP_TRUE,
+
+        LOOP
     };
 
     struct Program {

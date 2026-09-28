@@ -152,6 +152,18 @@ class BytecodeCompiler : public Stmt::StmtVisitor, public Expr::ExprVisitor{
         currentChunk().at(jumpLocation + 1) = jumpValue & 0xff;
     }
 
+    void emitLoop(u64 loopStart) {
+        emitByte(Bytecode::LOOP);
+
+        u64 distance = currentChunk().size() - loopStart + 2;
+        if (distance > UINT16_MAX) throw CompileError("Loop body too large");
+
+        u16 offset = distance;
+
+        emitByte((offset >> 8) & 0xff);
+        emitByte(offset & 0xff);
+    }
+
 
     void compileFunction(const Stmt::Function& function) {
 
@@ -419,8 +431,23 @@ public:
         return std::monostate();
     }
 
-    StmtVisitResults visitWhileStmt(Stmt::While *) override {
-        throw CompileError("Unimplemented Statement type: While");
+    StmtVisitResults visitWhileStmt(Stmt::While *stmt) override {
+        u64 loopStart = currentChunk().size();
+
+        compileExpression(stmt->condition);
+
+        u64 exitJump = emitJump(Bytecode::JUMP_FALSE);
+
+        emitByte(Bytecode::POP);
+
+        compileStmt(stmt->body);
+
+        emitLoop(loopStart);
+
+        patchJump(exitJump);
+        emitByte(Bytecode::POP);
+
+        return std::monostate();
     }
 
 };

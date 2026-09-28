@@ -168,6 +168,11 @@ public:
                     break;
                 }
 
+                case LOOP: {
+                    u16 distance = READ_SHORT();
+                    ip -= distance;
+                }
+
             }
         }
 
