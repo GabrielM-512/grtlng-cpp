@@ -20,6 +20,15 @@ using namespace Decompile;
     return offset + 2;
 }
 
+[[nodiscard]] u64 u16Instruction(u64 offset, const std::string& instruction, const std::vector<u8>& code) {
+    u16 value = (u16)(code[offset + 1] << 8);
+    value |= code[offset + 2];
+
+    std::cout << instruction << " | " << value << std::endl;
+
+    return offset + 3;
+}
+
 [[nodiscard]] u64 constantInstruction(u64 offset, const std::string& instruction, Bytecode::Program program) {
     u8 index = program.code.at(offset + 1);
     Value::Value value = program.constants.at(index);
@@ -132,6 +141,21 @@ void Decompile::decompile(Bytecode::Program program) {
 
             case Bytecode::SET_LOCAL: {
                 offset = u8Instruction(offset, "SET_LOCAL", program.code);
+                break;
+            }
+
+            case Bytecode::JUMP: {
+                offset = u16Instruction(offset, "JUMP", program.code);
+                break;
+            }
+
+            case Bytecode::JUMP_FALSE: {
+                offset = u16Instruction(offset, "JUMP_FALSE", program.code);
+                break;
+            }
+
+            case Bytecode::JUMP_TRUE: {
+                offset = u16Instruction(offset, "JUMP_TRUE", program.code);
                 break;
             }
 

@@ -33,6 +33,10 @@ namespace Bytecode {
 
         SET_GLOBAL,
         SET_LOCAL,
+
+        JUMP,
+        JUMP_FALSE,
+        JUMP_TRUE
     };
 
     struct Program {

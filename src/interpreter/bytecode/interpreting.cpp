@@ -10,6 +10,7 @@
 using namespace Bytecode;
 
 #define READ_BYTE() (*ip++)
+#define READ_SHORT() (ip += 2, (u16)((ip[-2] << 8) | ip[-1]))
 #define READ_OP() (static_cast<Operation>(READ_BYTE()))
 
 class VM {
@@ -144,6 +145,24 @@ public:
                 case SET_LOCAL: {
                     u8 slot = READ_BYTE();
                     stack[slot] = peek(0);
+                    break;
+                }
+
+                case JUMP: {
+                    u16 distance = READ_SHORT();
+                    ip += distance;
+                    break;
+                }
+
+                case JUMP_FALSE: {
+                    u16 distance = READ_SHORT();
+                    if (!Value::isTruthy(peek(0))) ip += distance;
+                    break;
+                }
+
+                case JUMP_TRUE: {
+                    u16 distance = READ_SHORT();
+                    if (Value::isTruthy(peek(0))) ip += distance;
                     break;
                 }
 
