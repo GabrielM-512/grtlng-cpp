@@ -51,6 +51,7 @@ target_compile_options(grtlng_cpp
         PUBLIC -Wextra
         PUBLIC -Werror
         PUBLIC -Ofast
+        PUBLIC -fno-finite-math-only # to ensure nan/infinity are handled correctly even when -Ofast is enabled
 )
 
 
