@@ -17,8 +17,12 @@ class BytecodeCompiler : public Stmt::StmtVisitor, public Expr::ExprVisitor{
 
     i32 scopeDepth = 0;
 
+    std::vector<u8>& currentChunk() {
+        return program.code;
+    }
+
     void emitByte(u8 byte) {
-        program.code.push_back(byte);
+        currentChunk().push_back(byte);
     }
 
     void emitBytes(u8 byte1, u8 byte2) {
