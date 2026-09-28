@@ -133,6 +133,25 @@ class BytecodeCompiler : public Stmt::StmtVisitor, public Expr::ExprVisitor{
         emitBytes(op, (u8) index);
     }
 
+    u64 emitJump(Bytecode::Operation operation) {
+        emitByte(operation);
+        emitBytes(0xff, 0xff);
+
+        return currentChunk().size() - 2;
+    }
+
+    void patchJump(u64 jumpLocation) {
+        // -2 to adjust for the bytecode for the jump offset
+        u64 difference = currentChunk().size() - jumpLocation - 2;
+
+        if (difference > UINT16_MAX) throw CompileError("Too much code to jump over");
+
+        u16 jumpValue = difference;
+
+        currentChunk().at(jumpLocation) = (jumpValue >> 8) & 0xff;
+        currentChunk().at(jumpLocation + 1) = jumpValue & 0xff;
+    }
+
 
     void compileFunction(const Stmt::Function& function) {
 
