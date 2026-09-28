@@ -116,7 +116,7 @@ public:
             if (auto func = dynamic_cast<Stmt::Function*> (current)) {
                 createGlobal(func->name.data.name);
 
-                if (!dynamic_cast<Stmt::Return*>(func->body->statements.back())) {
+                if (!func->body->statements.empty() && !dynamic_cast<Stmt::Return*>(func->body->statements.back())) {
 
                     static Expr::Number zeroExpr(0.0);
                     static Stmt::Return zeroReturn(&zeroExpr);
