@@ -212,6 +212,8 @@ public:
             compileFunction(function);
         }
 
+        program.globalCount = globals.size();
+
         return program;
     }
 
