@@ -291,6 +291,17 @@ public:
     }
 
     ExprVisitResults visitNumberExpr(Expr::Number *expr) override {
+
+        if (expr->value == 0) {
+            emitByte(Bytecode::FALSE);
+            return std::monostate();
+        }
+
+        if (expr->value == 1) {
+            emitByte(Bytecode::TRUE);
+            return std::monostate();
+        }
+
         double fraction;
         if (std::modf(expr->value, &fraction) == 0 && INT8_MIN <= expr->value && INT8_MAX >= expr->value) {
             // use LOAD_I8
