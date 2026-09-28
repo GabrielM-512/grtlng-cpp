@@ -80,6 +80,11 @@ void Decompile::decompile(Bytecode::Program program) {
                 break;
             }
 
+            case Bytecode::EQUALS: {
+                offset = simpleInstruction(offset, "EQUALS");
+                break;
+            }
+
             case Bytecode::POP: {
                 offset = simpleInstruction(offset, "POP");
                 break;
