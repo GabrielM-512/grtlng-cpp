@@ -418,7 +418,9 @@ public:
     }
 
     StmtVisitResults visitReturnStmt(Stmt::Return *stmt) override {
-        compileExpression(stmt->value);
+        if (stmt->value != nullptr) compileExpression(stmt->value);
+        else emitByte(Bytecode::FALSE);
+
         emitByte(Bytecode::RETURN);
 
         return std::monostate();
