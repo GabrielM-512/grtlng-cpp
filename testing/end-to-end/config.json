@@ -77,6 +77,10 @@
       "testfile": "function/scoped_vars.gl",
       "stderr": "function/scoped_vars_stderr"
     },
+    "number.nan_equality": {
+      "testfile": "number/nan_equality.gl",
+      "stdout": "number/nan_equality_stdout"
+    },
     "print.missing_argument": {
       "testfile": "print/missing_argument.gl",
       "stderr": "print/missing_argument_stderr"
