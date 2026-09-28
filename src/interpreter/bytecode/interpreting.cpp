@@ -35,7 +35,7 @@ class VM {
 public:
     explicit VM(Program program): ip(nullptr), sp(0), program(std::move(program)) {
         ip = this->program.code.data();
-        globals = (Value::Value*) malloc(sizeof(Value::Value) * program.globalCount);
+        globals = (Value::Value*) malloc(sizeof(Value::Value) * this->program.globalCount);
     }
 
     i32 interpret() {
