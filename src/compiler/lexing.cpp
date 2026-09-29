@@ -1,6 +1,7 @@
 #include "lexing.h"
 
 #include <cstring>
+#include <iostream>
 
 using namespace Lexing;
 
@@ -428,17 +429,20 @@ bool Lexer::comment() {
         case '/': //line comment
             while (peek() != '\n') advance();
             return true;
-        case '*': //block comment
+        case '*': { //block comment
+            u64 startLine = line;
             while (!(peek() == '*' && peekNext() == '/')) {
 
                 if (peek() == '\n') line++;
-                if (isAtEnd()) throw ScanException("Unterminated comment");
+                if (isAtEnd()) throw ScanException("Error on line " + std::to_string(startLine) + ": Unterminated comment");
                 advance();
             }
 
             advance(); // consume trailing */
             advance();
             return true;
+        }
+
         default:
             return false;
     }
@@ -478,11 +482,16 @@ std::vector<Token> Lexing::scan(const std::string& input) {
     Token token = {.type = ERROR, .line = 0, .position = 0, .data = {.name = nullptr}};
 
     lexer.skipWhitespace();
-
-    while (token.type != END_OF_FILE) {
-        token = lexer.scanToken();
-        tokens.push_back(token);
+    try {
+        while (token.type != END_OF_FILE) {
+            token = lexer.scanToken();
+            tokens.push_back(token);
+        }
+    } catch (ScanException& e) {
+        std::cerr << e.what() << std::endl;
+        exit(EX_DATAERR);
     }
+
 
     return tokens;
 
