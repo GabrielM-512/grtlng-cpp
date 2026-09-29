@@ -120,12 +120,12 @@ class BytecodeCompiler : public Stmt::StmtVisitor, public Expr::ExprVisitor{
     }
 
     void loadNamedVariable(const std::string& name) {
-        i32 index = resolveGlobal(name);
-        Bytecode::Operation op = Bytecode::LOAD_GLOBAL;
+        i32 index = resolveLocal(name);
+        Bytecode::Operation op = Bytecode::LOAD_LOCAL;
 
         if (index == -1) {
-            index = resolveLocal(name);
-            op = Bytecode::LOAD_LOCAL;
+            index = resolveGlobal(name);
+            op = Bytecode::LOAD_GLOBAL;
         }
 
         if (index == -1) throw CompileError("Unknown Variable " + name);
