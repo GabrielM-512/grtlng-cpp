@@ -13,9 +13,15 @@ using namespace Bytecode;
 #define READ_SHORT() (ip += 2, (u16)((ip[-2] << 8) | ip[-1]))
 #define READ_OP() (static_cast<Operation>(READ_BYTE()))
 
+#define BYTECODE_SAFETY
+
 class VM {
     u8* ip;
     int sp;
+
+#ifndef BYTECODE_SAFETY
+    Value::Value* constants;
+#endif
 
     Program program;
     Value::Value stack[256] {};
@@ -37,6 +43,9 @@ public:
     explicit VM(Program program): ip(nullptr), sp(0), program(std::move(program)) {
         ip = this->program.code.data();
         globals = (Value::Value*) malloc(sizeof(Value::Value) * this->program.globalCount);
+#ifndef BYTECODE_SAFETY
+        constants = this->program.constants.data();
+#endif
     }
 
     i32 interpret() {
@@ -120,7 +129,11 @@ public:
                 }
 
                 case LOAD_CONSTANT: {
-                    push(program.constants.at(READ_BYTE()));
+                    #ifdef BYTECODE_SAFETY
+                        push(program.constants.at(READ_BYTE()));
+                    #else
+                        push(constants[READ_BYTE()]);
+                    #endif
                     break;
                 }
 
