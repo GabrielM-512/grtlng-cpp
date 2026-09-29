@@ -4,7 +4,9 @@
 #include "../../AST/stmt.h"
 #include "../../error.h"
 #include "../../compiler/compiler.h"
+#include "../../global.h"
 
+#ifdef INTERPRETER_AST
 namespace Interpreting {
 
     class Interpreter : public Expr::ExprVisitor, public Stmt::StmtVisitor {
@@ -54,3 +56,4 @@ namespace Interpreting {
 
     f64 interpret(Compiler::CompileResult& program, Error::ErrorHandler& handler);
 }
+#endif

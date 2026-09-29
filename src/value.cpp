@@ -23,7 +23,7 @@ typedef Value::Value (*NativeFunction)(const std::vector<Value::Value>&);
 Value::Value clockNative(const std::vector<Value::Value>&) {
     return VALUE_NUM((double) clock() / CLOCKS_PER_SEC);
 }
-
+#ifdef INTERPRETER_AST
 class NativeFn : public Value::Callable {
     NativeFunction function;
 public:
@@ -49,75 +49,7 @@ void Value::defineNativeFunctions(Interpreting::Interpreter* interpreter) {
     defineNativeFn(interpreter, "clock", clockNative);
 }
 
-void defineNativeResolver(Resolving::Scope* scope, const char* name) {
-    scope->createVar(name);
-    scope->activateVar(name);
-}
 
-void Value::defineNativesResolver(Resolving::Scope *scope) {
-    defineNativeResolver(scope, "clock");
-}
-
-
-
-Value::Value Value::Function::call(Interpreting::Interpreter *interpreter, std::vector<Value> &args) {
-    if (args.size() != params.size()) {
-        throw Interpreting::RuntimeException(std::format("Function \"{:s}\" expected {} arguments, got {} instead", name, params.size(), args.size()));
-    }
-
-    Interpreting::Environment environment(&interpreter->global);
-
-    for (u64 i = 0; i < params.size(); i++) {
-        if (params.at(i)->name.data.name[0] != '\0')
-            environment.createVar(params.at(i)->name.data.name, args.at(i));
-    }
-
-    try {
-        interpreter->executeBlock(this->body, &environment);
-    } catch (Interpreting::ReturnException& e) {
-        return e.value;
-    }
-
-    return (Value) {.type = NUMBER, .as = {}};
-}
-
-/*
-     OOO    BBBB        J   EEEEE     CCC   TTTTT           H   H     A     N   N   DDDD    L       IIIII   N   N    GGG
-    O   O   B   B       J   E        C        T             H   H    A A    NN  N   D   D   L         I     NN  N   G
-    O   O   BBBB        J   EEEEE   C         T             HHHHH    AAA    N N N   D   D   L         I     N N N   G  GG
-    O   O   B   B   J   J   E        C        T             H   H   A   A   N  NN   D   D   L         I     N  NN   G   G
-     OOO    BBBB     JJJ    EEEEE     CCC     T             H   H   A   A   N   N   DDDD    LLLLL   IIIII   N   N    GGG
-*/
-
-bool Value::isObjType(const Value& val, ObjectType type) {
-    return val.type == OBJECT && val.as.object->type == type;
-}
-
-bool objsEqual(const Value::Obj* a, const Value::Obj* b) {
-    if (a->type != b->type) return false;
-
-    switch (a->type) {
-        case Value::CALLABLE: {
-            auto fnA = static_cast<const Value::Callable*>(a);
-            auto fnB = static_cast<const Value::Callable*>(b);
-
-            return fnA->getArity() == fnB->getArity() && fnA->getName() == fnB->getName();
-        }
-    }
-
-    return false;
-}
-
-bool Value::equality(Value a, Value b) {
-    if (a.type != b.type) return false;
-
-    switch (a.type) {
-        case NUMBER: return AS_NUM(a) == AS_NUM(b);
-        case OBJECT: return objsEqual(a.as.object, b.as.object);
-    }
-
-    return false;
-}
 
 void printObject(const Value::Obj* obj) {
     switch (obj->type) {
@@ -145,6 +77,110 @@ std::string getObjectString(const Value::Obj* obj) {
     }
 }
 
+bool Value::isObjType(const Value& val, ObjectType type) {
+    return val.type == OBJECT && val.as.object->type == type;
+}
+
+bool objsEqual(const Value::Obj* a, const Value::Obj* b) {
+    if (a->type != b->type) return false;
+
+    switch (a->type) {
+        case Value::CALLABLE: {
+            auto fnA = static_cast<const Value::Callable*>(a);
+            auto fnB = static_cast<const Value::Callable*>(b);
+
+            return fnA->getArity() == fnB->getArity() && fnA->getName() == fnB->getName();
+        }
+    }
+
+    return false;
+}
+
+Value::Value Value::Function::call(Interpreting::Interpreter *interpreter, std::vector<Value> &args) {
+    if (args.size() != params.size()) {
+        throw Interpreting::RuntimeException(std::format("Function \"{:s}\" expected {} arguments, got {} instead", name, params.size(), args.size()));
+    }
+
+    Interpreting::Environment environment(&interpreter->global);
+
+    for (u64 i = 0; i < params.size(); i++) {
+        if (params.at(i)->name.data.name[0] != '\0')
+            environment.createVar(params.at(i)->name.data.name, args.at(i));
+    }
+
+    try {
+        interpreter->executeBlock(this->body, &environment);
+    } catch (Interpreting::ReturnException& e) {
+        return e.value;
+    }
+
+    return (Value) {.type = NUMBER, .as = {}};
+}
+#endif
+
+
+void defineNativeResolver(Resolving::Scope* scope, const char* name) {
+    scope->createVar(name);
+    scope->activateVar(name);
+}
+
+void Value::defineNativesResolver(Resolving::Scope *scope) {
+    defineNativeResolver(scope, "clock");
+}
+
+/*
+     OOO    BBBB        J   EEEEE     CCC   TTTTT           H   H     A     N   N   DDDD    L       IIIII   N   N    GGG
+    O   O   B   B       J   E        C        T             H   H    A A    NN  N   D   D   L         I     NN  N   G
+    O   O   BBBB        J   EEEEE   C         T             HHHHH    AAA    N N N   D   D   L         I     N N N   G  GG
+    O   O   B   B   J   J   E        C        T             H   H   A   A   N  NN   D   D   L         I     N  NN   G   G
+     OOO    BBBB     JJJ    EEEEE     CCC     T             H   H   A   A   N   N   DDDD    LLLLL   IIIII   N   N    GGG
+*/
+
+#ifndef INTERPRETER_AST
+bool Value::isObjType(const Value& val, ObjectType type) {
+    return val.type == OBJECT && val.as.object->type == type;
+}
+
+bool objsEqual(const Value::Obj* a, const Value::Obj* b) {
+    if (a->type != b->type) return false;
+
+    switch (a->type) {
+        case Value::FUNCTION:
+        case Value::NATIVE_FN:
+            break; // TODO
+    }
+
+    return false;
+}
+
+void printObject(const Value::Obj* obj) {
+    switch (obj->type) {
+        case Value::FUNCTION:
+        case Value::NATIVE_FN:
+            break; // TODO
+
+    }
+}
+
+void Value::printValue(const Value& value) {
+    std::cout << getValueString(value) << std::endl;
+}
+
+std::string getObjectString(const Value::Obj* obj) {
+    switch (obj->type) {
+        case Value::FUNCTION:
+        case Value::NATIVE_FN:
+            break; // TODO
+
+        default:
+            return "UNKNOWN OBJECT TYPE";
+    }
+
+    return "";
+
+}
+#endif
+
 std::string Value::getValueString(const Value& value) {
     switch (value.type) {
         case NUMBER:
@@ -154,6 +190,17 @@ std::string Value::getValueString(const Value& value) {
         default:
             return "UNKNOWN VALUE TYPE";
     }
+}
+
+bool Value::equality(Value a, Value b) {
+    if (a.type != b.type) return false;
+
+    switch (a.type) {
+        case NUMBER: return AS_NUM(a) == AS_NUM(b);
+        case OBJECT: return objsEqual(a.as.object, b.as.object);
+    }
+
+    return false;
 }
 
 

@@ -1,5 +1,5 @@
 #include "interpreting.h"
-
+#ifdef INTERPRETER_AST
 using namespace Interpreting;
 
 StmtVisitResults Interpreter::visitPrintStmt(Stmt::Print *stmt) {
@@ -90,3 +90,4 @@ StmtVisitResults Interpreter::visitReturnStmt(Stmt::Return *stmt) {
 void Interpreter::execute(Stmt::Stmt* stmt) {
     stmt->accept(this);
 }
+#endif

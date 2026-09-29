@@ -1,5 +1,5 @@
 #include "interpreting.h"
-
+#ifdef INTERPRETER_AST
 using namespace Interpreting;
 
 Value::Value Interpreter::evaluate(Expr::Expr* expr) {
@@ -112,3 +112,4 @@ ExprVisitResults Interpreter::visitLogicalExpr(Expr::Logical *expr) {
 
     return Value::isTruthy(evaluate(expr->right)) ? VALUE_TRUE : VALUE_FALSE;
 }
+#endif

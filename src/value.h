@@ -3,6 +3,8 @@
 #include <utility>
 #include <vector>
 
+#include "global.h"
+
 // forward declarations due to header madness.
 
 /*
@@ -39,12 +41,16 @@ namespace Value {
         } as;
     };
 
+#ifdef INTERPRETER_AST
     enum ObjectType {
         CALLABLE
     };
-
-    bool isObjType(const Value& val, ObjectType type);
-    bool equality(Value a, Value b);
+#else
+    enum ObjectType {
+        FUNCTION,
+        NATIVE_FN
+    };
+#endif
 
     class Obj {
     public:
@@ -54,6 +60,8 @@ namespace Value {
 
         Obj(ObjectType type): type(type) {}
     };
+
+#ifdef INTERPRETER_AST
 
     class Callable : public Obj {
     protected:
@@ -83,6 +91,18 @@ namespace Value {
 
 
     void defineNativeFunctions(Interpreting::Interpreter* interpreter);
+#else
+
+
+
+
+
+#endif
+
+    bool isObjType(const Value& val, ObjectType type);
+    bool equality(Value a, Value b);
+
+
     void defineNativesResolver(Resolving::Scope* scope);
 
 #define VALUE_NUM(number) ((Value::Value) {.type = Value::NUMBER, .as = {.num = static_cast<double>(number)}})

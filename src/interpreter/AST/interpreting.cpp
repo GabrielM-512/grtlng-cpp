@@ -6,7 +6,7 @@
 #include "environment.h"
 #include "../../error.h"
 #include "../../compiler/compiler.h"
-
+#ifdef INTERPRETER_AST
 using namespace Interpreting;
 
 void Interpreter::beginEnvironment() {
@@ -66,3 +66,4 @@ f64 Interpreting::interpret(Compiler::CompileResult& program, Error::ErrorHandle
     return returnValue;
 
 }
+#endif
