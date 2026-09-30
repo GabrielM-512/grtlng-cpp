@@ -55,9 +55,13 @@ class Resolver : public Expr::ExprVisitor, public Stmt::StmtVisitor {
         location->activateVar(name);
     }
 
-    void error(std::string message, Lexing::Token token) const {
-        handler.compileError(std::move(message), "", token);
+    void error(std::string message, std::string hint, Lexing::Token token) const {
+        handler.compileError(std::move(message), std::move(hint), token);
         tree.success = false;
+    }
+
+    void error(std::string message, Lexing::Token token) const {
+        error(std::move(message), "", token);
     }
 
 public:
@@ -230,6 +234,12 @@ public:
         for (Stmt::Stmt* stmt : tree.tree) {
             std::string name;
             if (auto func = dynamic_cast<Stmt::Function*> (stmt)) {
+                if (varExists(func->name.data.name)) {
+                    error("Redeclared function \"" + std::string(func->name.data.name) + "\"",
+                    "No functions may be declared using names of native functions",
+                    func->name);
+                }
+
                 current->createVar(func->name.data.name);
                 activateVar(func->name.data.name);
                 functions.push_back(func);
