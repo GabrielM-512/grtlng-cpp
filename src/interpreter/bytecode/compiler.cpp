@@ -1,5 +1,7 @@
 #include "compiler.h"
 
+#ifndef INTERPRETER_AST
+
 #include <cmath>
 #include <unordered_map>
 
@@ -462,3 +464,5 @@ Bytecode::Program BytecodeCompilation::compile(const Compiler::CompileResult& as
 
     return program;
 }
+
+#endif

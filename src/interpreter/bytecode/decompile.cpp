@@ -1,5 +1,5 @@
 #include "decompile.h"
-
+#ifndef INTERPRETER_AST
 #include <iostream>
 
 using namespace Decompile;
@@ -206,3 +206,5 @@ void Decompile::decompile(Bytecode::Program program) {
 
     std::cout << std::endl << std::endl;
 }
+
+#endif
