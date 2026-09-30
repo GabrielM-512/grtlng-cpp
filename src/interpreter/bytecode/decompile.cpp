@@ -5,7 +5,7 @@
 using namespace Decompile;
 
 void printOffsetInstruction(u64 offset, const std::string& instruction, bool pipe) {
-    std::string message = std::format("0x{:04X} | ", offset) + instruction;
+    std::string message = std::format("  0x{:04X} | ", offset) + instruction;
     if (pipe) message +=  " | ";
 
     std::cout << message;
@@ -56,11 +56,13 @@ void printOffsetInstruction(u64 offset, const std::string& instruction, bool pip
     return offset + 1;
 }
 
-void Decompile::decompile(Bytecode::Program program) {
+void decompileChunk(std::vector<u8> code, const std::string& name, const Bytecode::Program& program) {
     u64 offset = 0;
 
-    while (offset < program.code.size()) {
-        auto op = static_cast<Bytecode::Operation>(program.code.at(offset));
+    std::cout << name << ":" << std::endl;
+
+    while (offset < code.size()) {
+        auto op = static_cast<Bytecode::Operation>(code.at(offset));
         switch (op) {
             case Bytecode::RETURN: {
                 offset = simpleInstruction(offset, "RETURN");
@@ -127,18 +129,23 @@ void Decompile::decompile(Bytecode::Program program) {
                 break;
             }
 
+            case Bytecode::CALL: {
+                offset = u8Instruction(offset, "CALL", code);
+                break;
+            }
+
             case Bytecode::POP: {
                 offset = simpleInstruction(offset, "POP");
                 break;
             }
 
             case Bytecode::POP_N: {
-                offset = u8Instruction(offset, "POP_N", program.code);
+                offset = u8Instruction(offset, "POP_N", code);
                 break;
             }
 
             case Bytecode::LOAD_I8: {
-                offset = i8Instruction(offset, "LOAD_I8", program.code);
+                offset = i8Instruction(offset, "LOAD_I8", code);
                 break;
             }
 
@@ -158,42 +165,47 @@ void Decompile::decompile(Bytecode::Program program) {
             }
 
             case Bytecode::LOAD_GLOBAL: {
-                offset = u8Instruction(offset, "LOAD_GLOBAL", program.code);
+                offset = u8Instruction(offset, "LOAD_GLOBAL", code);
                 break;
             }
 
             case Bytecode::LOAD_LOCAL: {
-                offset = u8Instruction(offset, "LOAD_LOCAL", program.code);
+                offset = u8Instruction(offset, "LOAD_LOCAL", code);
                 break;
             }
 
             case Bytecode::SET_GLOBAL: {
-                offset = u8Instruction(offset, "SET_GLOBAL", program.code);
+                offset = u8Instruction(offset, "SET_GLOBAL", code);
                 break;
             }
 
             case Bytecode::SET_LOCAL: {
-                offset = u8Instruction(offset, "SET_LOCAL", program.code);
+                offset = u8Instruction(offset, "SET_LOCAL", code);
                 break;
             }
 
             case Bytecode::JUMP: {
-                offset = u16Instruction(offset, "JUMP", program.code);
+                offset = u16Instruction(offset, "JUMP", code);
                 break;
             }
 
             case Bytecode::JUMP_FALSE: {
-                offset = u16Instruction(offset, "JUMP_FALSE", program.code);
+                offset = u16Instruction(offset, "JUMP_FALSE", code);
                 break;
             }
 
             case Bytecode::JUMP_TRUE: {
-                offset = u16Instruction(offset, "JUMP_TRUE", program.code);
+                offset = u16Instruction(offset, "JUMP_TRUE", code);
                 break;
             }
 
             case Bytecode::LOOP: {
-                offset = u16Instruction(offset, "LOOP", program.code);
+                offset = u16Instruction(offset, "LOOP", code);
+                break;
+            }
+
+            case Bytecode::EXIT: {
+                offset = simpleInstruction(offset, "EXIT");
                 break;
             }
 
@@ -201,6 +213,19 @@ void Decompile::decompile(Bytecode::Program program) {
             default:
                 std::cout << "Unknown Operation " << (i32) op << std::endl;
                 offset++;
+        }
+    }
+
+    std::cout << std::endl;
+}
+
+void Decompile::decompile(const Bytecode::Program& program) {
+    decompileChunk(program.code, "init", program);
+
+    for (Value::Value obj : program.constants) {
+        if (IS_FUNC(obj)) {
+            Value::Function* func = AS_FUNCTION(obj);
+            decompileChunk(func->code, func->name, program);
         }
     }
 

@@ -3,6 +3,7 @@
 #ifndef INTERPRETER_AST
 
 #include <cmath>
+#include <iostream>
 #include <unordered_map>
 
 using namespace BytecodeCompilation;
@@ -17,10 +18,17 @@ class BytecodeCompiler : public Stmt::StmtVisitor, public Expr::ExprVisitor{
     std::unordered_map<std::string, u16> globals;
     std::vector<Local> locals;
 
+    std::vector<u8> currentFunction;
+    std::vector<u8> init;
+
+    bool inInit = true;
+    std::vector<std::string> errors;
+
     i32 scopeDepth = 0;
 
     std::vector<u8>& currentChunk() {
-        return program.code;
+        if (inInit) return init;
+        return currentFunction;
     }
 
     void emitByte(u8 byte) {
@@ -32,12 +40,16 @@ class BytecodeCompiler : public Stmt::StmtVisitor, public Expr::ExprVisitor{
         emitByte(byte2);
     }
 
-    void emitConstant(f64 value) {
-        u32 index = addConstant(VALUE_NUM(value));
+    void emitConstant(Value::Value value) {
+        u32 index = addConstant(value);
 
         if (index > UINT8_MAX) throw CompileError("Too many constants in a chunk");
 
         emitBytes(Bytecode::LOAD_CONSTANT, (u8) index);
+    }
+
+    void emitConstant(f64 value) {
+        emitConstant(VALUE_NUM(value));
     }
 
     u32 addConstant(Value::Value value) {
@@ -169,8 +181,33 @@ class BytecodeCompiler : public Stmt::StmtVisitor, public Expr::ExprVisitor{
 
     void compileFunction(const Stmt::Function& function) {
 
+        inInit = false;
+
+        beginScope();
+
+        for (Stmt::VariableDeclaration* param: function.params) {
+            createLocal(param->name.data.name);
+        }
+
         for (Stmt::Stmt* stmt : function.body->statements) {
             compileStmt(stmt);
+        }
+
+        endScope();
+
+        auto* compiledFunction = new Value::Function(currentChunk(), function.name.data.name, (u8) function.params.size());
+
+        currentFunction.clear();
+
+        inInit = true;
+
+        emitConstant(VALUE_FUNCTION(compiledFunction));
+        emitBytes(Bytecode::SET_GLOBAL, resolveGlobal(function.name.data.name));
+        emitByte(Bytecode::POP);
+
+        if (function.params.size() > UINT8_MAX) {
+            std::string message = "Error: Function \"" + std::string(function.name.data.name) + "\" takes " + std::to_string(function.params.size()) + " parameters, maximum allowed is 255";
+            errors.push_back(message);
         }
     }
 
@@ -182,14 +219,25 @@ class BytecodeCompiler : public Stmt::StmtVisitor, public Expr::ExprVisitor{
         stmt->accept(this);
     }
 
+    void declareNatives() {
+        auto natives = Value::nativeFnDefinitions();
+        for (const Value::NativeFn& fn : natives) {
+            auto current = new Value::NativeFn(fn);
+            createGlobal(fn.name);
+
+            emitConstant(VALUE_NATIVE(current));
+            emitBytes(Bytecode::SET_GLOBAL, resolveGlobal(fn.name));
+            emitByte(Bytecode::POP);
+        }
+    }
+
 public:
     Bytecode::Program compile(const Compiler::CompileResult& ast) {
         std::vector<Stmt::Function*> funcs;
         for (Stmt::Stmt* current : ast.tree) {
             if (auto func = dynamic_cast<Stmt::Function*> (current)) {
                 createGlobal(func->name.data.name);
-
-                if (!func->body->statements.empty() && !dynamic_cast<Stmt::Return*>(func->body->statements.back())) {
+                if (func->body->statements.empty() || !dynamic_cast<Stmt::Return*>(func->body->statements.back())) {
 
                     static Expr::Number zeroExpr(0.0);
                     static Stmt::Return zeroReturn(&zeroExpr);
@@ -202,19 +250,38 @@ public:
                 auto var = dynamic_cast<Stmt::VariableDeclaration*>(current);
 
                 createGlobal(var->name.data.name);
-                if (var->value != nullptr) compileExpression(var->value);
+                if (var->value != nullptr) {
+                    compileExpression(var->value);
 
-                emitBytes(Bytecode::SET_GLOBAL, resolveGlobal(var->name.data.name));
-                emitByte(Bytecode::POP);
+                    emitBytes(Bytecode::SET_GLOBAL, resolveGlobal(var->name.data.name));
+                    emitByte(Bytecode::POP);
+                }
             }
         }
+
+        declareNatives();
 
         for (Stmt::Function* func : funcs) {
             Stmt::Function function = *func;
             compileFunction(function);
         }
 
+        if (!errors.empty()) {
+            std::string messages;
+
+            for (const std::string& message : errors) {
+                messages += message + "\n";
+            }
+
+            throw CompileError(messages);
+        }
+
+        loadNamedVariable("main");
+        emitBytes(Bytecode::CALL, 0);
+        emitByte(Bytecode::EXIT);
+
         program.globalCount = globals.size();
+        program.code = init;
 
         return program;
     }
@@ -263,8 +330,17 @@ public:
         return std::monostate();
     }
 
-    ExprVisitResults visitCallExpr(Expr::Call *) override {
-        throw CompileError("Unimplemented Expression Type: Call");
+    ExprVisitResults visitCallExpr(Expr::Call *expr) override {
+        compileExpression(expr->callee);
+
+        for (Expr::Expr* arg : expr->args) {
+            compileExpression(arg);
+        }
+
+        u8 argCount = (u8) expr->args.size();
+        emitBytes(Bytecode::CALL, argCount);
+
+        return std::monostate();
     }
 
     ExprVisitResults visitIdentifierExpr(Expr::Identifier *expr) override {
@@ -444,14 +520,14 @@ public:
 
         u64 exitJump = emitJump(Bytecode::JUMP_FALSE);
 
-        emitByte(Bytecode::POP);
+        emitByte(Bytecode::POP); // pop the condition true
 
         compileStmt(stmt->body);
 
         emitLoop(loopStart);
 
         patchJump(exitJump);
-        emitByte(Bytecode::POP);
+        emitByte(Bytecode::POP); // pop the condition if exited loop
 
         return std::monostate();
     }

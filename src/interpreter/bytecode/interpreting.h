@@ -21,6 +21,8 @@ namespace Bytecode {
         LESS_EQUALS,
         MORE_EQUALS,
 
+        CALL,
+
         POP,
         POP_N,
 
