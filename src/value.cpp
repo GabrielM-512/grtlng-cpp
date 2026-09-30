@@ -18,12 +18,15 @@
     N   N   A   A     T     IIIII     V     EEEEE           F        UUU    N   N     CCC     T     IIIII    OOO    N   N   SSSS
 */
 
+
+#ifdef INTERPRETER_AST
+
 typedef Value::Value (*NativeFunction)(const std::vector<Value::Value>&);
 
 Value::Value clockNative(const std::vector<Value::Value>&) {
     return VALUE_NUM((double) clock() / CLOCKS_PER_SEC);
 }
-#ifdef INTERPRETER_AST
+
 class NativeFn : public Value::Callable {
     NativeFunction function;
 public:

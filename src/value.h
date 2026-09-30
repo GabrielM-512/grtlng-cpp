@@ -91,6 +91,11 @@ namespace Value {
 
 
     void defineNativeFunctions(Interpreting::Interpreter* interpreter);
+
+    #define VALUE_CALLABLE(callable) ((Value::Value) {.type = Value::OBJECT, .as = {.object = (callable)}})
+    #define IS_CALLABLE(value) (Value::isObjType((value), Value::CALLABLE))
+    #define AS_CALLABLE(value) ((Value::Callable*)(value).as.object)
+
 #else
 
 
@@ -106,20 +111,15 @@ namespace Value {
     void defineNativesResolver(Resolving::Scope* scope);
 
 #define VALUE_NUM(number) ((Value::Value) {.type = Value::NUMBER, .as = {.num = static_cast<double>(number)}})
-#define VALUE_CALLABLE(callable) ((Value::Value) {.type = Value::OBJECT, .as = {.object = (callable)}})
 #define VALUE_TRUE (VALUE_NUM(1))
 #define VALUE_FALSE (VALUE_NUM(0))
 #define VALUE_BOOL(boolean) ((boolean) ? VALUE_TRUE : VALUE_FALSE)
 
 #define IS_NUM(value) ((value).type == NUMBER)
-
 #define IS_OBJ(value) ((value).type == Value::OBJECT)
-#define IS_CALLABLE(value) (Value::isObjType((value), Value::CALLABLE))
 
 #define AS_NUM(value) ((value).as.num)
-
 #define AS_OBJ(value) ((value).as.object)
-#define AS_CALLABLE(value) ((Value::Callable*)(value).as.object)
 
     void printValue(const Value& value);
     std::string getValueString(const Value& value);
