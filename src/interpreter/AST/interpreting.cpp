@@ -1,7 +1,6 @@
 #include "interpreting.h"
 
 #include <iostream>
-#include <sysexits.h>
 
 #include "environment.h"
 #include "../../error.h"

@@ -2,7 +2,6 @@
 
 #include <iostream>
 #include <utility>
-#include <sysexits.h>
 
 #include "compiler.h"
 #include "decompile.h"
