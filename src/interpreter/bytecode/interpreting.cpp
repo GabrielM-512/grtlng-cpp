@@ -185,6 +185,15 @@ public:
                 case LOOP: {
                     u16 distance = READ_SHORT();
                     ip -= distance;
+                    break;
+                }
+
+                case EXIT: {
+                    Value::Value returnValue = pop();
+#ifdef BYTECODE_SAFETY
+                    if (sp != 0) std::cerr << "stack was not empty, included " << sp << " values" << std::endl;
+#endif
+                    return AS_NUM(returnValue);
                 }
 
             }
