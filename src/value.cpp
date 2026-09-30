@@ -119,6 +119,18 @@ Value::Value Value::Function::call(Interpreting::Interpreter *interpreter, std::
 
     return (Value) {.type = NUMBER, .as = {}};
 }
+#else
+    Value::Value clockNative(Value::Value*) {
+        return VALUE_NUM((double) clock() / CLOCKS_PER_SEC);
+    }
+
+    std::vector<Value::NativeFn> Value::nativeFnDefinitions() {
+        std::vector fns = {
+            NativeFn(clockNative, "clock", 0),
+        };
+
+        return fns;
+    }
 #endif
 
 
@@ -148,21 +160,18 @@ bool objsEqual(const Value::Obj* a, const Value::Obj* b) {
     if (a->type != b->type) return false;
 
     switch (a->type) {
-        case Value::FUNCTION:
-        case Value::NATIVE_FN:
-            break; // TODO
+        case Value::NATIVE_FN: {
+            const auto funcA = static_cast<const Value::NativeFn*>(a);
+            const auto funcB = static_cast<const Value::NativeFn*>(b);
+
+            return funcA->fn == funcB->fn;
+        }
+        case Value::FUNCTION: {
+            return a == b;
+        }
     }
 
     return false;
-}
-
-void printObject(const Value::Obj* obj) {
-    switch (obj->type) {
-        case Value::FUNCTION:
-        case Value::NATIVE_FN:
-            break; // TODO
-
-    }
 }
 
 void Value::printValue(const Value& value) {
@@ -171,9 +180,16 @@ void Value::printValue(const Value& value) {
 
 std::string getObjectString(const Value::Obj* obj) {
     switch (obj->type) {
-        case Value::FUNCTION:
-        case Value::NATIVE_FN:
-            break; // TODO
+        case Value::FUNCTION: {
+            auto func = static_cast<const Value::Function*>(obj);
+            return "<fn \"" + func->name + "\">";
+        }
+
+        case Value::NATIVE_FN: {
+            auto func = static_cast<const Value::NativeFn*>(obj);
+            return "<fn \"" + func->name + "\">";
+            break;
+        }
 
         default:
             return "UNKNOWN OBJECT TYPE";

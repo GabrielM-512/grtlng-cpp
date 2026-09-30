@@ -98,8 +98,34 @@ namespace Value {
 
 #else
 
+    struct Function : Obj {
+        std::vector<u8> code;
+        std::string name;
+        u8 arity;
 
+        Function(const std::vector<u8> &code, const std::string &name, u8 arity): Obj(FUNCTION), code(code), name(name), arity(arity) {}
+    };
 
+    typedef Value (*NativeFunction)(Value*);
+
+    struct NativeFn : Obj {
+        NativeFunction fn;
+        std::string name;
+        u8 arity;
+
+        NativeFn(NativeFunction func, std::string  name, u8 arity): Obj(NATIVE_FN), fn(func), name(std::move(name)), arity(arity) {}
+    };
+
+    std::vector<NativeFn> nativeFnDefinitions();
+
+#define VALUE_FUNCTION(func) ((Value::Value) {.type = Value::OBJECT, .as = {.object = func}})
+#define VALUE_NATIVE(native) ((Value::Value) {.type = Value::OBJECT, .as = {.object = native}})
+
+#define IS_FUNC(value) (Value::isObjType((value), Value::FUNCTION))
+#define IS_NATIVE(value) (Value::isObjType((value), Value::NATIVE_FN))
+
+#define AS_FUNCTION(value) ((Value::Function*)(value).as.object)
+#define AS_NATIVE(value) ((Value::NativeFn*)(value).as.object)
 
 
 #endif
