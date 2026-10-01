@@ -4,6 +4,7 @@ namespace argvParse {
     struct ProgramArgs {
         bool interpret = false;
         bool decompile = false;
+        bool printAst = false;
         char *filePath = nullptr;
     };
 

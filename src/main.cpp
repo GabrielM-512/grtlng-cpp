@@ -1,5 +1,6 @@
 #include <iostream>
 
+#include "../tool/prettyPrinter.h"
 #include "compiler/compiler.h"
 #include "util/fileIO.h"
 
@@ -27,6 +28,10 @@ int main(const int argc, char* argv[]) {
         if (!program.success) {
             handler.printErrors();
             return 1;
+        }
+
+        if (compileFlags.printAst) {
+            std::cout << Printer::print(program) << std::endl;
         }
 
         if (compileFlags.interpret) {

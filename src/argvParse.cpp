@@ -24,6 +24,11 @@ error_t parse_opt (int key, char *arg, argp_state *state) {
             break;
         }
 
+        case 256: {
+            arguments->printAst = true;
+            break;
+        }
+
         case ARGP_KEY_ARG: {
             if (arguments->filePath == nullptr) {
                 arguments->filePath = (char*) malloc(strlen(arg));
@@ -53,8 +58,9 @@ ProgramArgs argvParse::parse(int argc, char* argv[]) {
     static char args_doc[] = "./grtlng [source file] [mode] [options]";
 
     static argp_option options[] = {
-        {.name = "compile-mode", .key = 'c', .arg = "type", .flags = 0, .doc = "[-c=<value>] The mode of the compiler. Possible options: i (interpret program)", .group = 0},
+        {.name = "compile-mode", .key = 'c', .arg = "type", .flags = 0, .doc = "[-c<value>] The mode of the compiler. Possible options: i (interpret program)", .group = 0},
         {.name = nullptr, .key = 'd', .arg = nullptr, .flags = 0, .doc = "[-d] Whether to decompile the bytecode before execution. Only valid when used in combination with -ci.", .group = 0},
+        {.name = "print-ast", .key = 256, .arg = nullptr, .flags = 0, .doc = "[--print-ast] Prints the AST for the program using parentheses in expressions to explicitly show precedence.", .group = 0},
         {.name = nullptr, .key = 0, .arg = nullptr, .flags = 0, .doc = nullptr, .group = 0} // last entry
     };
 
