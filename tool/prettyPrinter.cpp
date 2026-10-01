@@ -3,8 +3,6 @@
 #include <format>
 #include <iostream>
 
-#include "../src/AST/expr.h"
-
 class PrettyPrinter : public Expr::ExprVisitor, Stmt::StmtVisitor {
     int tabs = 0;
 public:
@@ -144,7 +142,7 @@ public:
     }
 };
 
-std::string Printer::print(const std::vector<Stmt::Stmt*>& tree) {
+std::string Printer::print(const Compiler::CompileResult& tree) {
     PrettyPrinter printer;
-    return printer.print(tree);
+    return printer.print(tree.tree);
 }

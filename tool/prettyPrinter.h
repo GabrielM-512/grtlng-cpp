@@ -1,6 +1,6 @@
 #pragma once
-#include "../src/AST/stmt.h"
+#include "../src/compiler/compiler.h"
 
 namespace Printer {
-    std::string print(const std::vector<Stmt::Stmt*>& tree);
+    std::string print(const Compiler::CompileResult& tree);
 }
