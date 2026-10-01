@@ -17,6 +17,7 @@ namespace Expr {
     struct Assign;
     struct Call;
     struct Logical;
+    struct Conditional;
 
     class ExprVisitor {
     public:
@@ -29,6 +30,7 @@ namespace Expr {
         virtual ExprVisitResults visitAssignExpr(Assign* expr) = 0;
         virtual ExprVisitResults visitCallExpr(Call* expr) = 0;
         virtual ExprVisitResults visitLogicalExpr(Logical* expr) = 0;
+        virtual ExprVisitResults visitConditionalExpr(Conditional* expr) = 0;
     };
 
     struct Expr {
@@ -133,6 +135,22 @@ namespace Expr {
 
         ExprVisitResults accept(ExprVisitor* visitor) override {
             return visitor->visitLogicalExpr(this);
+        }
+    };
+
+    struct Conditional: Expr {
+        Expr* condition;
+        Expr* thenBranch;
+        Expr* elseBranch;
+
+        explicit Conditional(
+            Expr* condition,
+            Expr* thenBranch,
+            Expr* elseBranch
+        ): condition(condition), thenBranch(thenBranch), elseBranch(elseBranch) {}
+
+        ExprVisitResults accept(ExprVisitor* visitor) override {
+            return visitor->visitConditionalExpr(this);
         }
     };
 }

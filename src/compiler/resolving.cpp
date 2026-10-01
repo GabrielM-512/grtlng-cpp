@@ -133,6 +133,13 @@ public:
         return std::monostate();
     }
 
+    ExprVisitResults visitConditionalExpr(Expr::Conditional *expr) override {
+        expression(expr->condition);
+        expression(expr->thenBranch);
+        expression(expr->elseBranch);
+        return std::monostate();
+    }
+
 /*
      SSSS   TTTTT     A     TTTTT   EEEEE   M   M   EEEEE   N   N   TTTTT    SSSS
     S         T      A A      T     E       MM MM   E       NN  N     T     S

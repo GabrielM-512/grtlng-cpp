@@ -15,7 +15,10 @@ namespace Lexing {
         FALSE,
         TRUE,
 
+        COLON,
         SEMICOLON,
+
+        QUESTION_MARK,
 
         LEFT_PAREN, // (
         RIGHT_PAREN, // )

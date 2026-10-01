@@ -64,6 +64,10 @@ public:
         return "( " + expression(expr->left) + operatorString(expr->operatorType) + expression(expr->right) + " )";
     }
 
+    ExprVisitResults visitConditionalExpr(Expr::Conditional *expr) override {
+        return "( ( " + expression(expr->condition) + " ) ? ( " + expression(expr->thenBranch) + " ) : ( " + expression(expr->elseBranch) + " ) )";
+    }
+
 
     StmtVisitResults visitExpressionStmt(Stmt::Expression *stmt) override {
         return "[EXPR] " + expression(stmt->expression);

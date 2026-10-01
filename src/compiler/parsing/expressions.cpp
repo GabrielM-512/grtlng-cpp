@@ -153,6 +153,21 @@ public:
     }
 };
 
+class ConditionalParselet : public Parsing::InfixParselet {
+public:
+    ConditionalParselet(int precedence): InfixParselet(precedence) {}
+
+    Expr::Expr *parse(Parsing::Parser &parser, Expr::Expr *left, Lexing::Token &) override {
+        Expr::Expr *thenBranch = parser.expression();
+
+        parser.consume(Lexing::COLON);
+
+        Expr::Expr *elseBranch = parser.parseExpression(Parsing::Precedence::CONDITIONAL - 1);
+
+        return new Expr::Conditional(left, thenBranch, elseBranch);
+    }
+};
+
 
 /*
     PPPP      A     RRRR     SSSS   EEEEE   L       EEEEE   TTTTT           U   U   TTTTT   IIIII   L        SSSS
@@ -205,6 +220,8 @@ void Expressions::registerExpressionParselets(Parsing::Parser &parser) {
 
     parser.registerPrefixParselet(new BoolParselet(), Lexing::TRUE);
     parser.registerPrefixParselet(new BoolParselet(), Lexing::FALSE);
+
+    parser.registerInfixParselet(new ConditionalParselet(Parsing::Precedence::CONDITIONAL), Lexing::QUESTION_MARK);
 }
 
 

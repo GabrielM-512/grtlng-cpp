@@ -16,14 +16,15 @@ namespace Parsing {
     public:
         static constexpr int LIMIT = 1;
         static constexpr int ASSIGNMENT = 2;
-        static constexpr int LOGICAL_OR = 3;
-        static constexpr int LOGICAL_AND = 4;
-        static constexpr int EQUALITY = 5;
-        static constexpr int COMPARISON = 6;
-        static constexpr int SUM = 7;
-        static constexpr int PRODUCT = 8;
-        static constexpr int UNARY = 9;
-        static constexpr int CALL = 10;
+        static constexpr int CONDITIONAL = 3;
+        static constexpr int LOGICAL_OR = 4;
+        static constexpr int LOGICAL_AND = 5;
+        static constexpr int EQUALITY = 6;
+        static constexpr int COMPARISON = 7;
+        static constexpr int SUM = 8;
+        static constexpr int PRODUCT = 9;
+        static constexpr int UNARY = 10;
+        static constexpr int CALL = 11;
     };
 
     class Parser {

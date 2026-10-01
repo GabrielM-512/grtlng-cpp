@@ -112,4 +112,12 @@ ExprVisitResults Interpreter::visitLogicalExpr(Expr::Logical *expr) {
 
     return Value::isTruthy(evaluate(expr->right)) ? VALUE_TRUE : VALUE_FALSE;
 }
+
+
+ExprVisitResults Interpreter::visitConditionalExpr(Expr::Conditional *expr) {
+    if (Value::isTruthy(evaluate(expr->condition))) {
+        return evaluate(expr->thenBranch);
+    }
+    return evaluate(expr->elseBranch);
+}
 #endif

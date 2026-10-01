@@ -12,7 +12,9 @@ std::string Token::toString(TokenType tokenType) {
         case ERROR: return "an error";
         case NUMBER: return "a number";
         case STRING: return "a string";
+        case COLON: return "\":\"";
         case SEMICOLON: return "\";\"";
+        case QUESTION_MARK: return "\"?\"";
         case LEFT_PAREN: return "\"(\"";
         case RIGHT_PAREN: return "\")\"";
         case LEFT_BRACE: return "\"{\"";
@@ -324,7 +326,9 @@ Token Lexer::scanToken() {
     switch (c) {
 
         // single-character tokens
+        case ':': return noDataToken(COLON);
         case ';': return noDataToken(SEMICOLON);
+        case '?': return noDataToken(QUESTION_MARK);
         case '(': return noDataToken(LEFT_PAREN);
         case ')': return noDataToken(RIGHT_PAREN);
         case '{': return noDataToken(LEFT_BRACE);

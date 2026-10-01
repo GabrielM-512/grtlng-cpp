@@ -343,6 +343,27 @@ public:
         return std::monostate();
     }
 
+    ExprVisitResults visitConditionalExpr(Expr::Conditional *expr) override {
+        compileExpression(expr->condition);
+        u64 elseJump = emitJump(Bytecode::JUMP_FALSE);
+
+        emitByte(Bytecode::POP); // pop condition (truthy path)
+
+        compileExpression(expr->thenBranch);
+
+        u64 exitJump = emitJump(Bytecode::JUMP);
+
+        patchJump(elseJump); // begin falsy path
+
+        emitByte(Bytecode::POP); // pop condition
+
+        compileExpression(expr->elseBranch);
+
+        patchJump(exitJump);
+
+        return std::monostate();
+    }
+
     ExprVisitResults visitIdentifierExpr(Expr::Identifier *expr) override {
         loadNamedVariable(expr->target.data.name);
         return std::monostate();
