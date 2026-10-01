@@ -114,7 +114,8 @@ public:
         std::string output = std::string(stmt->name.data.name) + "(";
 
         for (const Stmt::VariableDeclaration* param : stmt->params) {
-            output += Lexing::Token::toString(param->dataType) + " " + param->name.data.name + ", ";
+            std::string dataType = Lexing::Token::toString(param->dataType);
+            output += dataType.substr(1, dataType.size() - 2) + " " + param->name.data.name + ", ";
         }
 
         if (!stmt->params.empty())
