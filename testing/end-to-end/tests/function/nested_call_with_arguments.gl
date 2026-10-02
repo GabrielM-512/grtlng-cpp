@@ -1,0 +1,15 @@
+u8 returnArg(i8 arg) {
+  return arg;
+}
+
+u8 returnFunCallWithArg(i8 func, i8 arg) {
+  return returnArg(func)(arg);
+}
+
+u8 printArg(i8 arg) {
+  print arg;
+}
+
+i32 main() {
+    returnFunCallWithArg(printArg, 69); // expect: hello world
+}

@@ -1,0 +1,13 @@
+u8 isEven(u64 n) {
+  if (n == 0) return true;
+  return isOdd(n - 1);
+}
+
+u8 isOdd(u64 n) {
+  if (n == 0) return false;
+  return isEven(n - 1);
+}
+i32 main() {
+    print isEven(4); // expect: 1
+    print isOdd(3); // expect: 1
+}

@@ -66,12 +66,32 @@
       "testfile": "function/duplicate_parameter.gl",
       "stderr": "function/duplicate_parameter_stderr"
     },
+    "function.empty_body": {
+      "testfile": "function/empty_body.gl",
+      "stdout": "function/empty_body_stdout"
+    },
     "function.local": {
       "testfile": "function/local.gl",
       "stderr": "function/local_stderr"
     },
+    "function.mutual_recursion": {
+      "testfile": "function/mutual_recursion.gl",
+      "stdout": "function/mutual_recursion_stdout"
+    },
     "function.nameless_parameter": {
       "testfile": "function/nameless_parameter.gl"
+    },
+    "function.nested_call": {
+      "testfile": "function/nested_call_with_arguments.gl",
+      "stdout": "function/nested_call_with_arguments_stdout"
+    },
+    "function.print": {
+      "testfile": "function/print.gl",
+      "stdout": "function/print_stdout"
+    },
+    "function.recursion": {
+      "testfile": "function/print.gl",
+      "stdout": "function/print_stdout"
     },
     "function.scoped_vars": {
       "testfile": "function/scoped_vars.gl",

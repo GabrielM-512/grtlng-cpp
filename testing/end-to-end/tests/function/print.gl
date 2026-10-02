@@ -1,0 +1,7 @@
+void foo() {}
+
+i32 main() {
+    print foo; // expect: <fn foo>
+
+    print clock; // expect: <native fn>
+}
