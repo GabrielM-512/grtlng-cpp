@@ -69,7 +69,7 @@ int main() {
         {F32, 6, 180, {.name = nullptr}},
         {F64, 6, 184, {.name = nullptr}},
         {VOID, 6, 188, {.name = nullptr}},
-        {ERROR, 8, 194, {.name = (char*) "Unexpected character."}},
+        {QUESTION_MARK, 8, 194, {.name = nullptr}},
         {STRING, 10, 197, {.name = (char*) "hahahoho"}},
         {NUMBER, 11, 208, {.number = 1.000000}},
         {NUMBER, 12, 210, {.number = 2.000000}},
