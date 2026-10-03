@@ -40,8 +40,8 @@ void printOffsetInstruction(u64 offset, const std::string& instruction, bool pip
     return offset + 3;
 }
 
-[[nodiscard]] u64 constantInstruction(u64 offset, const std::string& instruction, Bytecode::Program program) {
-    u8 index = program.code.at(offset + 1);
+[[nodiscard]] u64 constantInstruction(u64 offset, const std::string& instruction, Bytecode::Program program, std::vector<u8> code) {
+    u8 index = code.at(offset + 1);
     Value::Value value = program.constants.at(index);
 
     printOffsetInstruction(offset, instruction, true);
@@ -160,7 +160,7 @@ void decompileChunk(std::vector<u8> code, const std::string& name, const Bytecod
             }
 
             case Bytecode::LOAD_CONSTANT: {
-                offset = constantInstruction(offset, "LOAD_CONSTANT", program);
+                offset = constantInstruction(offset, "LOAD_CONSTANT", program, code);
                 break;
             }
 
