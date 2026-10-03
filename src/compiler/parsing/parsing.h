@@ -31,6 +31,7 @@ namespace Parsing {
         std::vector<Lexing::Token>& tokens;
         Lexing::Token current, previous;
         u32 currentToken;
+        u16 loopCount;
 
         bool hadError;
         bool hadFatalError;
@@ -74,7 +75,12 @@ namespace Parsing {
 
         Stmt::Return *returnStatement();
 
+        Stmt::Break *breakStatement();
+        Stmt::Continue *continueStatement();
+
         void synchronise(bool isGlobal);
+
+        [[nodiscard]] bool hasLoop() const;
 
     public:
         bool consume(Lexing::TokenType type, const std::string &message);

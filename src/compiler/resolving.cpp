@@ -229,10 +229,34 @@ public:
         return std::monostate();
     }
 
+    StmtVisitResults visitForStmt(Stmt::For *stmt) override {
+
+        beginScope();
+
+        if (stmt->initialiser != nullptr) statement(stmt->initialiser);
+
+        expression(stmt->condition);
+        if (stmt->incrementer != nullptr) expression(stmt->incrementer);
+
+        statement(stmt->body);
+
+        endScope();
+
+        return std::monostate();
+    }
+
     StmtVisitResults visitWhileStmt(Stmt::While *stmt) override {
         expression(stmt->condition);
         statement(stmt->body);
 
+        return std::monostate();
+    }
+
+    StmtVisitResults visitBreakStmt(Stmt::Break *) override {
+        return std::monostate();
+    }
+
+    StmtVisitResults visitContinueStmt(Stmt::Continue *) override {
         return std::monostate();
     }
 

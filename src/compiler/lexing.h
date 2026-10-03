@@ -88,6 +88,9 @@ namespace Lexing {
         WHILE,
         FOR,
 
+        BREAK,
+        CONTINUE,
+
         PRINT,
 
         LAST // a marker token to always be the last token

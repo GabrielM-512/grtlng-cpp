@@ -10,6 +10,8 @@ Stmt::Stmt* Parser::statement() {
     if (match(Lexing::FOR)) return forStatement();
     if (match(Lexing::LEFT_BRACE)) return blockStatement();
     if (match(Lexing::RETURN)) return returnStatement();
+    if (match(Lexing::BREAK)) return breakStatement();
+    if (match(Lexing::CONTINUE)) return continueStatement();
 
     return expressionStatement();
 }
@@ -80,7 +82,9 @@ Stmt::While *Parser::whileStatement() {
     Expr::Expr* condition = expression();
     consume(Lexing::RIGHT_PAREN, " after while condition");
 
+    loopCount++;
     Stmt::Stmt* body = statement();
+    loopCount--;
 
     return new Stmt::While(condition, body);
 }
@@ -117,20 +121,11 @@ Stmt::Stmt* Parser::forStatement() {
 
     consume(Lexing::RIGHT_PAREN, " after incrementer clause");
 
+    loopCount++;
     Stmt::Stmt* body = statement();
+    loopCount--;
 
-
-    if (incrementer != nullptr) {
-        body = new Stmt::Block({body, new Stmt::Expression(incrementer)});
-    }
-
-    body = new Stmt::While(condition, body);
-
-    if (initialiser != nullptr) {
-        body = new Stmt::Block({initialiser, body});
-    }
-
-    return body;
+    return new Stmt::For(initialiser, condition, incrementer, body);
 }
 
 Stmt::Block *Parser::blockStatement() {
@@ -155,4 +150,25 @@ Stmt::Return *Parser::returnStatement() {
 
     consume(Lexing::SEMICOLON, " after return value");
     return new Stmt::Return(value);
+}
+
+Stmt::Break *Parser::breakStatement() {
+    if (!hasLoop()) {
+        errorAtCurrent("used \"break\" outside of a loop");
+    }
+
+    consume(Lexing::SEMICOLON, " after \"break\"");
+
+    return new Stmt::Break();
+
+}
+
+Stmt::Continue *Parser::continueStatement() {
+    if (!hasLoop()) {
+        errorAtCurrent("used \"continue\" outside of a loop");
+    }
+
+    consume(Lexing::SEMICOLON, " after \"continue\"");
+
+    return new Stmt::Continue();
 }

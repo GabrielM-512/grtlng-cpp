@@ -14,9 +14,12 @@ namespace Stmt {
     struct VariableDeclaration;
     struct If;
     struct While;
+    struct For;
     struct Block;
     struct Function;
     struct Return;
+    struct Continue;
+    struct Break;
 
     class StmtVisitor {
     public:
@@ -27,9 +30,12 @@ namespace Stmt {
         virtual StmtVisitResults visitVariableDeclarationStmt(VariableDeclaration* stmt) = 0;
         virtual StmtVisitResults visitIfStmt(If* stmt) = 0;
         virtual StmtVisitResults visitWhileStmt(While* stmt) = 0;
+        virtual StmtVisitResults visitForStmt(For* stmt) = 0;
         virtual StmtVisitResults visitBlockStmt(Block* stmt) = 0;
         virtual StmtVisitResults visitFunctionStmt(Function* stmt) = 0;
         virtual StmtVisitResults visitReturnStmt(Return* stmt) = 0;
+        virtual StmtVisitResults visitContinueStmt(Continue* stmt) = 0;
+        virtual StmtVisitResults visitBreakStmt(Break* stmt) = 0;
     };
 
     struct Stmt {
@@ -107,6 +113,24 @@ namespace Stmt {
         }
     };
 
+    struct For: Stmt {
+        Stmt* initialiser;
+        Expr::Expr* condition;
+        Expr::Expr* incrementer;
+        Stmt* body;
+
+        explicit For(
+            Stmt* initialiser,
+            Expr::Expr* condition,
+            Expr::Expr* incrementer,
+            Stmt* body
+        ): initialiser(initialiser), condition(condition), incrementer(incrementer), body(body) {}
+
+        StmtVisitResults accept(StmtVisitor* visitor) override {
+            return visitor->visitForStmt(this);
+        }
+    };
+
     struct Block: Stmt {
         std::vector<Stmt*> statements;
 
@@ -149,6 +173,24 @@ namespace Stmt {
 
         StmtVisitResults accept(StmtVisitor* visitor) override {
             return visitor->visitReturnStmt(this);
+        }
+    };
+
+    struct Continue: Stmt {
+
+        explicit Continue() {}
+
+        StmtVisitResults accept(StmtVisitor* visitor) override {
+            return visitor->visitContinueStmt(this);
+        }
+    };
+
+    struct Break: Stmt {
+
+        explicit Break() {}
+
+        StmtVisitResults accept(StmtVisitor* visitor) override {
+            return visitor->visitBreakStmt(this);
         }
     };
 }

@@ -153,8 +153,12 @@ if __name__ == "__main__":
                           "VariableDeclaration | Lexing::TokenType dataType, Lexing::Token name, Expr::Expr* value = nullptr",
                           "If                  | Expr::Expr* condition, Stmt* thenBranch, Stmt* elseBranch",
                           "While               | Expr::Expr* condition, Stmt* body",
+                          "For                 | Stmt* initialiser, Expr::Expr* condition, Expr::Expr* incrementer, Stmt* body",
                           "Block               | -std::vector<Stmt*> statements",
                           "Function            | Lexing::TokenType dataType, Lexing::Token name, std::vector<VariableDeclaration*> params, Block* body",
-                          "Return              | Expr::Expr* value"],
+                          "Return              | Expr::Expr* value",
+                          "Continue            | ",
+                          "Break               | "
+              ],
                visit_results = "std::monostate, std::string",
                includes="\"expr.h\"")

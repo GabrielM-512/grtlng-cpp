@@ -13,10 +13,17 @@ struct Local {
     i32 depth;
 };
 
+struct Loop {
+    std::vector<u64> breaks {};
+    std::vector<u64> continues {};
+    i32 localsSize {};
+};
+
 class BytecodeCompiler : public Stmt::StmtVisitor, public Expr::ExprVisitor{
     Bytecode::Program program {};
     std::unordered_map<std::string, u16> globals;
     std::vector<Local> locals;
+    std::vector<Loop> loops;
 
     std::vector<u8> currentFunction;
     std::vector<u8> init;
@@ -50,6 +57,12 @@ class BytecodeCompiler : public Stmt::StmtVisitor, public Expr::ExprVisitor{
 
     void emitConstant(f64 value) {
         emitConstant(VALUE_NUM(value));
+    }
+
+    void emitPops(u8 popCount) {
+        if (popCount == 0) return;
+        if (popCount == 1) emitByte(Bytecode::POP);
+        else emitBytes(Bytecode::POP_N, popCount);
     }
 
     u32 addConstant(Value::Value value) {
@@ -229,6 +242,14 @@ class BytecodeCompiler : public Stmt::StmtVisitor, public Expr::ExprVisitor{
             emitBytes(Bytecode::SET_GLOBAL, resolveGlobal(fn.name));
             emitByte(Bytecode::POP);
         }
+    }
+
+    void startLoop() {
+        loops.push_back({.breaks = {}, .continues = {}, .localsSize = static_cast<i32>(locals.size())});
+    }
+
+    void endLoop() {
+        loops.pop_back();
     }
 
 public:
@@ -462,12 +483,32 @@ public:
 
         u8 popCount = countCurrentScopeVars();
 
-        if (popCount > 0) {
-            if (popCount == 1) emitByte(Bytecode::POP);
-            else emitBytes(Bytecode::POP_N, popCount);
-        }
+        emitPops(popCount);
 
         endScope();
+
+        return std::monostate();
+    }
+
+    StmtVisitResults visitBreakStmt(Stmt::Break *) override {
+
+        u8 popCount = locals.size() - loops.back().localsSize;
+        emitPops(popCount);
+
+        u64 jump = emitJump(Bytecode::JUMP);
+        loops.back().breaks.push_back(jump);
+
+        return std::monostate();
+    }
+
+
+    StmtVisitResults visitContinueStmt(Stmt::Continue *) override {
+
+        u8 popCount = locals.size() - loops.back().localsSize;
+        emitPops(popCount);
+
+        u64 jump = emitJump(Bytecode::JUMP);
+        loops.back().continues.push_back(jump);
 
         return std::monostate();
     }
@@ -475,6 +516,50 @@ public:
     StmtVisitResults visitExpressionStmt(Stmt::Expression *stmt) override {
         compileExpression(stmt->expression);
         emitByte(Bytecode::POP);
+        return std::monostate();
+    }
+
+    StmtVisitResults visitForStmt(Stmt::For *stmt) override {
+
+        beginScope();
+
+        if (stmt->initialiser != nullptr) compileStmt(stmt->initialiser);
+
+        u64 loopStart = currentChunk().size();
+
+        compileExpression(stmt->condition);
+        u64 exitJump = emitJump(Bytecode::JUMP_FALSE);
+
+        emitByte(Bytecode::POP); // pop the condition true
+
+        startLoop();
+
+        compileStmt(stmt->body);
+
+        for (u64 cont : loops.back().continues) {
+            patchJump(cont);
+        }
+
+        if (stmt->incrementer != nullptr) compileExpression(stmt->incrementer);
+        emitByte(Bytecode::POP);
+
+        emitLoop(loopStart);
+
+        patchJump(exitJump);
+        emitByte(Bytecode::POP); // pop the condition if exited loop
+
+        for (u64 brk : loops.back().breaks) {
+            patchJump(brk);
+        }
+
+        endLoop();
+
+        if (stmt->initialiser != nullptr && dynamic_cast<Stmt::VariableDeclaration*>(stmt->initialiser)) {
+            emitByte(Bytecode::POP); // pop the initialised variable if it exists
+        }
+
+        endScope();
+
         return std::monostate();
     }
 
@@ -539,12 +624,24 @@ public:
 
         emitByte(Bytecode::POP); // pop the condition true
 
+        startLoop();
+
         compileStmt(stmt->body);
+
+        for (u64 cont : loops.back().continues) {
+            patchJump(cont);
+        }
 
         emitLoop(loopStart);
 
         patchJump(exitJump);
         emitByte(Bytecode::POP); // pop the condition if exited loop
+
+        for (u64 brk : loops.back().breaks) {
+            patchJump(brk);
+        }
+
+        endLoop();
 
         return std::monostate();
     }

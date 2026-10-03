@@ -101,6 +101,17 @@ public:
         return "PRINT " + expression(stmt->expression);
     }
 
+    StmtVisitResults visitForStmt(Stmt::For *stmt) override {
+
+        std::string init = (stmt->initialiser == nullptr ? "" : statement(stmt->initialiser)) + ";";
+        std::string condition = expression(stmt->condition) + ";";
+        std::string increment = (stmt->incrementer == nullptr ? "" : expression(stmt->incrementer)) + ")";
+
+        std::string body = statement(stmt->body);
+
+        return "FOR (" + init + condition + increment + body;
+    }
+
     StmtVisitResults visitWhileStmt(Stmt::While *stmt) override {
         return "WHILE (" + expression(stmt->condition) + ") DO\n"
             + statement(stmt->body);
@@ -144,6 +155,14 @@ public:
         }
 
         return output;
+    }
+
+    StmtVisitResults visitBreakStmt(Stmt::Break *) override {
+        return "BREAK";
+    }
+
+    StmtVisitResults visitContinueStmt(Stmt::Continue *) override {
+        return "CONTINUE";
     }
 };
 
