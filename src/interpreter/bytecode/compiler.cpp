@@ -489,22 +489,18 @@ public:
         compileExpression(stmt->condition);
 
         u64 elseJump = emitJump(Bytecode::JUMP_FALSE);
+        emitByte(Bytecode::POP); // pop condition (truthy branch)
 
         compileStmt(stmt->thenBranch);
 
+        u64 thenJump = emitJump(Bytecode::JUMP);
 
-        if (stmt->elseBranch != nullptr) {
-            u64 thenJump = emitJump(Bytecode::JUMP);
-            patchJump(elseJump);
+        patchJump(elseJump);
 
-            compileStmt(stmt->elseBranch);
+        emitByte(Bytecode::POP); // pop condition (falsy path)
+        if (stmt->elseBranch != nullptr) compileStmt(stmt->elseBranch);
 
-            patchJump(thenJump);
-        } else {
-            patchJump(elseJump);
-        }
-
-        emitByte(Bytecode::POP); // pop the condition
+        patchJump(thenJump);
 
         return std::monostate();
     }
