@@ -164,6 +164,11 @@ public:
     StmtVisitResults visitContinueStmt(Stmt::Continue *) override {
         return "CONTINUE";
     }
+
+    StmtVisitResults visitSwitchStmt(Stmt::Switch *) override {
+        // TODO
+        return "";
+    }
 };
 
 std::string Printer::print(const Compiler::CompileResult& tree) {

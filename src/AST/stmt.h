@@ -5,6 +5,7 @@
 #include <variant>
 
 #include "expr.h"
+#include <optional>
 
 using StmtVisitResults = std::variant<std::monostate, std::string>;
 
@@ -20,6 +21,7 @@ namespace Stmt {
     struct Return;
     struct Continue;
     struct Break;
+    struct Switch;
 
     class StmtVisitor {
     public:
@@ -36,12 +38,19 @@ namespace Stmt {
         virtual StmtVisitResults visitReturnStmt(Return* stmt) = 0;
         virtual StmtVisitResults visitContinueStmt(Continue* stmt) = 0;
         virtual StmtVisitResults visitBreakStmt(Break* stmt) = 0;
+        virtual StmtVisitResults visitSwitchStmt(Switch* stmt) = 0;
     };
 
     struct Stmt {
         virtual ~Stmt() = default;
         virtual StmtVisitResults accept(StmtVisitor *visitor) = 0;
     };
+
+    struct Case {
+        Expr::Expr* value;
+        std::vector<Stmt*> content;
+    };
+
 
     struct Expression: Stmt {
         Expr::Expr* expression;
@@ -191,6 +200,22 @@ namespace Stmt {
 
         StmtVisitResults accept(StmtVisitor* visitor) override {
             return visitor->visitBreakStmt(this);
+        }
+    };
+
+    struct Switch: Stmt {
+        Expr::Expr* condition;
+        std::vector<Case> cases;
+        std::optional<Case> defaultCase;
+
+        explicit Switch(
+            Expr::Expr* condition,
+            std::vector<Case> cases,
+            std::optional<Case> defaultCase
+        ): condition(condition), cases(cases), defaultCase(defaultCase) {}
+
+        StmtVisitResults accept(StmtVisitor* visitor) override {
+            return visitor->visitSwitchStmt(this);
         }
     };
 }

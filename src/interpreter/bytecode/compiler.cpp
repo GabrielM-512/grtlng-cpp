@@ -646,6 +646,10 @@ public:
         return std::monostate();
     }
 
+    StmtVisitResults visitSwitchStmt(Stmt::Switch *) override {
+        throw CompileError("Unimplemented statement type: Switch");
+    }
+
 };
 
 Bytecode::Program BytecodeCompilation::compile(const Compiler::CompileResult& ast) {

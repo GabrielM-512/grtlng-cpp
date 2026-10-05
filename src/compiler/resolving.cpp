@@ -260,6 +260,11 @@ public:
         return std::monostate();
     }
 
+    StmtVisitResults visitSwitchStmt(Stmt::Switch *) override {
+        // TODO
+        return std::monostate();
+    }
+
     void resolve() {
         std::vector<Stmt::Function*> functions;
         for (Stmt::Stmt* stmt : tree.tree) {
