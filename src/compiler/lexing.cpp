@@ -63,6 +63,9 @@ std::string Token::toString(TokenType tokenType) {
         case FOR: return "\"for\"";
         case BREAK: return "\"break\"";
         case CONTINUE: return "\"continue\"";
+        case SWITCH: return "\"switch\"";
+        case CASE: return "\"case\"";
+        case DEFAULT: return "\"default\"";
         case PRINT: return "\"print\"";
         case FALSE: return "\"false\"";
         case TRUE: return "\"true\"";
@@ -228,7 +231,17 @@ Token Lexer::keyword() const {
     const u32 length = head - base;
     switch (source[base]) {
         case 'b': return checkKeyword(1, "reak", BREAK);
-        case 'c': return checkKeyword(1, "ontinue", CONTINUE);
+        case 'c': if (length > 1) {
+            switch (source[base + 1]) {
+                case 'a': return checkKeyword(2, "se", CASE);
+                case 'o': return checkKeyword(2, "ntinue", CONTINUE);
+                default:
+                    break;
+            }
+        }
+            break;
+
+        case 'd': return checkKeyword(1, "efault", DEFAULT);
         case 'e': if (length > 1) {
             switch (source[base + 1]) {
                 case 'l': return checkKeyword(2, "se", ELSE);
@@ -268,6 +281,8 @@ Token Lexer::keyword() const {
         case 'p': return checkKeyword(1, "rint", PRINT);
 
         case 'r': return checkKeyword(1, "eturn", RETURN);
+
+        case 's': return checkKeyword(1, "witch", SWITCH);
 
         case 't': return checkKeyword(1, "rue", TRUE);
 

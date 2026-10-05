@@ -91,6 +91,10 @@ namespace Lexing {
         BREAK,
         CONTINUE,
 
+        SWITCH,
+        CASE,
+        DEFAULT,
+
         PRINT,
 
         LAST // a marker token to always be the last token
