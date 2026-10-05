@@ -203,7 +203,7 @@ class BytecodeCompiler : public Stmt::StmtVisitor, public Expr::ExprVisitor{
         }
 
         for (Stmt::Stmt* stmt : function.body->statements) {
-            compileStmt(stmt);
+            compileStatement(stmt);
         }
 
         endScope();
@@ -228,7 +228,7 @@ class BytecodeCompiler : public Stmt::StmtVisitor, public Expr::ExprVisitor{
         expr->accept(this);
     }
 
-    void compileStmt(Stmt::Stmt* stmt) {
+    void compileStatement(Stmt::Stmt* stmt) {
         stmt->accept(this);
     }
 
@@ -478,7 +478,7 @@ public:
         beginScope();
 
         for (Stmt::Stmt* current : stmt->statements) {
-            compileStmt(current);
+            compileStatement(current);
         }
 
         u8 popCount = countCurrentScopeVars();
@@ -523,7 +523,7 @@ public:
 
         beginScope();
 
-        if (stmt->initialiser != nullptr) compileStmt(stmt->initialiser);
+        if (stmt->initialiser != nullptr) compileStatement(stmt->initialiser);
 
         u64 loopStart = currentChunk().size();
 
@@ -534,7 +534,7 @@ public:
 
         startLoop();
 
-        compileStmt(stmt->body);
+        compileStatement(stmt->body);
 
         for (u64 cont : loops.back().continues) {
             patchJump(cont);
@@ -576,14 +576,14 @@ public:
         u64 elseJump = emitJump(Bytecode::JUMP_FALSE);
         emitByte(Bytecode::POP); // pop condition (truthy branch)
 
-        compileStmt(stmt->thenBranch);
+        compileStatement(stmt->thenBranch);
 
         u64 thenJump = emitJump(Bytecode::JUMP);
 
         patchJump(elseJump);
 
         emitByte(Bytecode::POP); // pop condition (falsy path)
-        if (stmt->elseBranch != nullptr) compileStmt(stmt->elseBranch);
+        if (stmt->elseBranch != nullptr) compileStatement(stmt->elseBranch);
 
         patchJump(thenJump);
 
@@ -626,7 +626,7 @@ public:
 
         startLoop();
 
-        compileStmt(stmt->body);
+        compileStatement(stmt->body);
 
         for (u64 cont : loops.back().continues) {
             patchJump(cont);
