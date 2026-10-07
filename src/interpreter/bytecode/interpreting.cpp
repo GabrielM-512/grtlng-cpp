@@ -1,7 +1,5 @@
 #include "interpreting.h"
 
-#ifndef INTERPRETER_AST
-
 #include <iostream>
 
 #include "compiler.h"
@@ -339,5 +337,3 @@ i32 Bytecode::interpret(const Compiler::CompileResult &ast, bool decompile) {
     VM vm(program);
     return vm.interpret();
 }
-
-#endif

@@ -26,7 +26,19 @@ namespace Resolving {
 
 namespace Value {
 
-    class Obj;
+    enum ObjectType {
+        FUNCTION,
+        NATIVE_FN
+    };
+
+    class Obj {
+    public:
+        virtual ~Obj() = default;
+
+        ObjectType type;
+
+        Obj(ObjectType type): type(type) {}
+    };
 
     enum ValueType {
         NUMBER,
@@ -40,63 +52,6 @@ namespace Value {
             Obj* object;
         } as;
     };
-
-#ifdef INTERPRETER_AST
-    enum ObjectType {
-        CALLABLE
-    };
-#else
-    enum ObjectType {
-        FUNCTION,
-        NATIVE_FN
-    };
-#endif
-
-    class Obj {
-    public:
-        virtual ~Obj() = default;
-
-        ObjectType type;
-
-        Obj(ObjectType type): type(type) {}
-    };
-
-#ifdef INTERPRETER_AST
-
-    class Callable : public Obj {
-    protected:
-        std::string name;
-        std::vector<Stmt::VariableDeclaration*> params;
-    public:
-        Callable(std::string name, std::vector<Stmt::VariableDeclaration*> params): Obj(CALLABLE),
-            name(std::move(name)), params(std::move(params)) {}
-
-        [[nodiscard]] std::string getName() const {return name;}
-
-        [[nodiscard]] int getArity() const {return (int) params.size();}
-        virtual Value call(Interpreting::Interpreter* interpreter, std::vector<Value>& args) = 0;
-
-    };
-
-    class Function : public Callable {
-
-        Stmt::Block* body;
-    public:
-        Function(std::string name, std::vector<Stmt::VariableDeclaration*> params, Stmt::Block* body): Callable(std::move(name), std::move(params)),
-            body(body) {}
-
-        Value call(Interpreting::Interpreter *interpreter, std::vector<Value> &args) override;
-
-    };
-
-
-    void defineNativeFunctions(Interpreting::Interpreter* interpreter);
-
-    #define VALUE_CALLABLE(callable) ((Value::Value) {.type = Value::OBJECT, .as = {.object = (callable)}})
-    #define IS_CALLABLE(value) (Value::isObjType((value), Value::CALLABLE))
-    #define AS_CALLABLE(value) ((Value::Callable*)(value).as.object)
-
-#else
 
     struct Function : Obj {
         std::vector<u8> code;
@@ -116,34 +71,26 @@ namespace Value {
         NativeFn(NativeFunction func, std::string  name, u8 arity): Obj(NATIVE_FN), fn(func), name(std::move(name)), arity(arity) {}
     };
 
+    bool isObjType(const Value& val, ObjectType type);
+    bool equality(Value a, Value b);
+
+    void defineNativesResolver(Resolving::Scope* scope);
     std::vector<NativeFn> nativeFnDefinitions();
 
 #define VALUE_FUNCTION(func) ((Value::Value) {.type = Value::OBJECT, .as = {.object = func}})
 #define VALUE_NATIVE(native) ((Value::Value) {.type = Value::OBJECT, .as = {.object = native}})
-
-#define IS_FUNC(value) (Value::isObjType((value), Value::FUNCTION))
-#define IS_NATIVE(value) (Value::isObjType((value), Value::NATIVE_FN))
-
-#define AS_FUNCTION(value) ((Value::Function*)(value).as.object)
-#define AS_NATIVE(value) ((Value::NativeFn*)(value).as.object)
-
-
-#endif
-
-    bool isObjType(const Value& val, ObjectType type);
-    bool equality(Value a, Value b);
-
-
-    void defineNativesResolver(Resolving::Scope* scope);
-
 #define VALUE_NUM(number) ((Value::Value) {.type = Value::NUMBER, .as = {.num = static_cast<double>(number)}})
 #define VALUE_TRUE (VALUE_NUM(1))
 #define VALUE_FALSE (VALUE_NUM(0))
 #define VALUE_BOOL(boolean) ((boolean) ? VALUE_TRUE : VALUE_FALSE)
 
+#define IS_FUNC(value) (Value::isObjType((value), Value::FUNCTION))
+#define IS_NATIVE(value) (Value::isObjType((value), Value::NATIVE_FN))
 #define IS_NUM(value) ((value).type == NUMBER)
 #define IS_OBJ(value) ((value).type == Value::OBJECT)
 
+#define AS_FUNCTION(value) ((Value::Function*)(value).as.object)
+#define AS_NATIVE(value) ((Value::NativeFn*)(value).as.object)
 #define AS_NUM(value) ((value).as.num)
 #define AS_OBJ(value) ((value).as.object)
 

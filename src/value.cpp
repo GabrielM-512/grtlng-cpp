@@ -1,12 +1,10 @@
 #include "value.h"
 
 #include <cstring>
-#include <utility>
 
 #include "iostream"
 #include "compiler/lexing.h"
 #include "interpreter/runtimeException.h"
-#include "interpreter/AST/interpreting.h"
 
 #include "compiler/resolving.h"
 
@@ -18,120 +16,17 @@
     N   N   A   A     T     IIIII     V     EEEEE           F        UUU    N   N     CCC     T     IIIII    OOO    N   N   SSSS
 */
 
-
-#ifdef INTERPRETER_AST
-
-typedef Value::Value (*NativeFunction)(const std::vector<Value::Value>&);
-
-Value::Value clockNative(const std::vector<Value::Value>&) {
+Value::Value clockNative(Value::Value*) {
     return VALUE_NUM((double) clock() / CLOCKS_PER_SEC);
 }
 
-class NativeFn : public Value::Callable {
-    NativeFunction function;
-public:
-    NativeFn(std::string name, std::vector<Stmt::VariableDeclaration*> params, NativeFunction function):
-        Callable(std::move(name), std::move(params)), function(function) {}
+std::vector<Value::NativeFn> Value::nativeFnDefinitions() {
+    std::vector fns = {
+        NativeFn(clockNative, "clock", 0),
+    };
 
-    Value::Value call(Interpreting::Interpreter *, std::vector<Value::Value> &args) override {
-        return function(args);
-    }
-};
-
-void defineNativeFn(Interpreting::Interpreter* interpreter, const std::string& name, std::vector<Stmt::VariableDeclaration*> params, NativeFunction fn) {
-    Value::Obj* function = new NativeFn(name, std::move(params), fn);
-
-    interpreter->addGlobalValue(name, VALUE_CALLABLE(function));
+    return fns;
 }
-
-void defineNativeFn(Interpreting::Interpreter* interpreter, const std::string& name, NativeFunction fn) {
-    defineNativeFn(interpreter, name, std::vector<Stmt::VariableDeclaration*>(), fn);
-}
-
-void Value::defineNativeFunctions(Interpreting::Interpreter* interpreter) {
-    defineNativeFn(interpreter, "clock", clockNative);
-}
-
-
-
-void printObject(const Value::Obj* obj) {
-    switch (obj->type) {
-        case Value::CALLABLE: {
-            auto callable = dynamic_cast<const Value::Callable*> (obj);
-            std::cout << "<fn \"" << callable->getName() << "\" at " << obj << ">\n";
-        }
-
-    }
-}
-
-void Value::printValue(const Value& value) {
-    std::cout << getValueString(value) << std::endl;
-}
-
-std::string getObjectString(const Value::Obj* obj) {
-    switch (obj->type) {
-        case Value::CALLABLE: {
-            auto callable = dynamic_cast<const Value::Callable*> (obj);
-            return "<fn \"" + callable->getName() + "\"";
-        }
-        default:
-            return "UNKNOWN OBJECT TYPE";
-
-    }
-}
-
-bool Value::isObjType(const Value& val, ObjectType type) {
-    return val.type == OBJECT && val.as.object->type == type;
-}
-
-bool objsEqual(const Value::Obj* a, const Value::Obj* b) {
-    if (a->type != b->type) return false;
-
-    switch (a->type) {
-        case Value::CALLABLE: {
-            auto fnA = static_cast<const Value::Callable*>(a);
-            auto fnB = static_cast<const Value::Callable*>(b);
-
-            return fnA->getArity() == fnB->getArity() && fnA->getName() == fnB->getName();
-        }
-    }
-
-    return false;
-}
-
-Value::Value Value::Function::call(Interpreting::Interpreter *interpreter, std::vector<Value> &args) {
-    if (args.size() != params.size()) {
-        throw Interpreting::RuntimeException(std::format("Function \"{:s}\" expected {} arguments, got {} instead", name, params.size(), args.size()));
-    }
-
-    Interpreting::Environment environment(&interpreter->global);
-
-    for (u64 i = 0; i < params.size(); i++) {
-        if (params.at(i)->name.data.name[0] != '\0')
-            environment.createVar(params.at(i)->name.data.name, args.at(i));
-    }
-
-    try {
-        interpreter->executeBlock(this->body, &environment);
-    } catch (Interpreting::ReturnException& e) {
-        return e.value;
-    }
-
-    return (Value) {.type = NUMBER, .as = {}};
-}
-#else
-    Value::Value clockNative(Value::Value*) {
-        return VALUE_NUM((double) clock() / CLOCKS_PER_SEC);
-    }
-
-    std::vector<Value::NativeFn> Value::nativeFnDefinitions() {
-        std::vector fns = {
-            NativeFn(clockNative, "clock", 0),
-        };
-
-        return fns;
-    }
-#endif
 
 
 void defineNativeResolver(Resolving::Scope* scope, const char* name) {
@@ -151,7 +46,6 @@ void Value::defineNativesResolver(Resolving::Scope *scope) {
      OOO    BBBB     JJJ    EEEEE     CCC     T             H   H   A   A   N   N   DDDD    LLLLL   IIIII   N   N    GGG
 */
 
-#ifndef INTERPRETER_AST
 bool Value::isObjType(const Value& val, ObjectType type) {
     return val.type == OBJECT && val.as.object->type == type;
 }
@@ -198,7 +92,6 @@ std::string getObjectString(const Value::Obj* obj) {
     return "";
 
 }
-#endif
 
 std::string Value::getValueString(const Value& value) {
     switch (value.type) {

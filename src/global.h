@@ -19,5 +19,3 @@ typedef float f32;
 typedef double f64;
 
 #define UINT8_COUNT (UINT8_MAX + 1)
-
-//#define INTERPRETER_AST
