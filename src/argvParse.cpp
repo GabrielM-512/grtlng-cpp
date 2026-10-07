@@ -12,7 +12,11 @@ error_t parse_opt (int key, char *arg, argp_state *state) {
     switch (key) {
         case 'c': {
             if (strcmp(arg, "i") == 0) {
-                arguments->interpret = true;
+                if (arguments->type != NONE) {
+                    argp_error(state, "Set compile mode more than once");
+                } else {
+                    arguments->type = INTERPRET;
+                }
             } else {
                 argp_failure(state, EX_USAGE, EINVAL, "Bad option \"%s\" to -c\nExpected options: i", arg);
             }

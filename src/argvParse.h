@@ -1,8 +1,14 @@
 #pragma once
 
 namespace argvParse {
+
+    enum CompileType : unsigned char {
+        NONE,
+        INTERPRET
+    };
+
     struct ProgramArgs {
-        bool interpret = false;
+        CompileType type = NONE;
         bool decompile = false;
         bool printAst = false;
         char *filePath = nullptr;

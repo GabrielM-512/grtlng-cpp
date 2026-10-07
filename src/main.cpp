@@ -34,16 +34,19 @@ int main(const int argc, char* argv[]) {
             std::cout << Printer::print(program) << std::endl;
         }
 
-        if (compileFlags.interpret) {
-#ifdef INTERPRETER_AST
-            double result = Interpreting::interpret(program, handler);
-#else
-            double result = Bytecode::interpret(program, compileFlags.decompile);
-#endif
-            return (int) result;
-        }
+        switch (compileFlags.type) {
+            case argvParse::INTERPRET: {
+                #ifdef INTERPRETER_AST
+                    double result = Interpreting::interpret(program, handler);
+                #else
+                    double result = Bytecode::interpret(program, compileFlags.decompile);
+                #endif
+                return (int) result;
+            }
 
-        return 0;
+            case argvParse::NONE: return 0;
+
+        }
 #ifdef CATCH_ERRORS
     } catch (std::exception& e) {
         std::cerr << "Error: " << e.what() << std::endl;
