@@ -8,7 +8,7 @@ namespace argvParse {
     };
 
     struct ProgramArgs {
-        CompileType type = NONE;
+        CompileType type = INTERPRET;
         bool decompile = false;
         bool printAst = false;
         char *filePath = nullptr;
