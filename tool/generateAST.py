@@ -31,13 +31,12 @@ class Subclass:
         self.base_class : str = base_class
 
     def define_constructor(self, parameters : list[str]) -> str:
-        output = f"\n        explicit {self.name}("
+        output = f"\n        explicit {self.name}(Lexing::Token token,"
 
         for arg in parameters:
             output += f"\n            {arg},"
 
-        if len(parameters) != 0:
-            output = output[:-1] + "\n        "  # remove trailing comma
+        output = output[:-1] + "\n        "  # remove trailing comma
 
         output += ")"
 
@@ -51,7 +50,7 @@ class Subclass:
         if len(parameters) != 0:
             output = output[:-1]  # remove trailing comma
 
-        output += " {}\n\n"
+        output += " {this->token = token;}\n\n"
 
         return output
 
@@ -137,6 +136,7 @@ def define_ast(output_dir : str, base_class : str, classes : list[str], visit_re
               f"    struct {base_class} " + "{\n" +
               f"        virtual ~{base_class}() = default;\n" +
               f"        virtual {base_class}VisitResults accept({base_class}Visitor *visitor) = 0;\n" +
+               "        Lexing::Token token;\n" +
                "    };")
 
 
@@ -163,14 +163,14 @@ if __name__ == "__main__":
                   "Binary      | Expr* left = nullptr, Lexing::TokenType operatorType = Lexing::ERROR, Expr* right = nullptr",
                   "Unary       | Lexing::TokenType operatorType = Lexing::ERROR, Expr* right = nullptr",
                   "Number      | double value = 0",
-                  "Identifier  | const Lexing::Token target",
+                  "Identifier  | ",
                   "Assign      | Lexing::Token name, Expr* value",
                   "Call        | Expr* callee, std::vector<Expr*> args, Lexing::Token paren",
                   "Logical     | Expr* left, Lexing::TokenType operatorType, Expr* right",
                   "Conditional | Expr* condition, Expr* thenBranch, Expr* elseBranch"
               ],
-               visit_results= "std::string, Value::Value, std::monostate",
-               includes = "\"../compiler/lexing.h\" | \"../value.h\"")
+               visit_results= "std::string, Value::Value, std::monostate, structs::test",
+               includes = "\"../compiler/lexing.h\" | \"../value.h\" | \"../compiler/compileStructs.h\"")
 
     define_ast(output_dir = "/home/gabriel/CLionProjects/grtlng-cpp/src/AST/stmt.h",
                base_class = "Stmt",
@@ -190,5 +190,5 @@ if __name__ == "__main__":
                visit_results = "std::monostate, std::string",
                includes="\"expr.h\"|<optional>",
                data_structs=[
-                   "Case                | Expr::Expr* value, std::vector<Stmt*> content"
+                   "Case                | Expr::Expr* value, Lexing::Token valueToken, std::vector<Stmt*> content"
                ])

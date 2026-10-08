@@ -44,10 +44,12 @@ namespace Stmt {
     struct Stmt {
         virtual ~Stmt() = default;
         virtual StmtVisitResults accept(StmtVisitor *visitor) = 0;
+        Lexing::Token token;
     };
 
     struct Case {
         Expr::Expr* value;
+        Lexing::Token valueToken;
         std::vector<Stmt*> content;
     };
 
@@ -55,9 +57,9 @@ namespace Stmt {
     struct Expression: Stmt {
         Expr::Expr* expression;
 
-        explicit Expression(
+        explicit Expression(Lexing::Token token,
             Expr::Expr* expression
-        ): expression(expression) {}
+        ): expression(expression) {this->token = token;}
 
         StmtVisitResults accept(StmtVisitor* visitor) override {
             return visitor->visitExpressionStmt(this);
@@ -67,9 +69,9 @@ namespace Stmt {
     struct Print: Stmt {
         Expr::Expr* expression;
 
-        explicit Print(
+        explicit Print(Lexing::Token token,
             Expr::Expr* expression
-        ): expression(expression) {}
+        ): expression(expression) {this->token = token;}
 
         StmtVisitResults accept(StmtVisitor* visitor) override {
             return visitor->visitPrintStmt(this);
@@ -81,11 +83,11 @@ namespace Stmt {
         Lexing::Token name;
         Expr::Expr* value;
 
-        explicit VariableDeclaration(
+        explicit VariableDeclaration(Lexing::Token token,
             Lexing::TokenType dataType,
             Lexing::Token name,
             Expr::Expr* value = nullptr
-        ): dataType(dataType), name(name), value(value) {}
+        ): dataType(dataType), name(name), value(value) {this->token = token;}
 
         StmtVisitResults accept(StmtVisitor* visitor) override {
             return visitor->visitVariableDeclarationStmt(this);
@@ -97,11 +99,11 @@ namespace Stmt {
         Stmt* thenBranch;
         Stmt* elseBranch;
 
-        explicit If(
+        explicit If(Lexing::Token token,
             Expr::Expr* condition,
             Stmt* thenBranch,
             Stmt* elseBranch
-        ): condition(condition), thenBranch(thenBranch), elseBranch(elseBranch) {}
+        ): condition(condition), thenBranch(thenBranch), elseBranch(elseBranch) {this->token = token;}
 
         StmtVisitResults accept(StmtVisitor* visitor) override {
             return visitor->visitIfStmt(this);
@@ -112,10 +114,10 @@ namespace Stmt {
         Expr::Expr* condition;
         Stmt* body;
 
-        explicit While(
+        explicit While(Lexing::Token token,
             Expr::Expr* condition,
             Stmt* body
-        ): condition(condition), body(body) {}
+        ): condition(condition), body(body) {this->token = token;}
 
         StmtVisitResults accept(StmtVisitor* visitor) override {
             return visitor->visitWhileStmt(this);
@@ -128,12 +130,12 @@ namespace Stmt {
         Expr::Expr* incrementer;
         Stmt* body;
 
-        explicit For(
+        explicit For(Lexing::Token token,
             Stmt* initialiser,
             Expr::Expr* condition,
             Expr::Expr* incrementer,
             Stmt* body
-        ): initialiser(initialiser), condition(condition), incrementer(incrementer), body(body) {}
+        ): initialiser(initialiser), condition(condition), incrementer(incrementer), body(body) {this->token = token;}
 
         StmtVisitResults accept(StmtVisitor* visitor) override {
             return visitor->visitForStmt(this);
@@ -143,12 +145,13 @@ namespace Stmt {
     struct Block: Stmt {
         std::vector<Stmt*> statements;
 
-        explicit Block() {}
+        explicit Block(Lexing::Token token
+        ) {this->token = token;}
 
 
-        explicit Block(
+        explicit Block(Lexing::Token token,
             std::vector<Stmt*> statements
-        ): statements(statements) {}
+        ): statements(statements) {this->token = token;}
 
         StmtVisitResults accept(StmtVisitor* visitor) override {
             return visitor->visitBlockStmt(this);
@@ -161,12 +164,12 @@ namespace Stmt {
         std::vector<VariableDeclaration*> params;
         Block* body;
 
-        explicit Function(
+        explicit Function(Lexing::Token token,
             Lexing::TokenType dataType,
             Lexing::Token name,
             std::vector<VariableDeclaration*> params,
             Block* body
-        ): dataType(dataType), name(name), params(params), body(body) {}
+        ): dataType(dataType), name(name), params(params), body(body) {this->token = token;}
 
         StmtVisitResults accept(StmtVisitor* visitor) override {
             return visitor->visitFunctionStmt(this);
@@ -176,9 +179,9 @@ namespace Stmt {
     struct Return: Stmt {
         Expr::Expr* value;
 
-        explicit Return(
+        explicit Return(Lexing::Token token,
             Expr::Expr* value
-        ): value(value) {}
+        ): value(value) {this->token = token;}
 
         StmtVisitResults accept(StmtVisitor* visitor) override {
             return visitor->visitReturnStmt(this);
@@ -187,7 +190,8 @@ namespace Stmt {
 
     struct Continue: Stmt {
 
-        explicit Continue() {}
+        explicit Continue(Lexing::Token token
+        ) {this->token = token;}
 
         StmtVisitResults accept(StmtVisitor* visitor) override {
             return visitor->visitContinueStmt(this);
@@ -196,7 +200,8 @@ namespace Stmt {
 
     struct Break: Stmt {
 
-        explicit Break() {}
+        explicit Break(Lexing::Token token
+        ) {this->token = token;}
 
         StmtVisitResults accept(StmtVisitor* visitor) override {
             return visitor->visitBreakStmt(this);
@@ -208,11 +213,11 @@ namespace Stmt {
         std::vector<Case> cases;
         std::optional<Case> defaultCase;
 
-        explicit Switch(
+        explicit Switch(Lexing::Token token,
             Expr::Expr* condition,
             std::vector<Case> cases,
             std::optional<Case> defaultCase
-        ): condition(condition), cases(cases), defaultCase(defaultCase) {}
+        ): condition(condition), cases(cases), defaultCase(defaultCase) {this->token = token;}
 
         StmtVisitResults accept(StmtVisitor* visitor) override {
             return visitor->visitSwitchStmt(this);

@@ -88,6 +88,10 @@ int Parser::getPrecedence() const {
      UUU      T     IIIII   LLLLL   SSSS
 */
 
+Lexing::Token Parser::fakeToken() {
+    return {.type = Lexing::ERROR, .line = 0, .position = 0, .data = {.name = nullptr}};
+}
+
 Lexing::Token Parser::advance() {
     previous = current;
     while (true) {

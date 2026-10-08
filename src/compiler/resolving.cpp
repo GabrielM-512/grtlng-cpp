@@ -107,13 +107,13 @@ public:
     }
 
     ExprVisitResults visitIdentifierExpr(Expr::Identifier *expr) override {
-        if (!varExists(expr->target.data.name)) {
-            error("Unknown symbol \"" + std::string(expr->target.data.name) + "\"", expr->target);
+        if (!varExists(expr->token.data.name)) {
+            error("Unknown symbol \"" + std::string(expr->token.data.name) + "\"", expr->token);
             return std::monostate();
         }
 
-        if (!varActivated(expr->target.data.name))
-            error("Symbol \"" + std::string(expr->target.data.name) + "\" used in its own initialiser", expr->target);
+        if (!varActivated(expr->token.data.name))
+            error("Symbol \"" + std::string(expr->token.data.name) + "\" used in its own initialiser", expr->token);
 
         return std::monostate();
     }

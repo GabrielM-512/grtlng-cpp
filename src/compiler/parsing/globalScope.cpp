@@ -16,7 +16,7 @@ std::vector<Stmt::VariableDeclaration*> Parser::parseParameters() {
                 throw errorAtCurrent("Expected parameter type, got " + peek().toString() + " instead");
             }
 
-            Lexing::TokenType dataType = previous.type;
+            Lexing::Token dataType = previous;
 
             Lexing::Token name = current;
 
@@ -26,7 +26,7 @@ std::vector<Stmt::VariableDeclaration*> Parser::parseParameters() {
                 name = previous;
             }
 
-            params.push_back(new Stmt::VariableDeclaration(dataType, name, nullptr));
+            params.push_back(new Stmt::VariableDeclaration(dataType, dataType.type, name, nullptr));
 
         } while (match(Lexing::COMMA));
     } catch (Error::CompileError&) {
@@ -38,7 +38,7 @@ std::vector<Stmt::VariableDeclaration*> Parser::parseParameters() {
     return params;
 }
 
-Stmt::Stmt* Parser::functionDeclaration(Lexing::TokenType dataType, const Lexing::Token& name) {
+Stmt::Stmt* Parser::functionDeclaration(Lexing::Token dataType, const Lexing::Token& name) {
     std::vector<Stmt::VariableDeclaration*> parameters = parseParameters();
 
     if (!match(Lexing::LEFT_BRACE)) {
@@ -47,7 +47,7 @@ Stmt::Stmt* Parser::functionDeclaration(Lexing::TokenType dataType, const Lexing
 
     Stmt::Block* body = blockStatement();
 
-    return new Stmt::Function(dataType, name, parameters, body);
+    return new Stmt::Function(dataType, dataType.type, name, parameters, body);
 
     return nullptr;
 }
@@ -57,7 +57,7 @@ Stmt::Stmt* Parser::globalDeclaration() {
         throw errorAtCurrent("Expected Function or Variable declaration");
     }
 
-    Lexing::TokenType dataType = previous.type;
+    Lexing::Token dataType = previous;
 
     consume(Lexing::IDENTIFIER, " after declaration datatype");
 

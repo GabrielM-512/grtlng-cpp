@@ -38,6 +38,7 @@ add_executable(grtlng_cpp
         src/interpreter/bytecode/compiler.h
         src/interpreter/bytecode/decompile.cpp
         src/interpreter/bytecode/decompile.h
+        src/compiler/compileStructs.h
 )
 
 target_compile_options(grtlng_cpp

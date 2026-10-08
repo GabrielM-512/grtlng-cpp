@@ -39,7 +39,7 @@ public:
     }
 
     ExprVisitResults visitIdentifierExpr(Expr::Identifier* expr) override {
-        return expr->target.data.name;
+        return expr->token.data.name;
     }
 
     ExprVisitResults visitAssignExpr(Expr::Assign *expr) override {

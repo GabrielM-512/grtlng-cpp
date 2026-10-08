@@ -22,6 +22,8 @@ Stmt::Stmt* Parser::declaration() {
 }
 
 Stmt::Print *Parser::printStatement() {
+    Lexing::Token print = previous;
+
     Expr::Expr* expr = nullptr;
     if (check(Lexing::SEMICOLON)) {
         fatalErrorAtCurrent("Expected expression");
@@ -30,16 +32,16 @@ Stmt::Print *Parser::printStatement() {
     }
 
     consume(Lexing::SEMICOLON);
-    return new Stmt::Print(expr);
+    return new Stmt::Print(print, expr);
 }
 
 Stmt::Expression *Parser::expressionStatement() {
     Expr::Expr* expr = expression();
     consume(Lexing::SEMICOLON);
-    return new Stmt::Expression(expr);
+    return new Stmt::Expression(expr->token, expr);
 }
 
-Stmt::VariableDeclaration *Parser::variableDeclaration(Lexing::TokenType dataType, const Lexing::Token &name) {
+Stmt::VariableDeclaration *Parser::variableDeclaration(Lexing::Token dataType, const Lexing::Token &name) {
     Expr::Expr* value = nullptr;
 
     if (match(Lexing::EQUALS)) {
@@ -48,11 +50,11 @@ Stmt::VariableDeclaration *Parser::variableDeclaration(Lexing::TokenType dataTyp
 
     consume(Lexing::SEMICOLON, " after variable declaration");
 
-    return new Stmt::VariableDeclaration(dataType, name, value);
+    return new Stmt::VariableDeclaration(dataType, dataType.type, name, value);
 }
 
 Stmt::VariableDeclaration *Parser::localDeclarationStatement() {
-    Lexing::TokenType dataType = previous.type;
+    Lexing::Token dataType = previous;
     consume(Lexing::IDENTIFIER, " after data type");
 
     if (match(Lexing::LEFT_PAREN)) {
@@ -65,6 +67,8 @@ Stmt::VariableDeclaration *Parser::localDeclarationStatement() {
 }
 
 Stmt::If *Parser::ifStatement() {
+    Lexing::Token if_ = previous;
+
     consume(Lexing::LEFT_PAREN, " after \"if\"");
     Expr::Expr* condition = expression();
     consume(Lexing::RIGHT_PAREN, " after if condition");
@@ -74,10 +78,12 @@ Stmt::If *Parser::ifStatement() {
 
     if (match(Lexing::ELSE)) elseBranch = statement();
 
-    return new Stmt::If(condition, thenBranch, elseBranch);
+    return new Stmt::If(if_, condition, thenBranch, elseBranch);
 }
 
 Stmt::While *Parser::whileStatement() {
+    Lexing::Token while_ = previous;
+
     consume(Lexing::LEFT_PAREN, " after \"while\"");
     Expr::Expr* condition = expression();
     consume(Lexing::RIGHT_PAREN, " after while condition");
@@ -86,11 +92,12 @@ Stmt::While *Parser::whileStatement() {
     Stmt::Stmt* body = statement();
     loopCount--;
 
-    return new Stmt::While(condition, body);
+    return new Stmt::While(while_, condition, body);
 }
 
 Stmt::Stmt* Parser::forStatement() {
-    // desugar for loop to while loop
+    Lexing::Token for_ = previous;
+
     consume(Lexing::LEFT_PAREN, " after \"while\"");
     Stmt::Stmt* initialiser = nullptr;
 
@@ -107,7 +114,7 @@ Stmt::Stmt* Parser::forStatement() {
         condition = expression();
     } else {
         // always truthy
-        condition = new Expr::Number(1);
+        condition = new Expr::Number(peek(), 1);
     }
 
     consume(Lexing::SEMICOLON, " after condition");
@@ -125,10 +132,11 @@ Stmt::Stmt* Parser::forStatement() {
     Stmt::Stmt* body = statement();
     loopCount--;
 
-    return new Stmt::For(initialiser, condition, incrementer, body);
+    return new Stmt::For(for_, initialiser, condition, incrementer, body);
 }
 
 Stmt::Block *Parser::blockStatement() {
+    Lexing::Token brace = previous;
     std::vector<Stmt::Stmt*> contents;
     while (!match(Lexing::RIGHT_BRACE)) {
         if (check(Lexing::END_OF_FILE)) {
@@ -139,36 +147,42 @@ Stmt::Block *Parser::blockStatement() {
         contents.push_back(stmt);
     }
 
-    return new Stmt::Block(contents);
+    return new Stmt::Block(brace, contents);
 }
 
 Stmt::Return *Parser::returnStatement() {
+    Lexing::Token return_ = previous;
+
     Expr::Expr* value = nullptr;
 
     if (!check(Lexing::SEMICOLON))
         value = expression();
 
     consume(Lexing::SEMICOLON, " after return value");
-    return new Stmt::Return(value);
+    return new Stmt::Return(return_, value);
 }
 
 Stmt::Break *Parser::breakStatement() {
+    Lexing::Token break_ = previous;
+
     if (!hasLoop()) {
         errorAtCurrent("used \"break\" outside of a loop");
     }
 
     consume(Lexing::SEMICOLON, " after \"break\"");
 
-    return new Stmt::Break();
+    return new Stmt::Break(break_);
 
 }
 
 Stmt::Continue *Parser::continueStatement() {
+    Lexing::Token continue_ = previous;
+
     if (!hasLoop()) {
         errorAtCurrent("used \"continue\" outside of a loop");
     }
 
     consume(Lexing::SEMICOLON, " after \"continue\"");
 
-    return new Stmt::Continue();
+    return new Stmt::Continue(continue_);
 }

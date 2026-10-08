@@ -258,10 +258,7 @@ public:
                 createGlobal(func->name.data.name);
                 if (func->body->statements.empty() || !dynamic_cast<Stmt::Return*>(func->body->statements.back())) {
 
-                    static Expr::Number zeroExpr(0.0);
-                    static Stmt::Return zeroReturn(&zeroExpr);
-
-                    func->body->statements.push_back(&zeroReturn);
+                    func->body->statements.push_back(ast.zeroReturn);
                 }
 
                 funcs.push_back(func);
@@ -384,7 +381,7 @@ public:
     }
 
     ExprVisitResults visitIdentifierExpr(Expr::Identifier *expr) override {
-        loadNamedVariable(expr->target.data.name);
+        loadNamedVariable(expr->token.data.name);
         return std::monostate();
     }
 

@@ -18,7 +18,7 @@ public:
 class NumberParselet : public Parsing::PrefixParselet {
 public:
     Expr::Expr* parse(Parsing::Parser&, Lexing::Token& token) override {
-        return new Expr::Number(token.data.number);
+        return new Expr::Number(token, token.data.number);
     }
 };
 
@@ -35,15 +35,17 @@ public:
             }
         }
 
-        return new Expr::Unary(token.type, operand);
+        return new Expr::Unary(token, token.type, operand);
     }
 };
 
 class GroupingParselet : public Parsing::PrefixParselet {
 public:
-    Expr::Expr* parse (Parsing::Parser& parser, Lexing::Token&) override {
+    Expr::Expr* parse (Parsing::Parser& parser, Lexing::Token& token) override {
         Expr::Expr* node = parser.expression();
         parser.consume(Lexing::RIGHT_PAREN);
+
+        node->token = token;
 
         return node;
     }
@@ -52,7 +54,7 @@ public:
 class BoolParselet : public Parsing::PrefixParselet {
 public:
     Expr::Expr *parse(Parsing::Parser &, Lexing::Token &token) override {
-        return new Expr::Number(token.type == Lexing::TRUE ? 1 : 0);
+        return new Expr::Number(token, token.type == Lexing::TRUE ? 1 : 0);
     }
 };
 
@@ -70,7 +72,7 @@ public:
 
     Expr::Expr* parse(Parsing::Parser &parser, Expr::Expr *left, Lexing::Token& token) override {
         Expr::Expr* right = parser.parseExprPrec();
-        return new Expr::Binary(left, token.type, right);
+        return new Expr::Binary(token, left, token.type, right);
     }
 };
 
@@ -82,9 +84,9 @@ public:
         Expr::Expr* right = parser.parseExprPrecRight();
 
         if(const auto target = dynamic_cast<Expr::Identifier*>(left)) {
-            Lexing::Token name = target->target;
+            Lexing::Token name = target->token;
 
-            return new Expr::Assign(name, right);
+            return new Expr::Assign(token, name, right);
         }
 
         throw parser.errorAt(token, "Invalid assignment target", "", false);
@@ -111,12 +113,12 @@ public:
         }
 
         if(const auto target = dynamic_cast<Expr::Identifier*>(left)) {
-            Lexing::Token name = target->target;
+            Lexing::Token name = target->token;
 
             // ReSharper disable once CppLocalVariableMightNotBeInitialized
-            const auto value = new Expr::Binary(left, argument, right);
+            const auto value = new Expr::Binary(token, left, argument, right);
 
-            return new Expr::Assign(name, value);
+            return new Expr::Assign(token, name, value);
         }
 
         throw parser.errorAt(token, "Invalid assignment target", "", false);
@@ -139,7 +141,7 @@ public:
 
         parser.consume(Lexing::RIGHT_PAREN, " after call arguments");
 
-        return new Expr::Call(left, args, token);
+        return new Expr::Call(token, left, args, token);
     }
 };
 
@@ -149,7 +151,7 @@ public:
 
     Expr::Expr *parse(Parsing::Parser &parser, Expr::Expr *left, Lexing::Token &token) override {
         Expr::Expr* right = parser.parseExprPrec();
-        return new Expr::Logical(left, token.type, right);
+        return new Expr::Logical(token, left, token.type, right);
     }
 };
 
@@ -157,14 +159,14 @@ class ConditionalParselet : public Parsing::InfixParselet {
 public:
     ConditionalParselet(int precedence): InfixParselet(precedence) {}
 
-    Expr::Expr *parse(Parsing::Parser &parser, Expr::Expr *left, Lexing::Token &) override {
+    Expr::Expr *parse(Parsing::Parser &parser, Expr::Expr *left, Lexing::Token &token) override {
         Expr::Expr *thenBranch = parser.expression();
 
         parser.consume(Lexing::COLON);
 
         Expr::Expr *elseBranch = parser.parseExpression(Parsing::Precedence::CONDITIONAL - 1);
 
-        return new Expr::Conditional(left, thenBranch, elseBranch);
+        return new Expr::Conditional(token, left, thenBranch, elseBranch);
     }
 };
 

@@ -5,9 +5,10 @@
 #include <variant>
 
 #include "../compiler/lexing.h" 
-#include  "../value.h"
+#include  "../value.h" 
+#include  "../compiler/compileStructs.h"
 
-using ExprVisitResults = std::variant<std::string, Value::Value, std::monostate>;
+using ExprVisitResults = std::variant<std::string, Value::Value, std::monostate, structs::test>;
 
 namespace Expr {
     struct Binary;
@@ -36,6 +37,7 @@ namespace Expr {
     struct Expr {
         virtual ~Expr() = default;
         virtual ExprVisitResults accept(ExprVisitor *visitor) = 0;
+        Lexing::Token token;
     };
 
     struct Binary: Expr {
@@ -43,11 +45,11 @@ namespace Expr {
         Lexing::TokenType operatorType;
         Expr* right;
 
-        explicit Binary(
+        explicit Binary(Lexing::Token token,
             Expr* left = nullptr,
             Lexing::TokenType operatorType = Lexing::ERROR,
             Expr* right = nullptr
-        ): left(left), operatorType(operatorType), right(right) {}
+        ): left(left), operatorType(operatorType), right(right) {this->token = token;}
 
         ExprVisitResults accept(ExprVisitor* visitor) override {
             return visitor->visitBinaryExpr(this);
@@ -58,10 +60,10 @@ namespace Expr {
         Lexing::TokenType operatorType;
         Expr* right;
 
-        explicit Unary(
+        explicit Unary(Lexing::Token token,
             Lexing::TokenType operatorType = Lexing::ERROR,
             Expr* right = nullptr
-        ): operatorType(operatorType), right(right) {}
+        ): operatorType(operatorType), right(right) {this->token = token;}
 
         ExprVisitResults accept(ExprVisitor* visitor) override {
             return visitor->visitUnaryExpr(this);
@@ -71,9 +73,9 @@ namespace Expr {
     struct Number: Expr {
         double value;
 
-        explicit Number(
+        explicit Number(Lexing::Token token,
             double value = 0
-        ): value(value) {}
+        ): value(value) {this->token = token;}
 
         ExprVisitResults accept(ExprVisitor* visitor) override {
             return visitor->visitNumberExpr(this);
@@ -81,11 +83,9 @@ namespace Expr {
     };
 
     struct Identifier: Expr {
-        const Lexing::Token target;
 
-        explicit Identifier(
-            const Lexing::Token target
-        ): target(target) {}
+        explicit Identifier(Lexing::Token token
+        ) {this->token = token;}
 
         ExprVisitResults accept(ExprVisitor* visitor) override {
             return visitor->visitIdentifierExpr(this);
@@ -96,10 +96,10 @@ namespace Expr {
         Lexing::Token name;
         Expr* value;
 
-        explicit Assign(
+        explicit Assign(Lexing::Token token,
             Lexing::Token name,
             Expr* value
-        ): name(name), value(value) {}
+        ): name(name), value(value) {this->token = token;}
 
         ExprVisitResults accept(ExprVisitor* visitor) override {
             return visitor->visitAssignExpr(this);
@@ -111,11 +111,11 @@ namespace Expr {
         std::vector<Expr*> args;
         Lexing::Token paren;
 
-        explicit Call(
+        explicit Call(Lexing::Token token,
             Expr* callee,
             std::vector<Expr*> args,
             Lexing::Token paren
-        ): callee(callee), args(args), paren(paren) {}
+        ): callee(callee), args(args), paren(paren) {this->token = token;}
 
         ExprVisitResults accept(ExprVisitor* visitor) override {
             return visitor->visitCallExpr(this);
@@ -127,11 +127,11 @@ namespace Expr {
         Lexing::TokenType operatorType;
         Expr* right;
 
-        explicit Logical(
+        explicit Logical(Lexing::Token token,
             Expr* left,
             Lexing::TokenType operatorType,
             Expr* right
-        ): left(left), operatorType(operatorType), right(right) {}
+        ): left(left), operatorType(operatorType), right(right) {this->token = token;}
 
         ExprVisitResults accept(ExprVisitor* visitor) override {
             return visitor->visitLogicalExpr(this);
@@ -143,11 +143,11 @@ namespace Expr {
         Expr* thenBranch;
         Expr* elseBranch;
 
-        explicit Conditional(
+        explicit Conditional(Lexing::Token token,
             Expr* condition,
             Expr* thenBranch,
             Expr* elseBranch
-        ): condition(condition), thenBranch(thenBranch), elseBranch(elseBranch) {}
+        ): condition(condition), thenBranch(thenBranch), elseBranch(elseBranch) {this->token = token;}
 
         ExprVisitResults accept(ExprVisitor* visitor) override {
             return visitor->visitConditionalExpr(this);
