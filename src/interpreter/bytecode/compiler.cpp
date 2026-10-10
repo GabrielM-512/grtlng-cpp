@@ -122,9 +122,14 @@ class BytecodeCompiler : public Stmt::StmtVisitor, public Expr::ExprVisitor{
 
     void endScope() {
         // remove current scoped vars
+        u8 popCount = 0;
+
         while (!locals.empty() && locals.back().depth == scopeDepth) {
             locals.pop_back();
+            popCount++;
         }
+
+        emitPops(popCount);
 
         scopeDepth--;
 
@@ -476,10 +481,6 @@ public:
             compileStatement(current);
         }
 
-        u8 popCount = countCurrentScopeVars();
-
-        emitPops(popCount);
-
         endScope();
 
         return std::monostate();
@@ -535,8 +536,10 @@ public:
             patchJump(cont);
         }
 
-        if (stmt->incrementer != nullptr) compileExpression(stmt->incrementer);
-        emitByte(Bytecode::POP);
+        if (stmt->incrementer != nullptr) {
+            compileExpression(stmt->incrementer);
+            emitByte(Bytecode::POP);
+        }
 
         emitLoop(loopStart);
 
@@ -548,10 +551,6 @@ public:
         }
 
         endLoop();
-
-        if (stmt->initialiser != nullptr && dynamic_cast<Stmt::VariableDeclaration*>(stmt->initialiser)) {
-            emitByte(Bytecode::POP); // pop the initialised variable if it exists
-        }
 
         endScope();
 
