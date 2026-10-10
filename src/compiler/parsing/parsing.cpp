@@ -42,6 +42,10 @@ bool Parser::hasLoop() const {
     return loopCount > 0;
 }
 
+bool Parser::hasSwitch() const {
+    return switchCount > 0;
+}
+
 /*
     PPPP      A     RRRR     SSSS   EEEEE   L       EEEEE   TTTTT    SSSS
     P   P    A A    R   R   S       E       L       E         T     S

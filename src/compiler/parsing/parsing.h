@@ -32,6 +32,7 @@ namespace Parsing {
         Lexing::Token current, previous;
         u32 currentToken;
         u16 loopCount;
+        u16 switchCount;
 
         bool hadError;
         bool hadFatalError;
@@ -78,9 +79,12 @@ namespace Parsing {
         Stmt::Break *breakStatement();
         Stmt::Continue *continueStatement();
 
+        Stmt::Switch *switchStatement();
+        Stmt::Case switchCase(std::optional<Expr::Expr *>, Lexing::Token exprToken);
         void synchronise(bool isGlobal);
 
         [[nodiscard]] bool hasLoop() const;
+        [[nodiscard]] bool hasSwitch() const;
 
     public:
         bool consume(Lexing::TokenType type, const std::string &message);

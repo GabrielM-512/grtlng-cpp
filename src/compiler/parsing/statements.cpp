@@ -12,6 +12,9 @@ Stmt::Stmt* Parser::statement() {
     if (match(Lexing::RETURN)) return returnStatement();
     if (match(Lexing::BREAK)) return breakStatement();
     if (match(Lexing::CONTINUE)) return continueStatement();
+    if (match(Lexing::SWITCH)) return switchStatement();
+
+    if (checkTypeIdent()) throw errorAtCurrent("Unexpected type identifier", "Variable declarations are not allowed in this context");
 
     return expressionStatement();
 }
@@ -165,8 +168,8 @@ Stmt::Return *Parser::returnStatement() {
 Stmt::Break *Parser::breakStatement() {
     Lexing::Token break_ = previous;
 
-    if (!hasLoop()) {
-        errorAtCurrent("used \"break\" outside of a loop");
+    if (!hasLoop() && !hasSwitch()) {
+        errorAtCurrent("Used \"break\" outside of a loop or switch statement");
     }
 
     consume(Lexing::SEMICOLON, " after \"break\"");
@@ -179,10 +182,63 @@ Stmt::Continue *Parser::continueStatement() {
     Lexing::Token continue_ = previous;
 
     if (!hasLoop()) {
-        errorAtCurrent("used \"continue\" outside of a loop");
+        errorAtCurrent("Used \"continue\" outside of a loop");
     }
 
     consume(Lexing::SEMICOLON, " after \"continue\"");
 
     return new Stmt::Continue(continue_);
+}
+
+Stmt::Case Parser::switchCase(std::optional<Expr::Expr *> value, Lexing::Token exprToken) {
+    std::vector<Stmt::Stmt*> stmts;
+
+    while (!check(Lexing::CASE) && !check(Lexing::DEFAULT) && !check(Lexing::END_OF_FILE) && !check(Lexing::RIGHT_BRACE)) {
+        stmts.push_back(statement());
+    }
+
+    return {.value = value, .valueToken = exprToken, .content = stmts};
+}
+
+Stmt::Switch *Parser::switchStatement() {
+    Lexing::Token switch_ = previous;
+
+    switchCount++;
+
+    consume(Lexing::LEFT_PAREN, " after switch");
+
+    Expr::Expr* value = expression();
+
+    consume(Lexing::RIGHT_PAREN, " after switch value");
+    consume(Lexing::LEFT_BRACE, " before switch cases");
+    std::vector<Stmt::Case> cases;
+
+    while (true) {
+        if (check(Lexing::END_OF_FILE)) throw Compiler::CompileError("Unterminated switch statement body", peek());
+        if (match(Lexing::RIGHT_BRACE)) break;
+
+        if (match(Lexing::CASE)) {
+            Lexing::Token exprStart = peek();
+            Expr::Expr *condition = expression();
+
+            consume(Lexing::COLON, " after switch value");
+
+            cases.push_back(switchCase(condition, exprStart));
+        } else if (match(Lexing::DEFAULT)) {
+            for (const Stmt::Case& case_ : cases) {
+                if (!case_.value.has_value()) throw Compiler::CompileError("Redefined default case", previous);
+            }
+
+            consume(Lexing::COLON, " after default");
+
+            cases.push_back(switchCase(std::nullopt, fakeToken()));
+        } else {
+            switchCount--;
+            throw Compiler::CompileError("Expected \"case\" or \"default\", got " + peek().toString() + "instead", peek());
+        }
+    }
+
+    switchCount--;
+
+    return new Stmt::Switch(switch_, value, cases);
 }

@@ -48,7 +48,7 @@ namespace Stmt {
     };
 
     struct Case {
-        Expr::Expr* value;
+        std::optional<Expr::Expr*> value;
         Lexing::Token valueToken;
         std::vector<Stmt*> content;
     };
@@ -211,13 +211,11 @@ namespace Stmt {
     struct Switch: Stmt {
         Expr::Expr* condition;
         std::vector<Case> cases;
-        std::optional<Case> defaultCase;
 
         explicit Switch(Lexing::Token token,
             Expr::Expr* condition,
-            std::vector<Case> cases,
-            std::optional<Case> defaultCase
-        ): condition(condition), cases(cases), defaultCase(defaultCase) {this->token = token;}
+            std::vector<Case> cases
+        ): condition(condition), cases(cases) {this->token = token;}
 
         StmtVisitResults accept(StmtVisitor* visitor) override {
             return visitor->visitSwitchStmt(this);

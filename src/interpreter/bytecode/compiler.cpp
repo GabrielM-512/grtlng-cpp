@@ -2,6 +2,7 @@
 
 #include <cmath>
 #include <iostream>
+#include <ranges>
 #include <unordered_map>
 
 using namespace BytecodeCompilation;
@@ -11,17 +12,24 @@ struct Local {
     i32 depth;
 };
 
-struct Loop {
+enum BreakType : u32 {
+    LOOP,
+    SWITCH
+};
+
+// loops and switch statements
+struct BreakStop {
+    BreakType type;
+    i32 localsSize {};
     std::vector<u64> breaks {};
     std::vector<u64> continues {};
-    i32 localsSize {};
 };
 
 class BytecodeCompiler : public Stmt::StmtVisitor, public Expr::ExprVisitor{
     Bytecode::Program program {};
     std::unordered_map<std::string, u16> globals;
     std::vector<Local> locals;
-    std::vector<Loop> loops;
+    std::vector<BreakStop> breakables;
 
     std::vector<u8> currentFunction;
     std::vector<u8> init;
@@ -247,12 +255,46 @@ class BytecodeCompiler : public Stmt::StmtVisitor, public Expr::ExprVisitor{
         }
     }
 
+    void startBreakable(BreakType type) {
+        breakables.push_back({.type = type, .localsSize = static_cast<i32>(locals.size()), .breaks = {}, .continues = {}});
+    }
+
     void startLoop() {
-        loops.push_back({.breaks = {}, .continues = {}, .localsSize = static_cast<i32>(locals.size())});
+        startBreakable(LOOP);
+    }
+
+    void startSwitch() {
+        startBreakable(SWITCH);
     }
 
     void endLoop() {
-        loops.pop_back();
+        breakables.pop_back();
+    }
+
+    BreakStop& findLoop() {
+        for (auto & breakable : std::views::reverse(breakables)) {
+            if (breakable.type == LOOP) return breakable;
+        }
+
+        // unreachable if used properly
+
+        throw CompileError("No loop");
+    }
+
+    BreakStop& findSwitch() {
+        for (auto & breakable : std::views::reverse(breakables)) {
+            if (breakable.type == SWITCH) return breakable;
+        }
+
+        // unreachable if used properly
+
+        throw CompileError("No switch");
+    }
+
+    void compileSwitchCase(const Stmt::Case& case_) {
+        for (Stmt::Stmt* stmt : case_.content) {
+            compileStatement(stmt);
+        }
     }
 
 public:
@@ -488,11 +530,11 @@ public:
 
     StmtVisitResults visitBreakStmt(Stmt::Break *) override {
 
-        u8 popCount = locals.size() - loops.back().localsSize;
+        u8 popCount = locals.size() - breakables.back().localsSize;
         emitPops(popCount);
 
         u64 jump = emitJump(Bytecode::JUMP);
-        loops.back().breaks.push_back(jump);
+        breakables.back().breaks.push_back(jump);
 
         return std::monostate();
     }
@@ -500,11 +542,11 @@ public:
 
     StmtVisitResults visitContinueStmt(Stmt::Continue *) override {
 
-        u8 popCount = locals.size() - loops.back().localsSize;
+        u8 popCount = locals.size() - breakables.back().localsSize;
         emitPops(popCount);
 
         u64 jump = emitJump(Bytecode::JUMP);
-        loops.back().continues.push_back(jump);
+        findLoop().continues.push_back(jump);
 
         return std::monostate();
     }
@@ -532,7 +574,7 @@ public:
 
         compileStatement(stmt->body);
 
-        for (u64 cont : loops.back().continues) {
+        for (u64 cont : breakables.back().continues) {
             patchJump(cont);
         }
 
@@ -546,7 +588,7 @@ public:
         patchJump(exitJump);
         emitByte(Bytecode::POP); // pop the condition if exited loop
 
-        for (u64 brk : loops.back().breaks) {
+        for (u64 brk : breakables.back().breaks) {
             patchJump(brk);
         }
 
@@ -622,7 +664,7 @@ public:
 
         compileStatement(stmt->body);
 
-        for (u64 cont : loops.back().continues) {
+        for (u64 cont : breakables.back().continues) {
             patchJump(cont);
         }
 
@@ -631,7 +673,7 @@ public:
         patchJump(exitJump);
         emitByte(Bytecode::POP); // pop the condition if exited loop
 
-        for (u64 brk : loops.back().breaks) {
+        for (u64 brk : breakables.back().breaks) {
             patchJump(brk);
         }
 
@@ -640,8 +682,61 @@ public:
         return std::monostate();
     }
 
-    StmtVisitResults visitSwitchStmt(Stmt::Switch *) override {
-        throw CompileError("Unimplemented statement type: Switch");
+    StmtVisitResults visitSwitchStmt(Stmt::Switch *stmt) override {
+        beginScope();
+
+        compileExpression(stmt->condition);
+        createLocal("");
+
+        startSwitch();
+
+        std::vector<u64> entryJumps;
+        bool hasDefault = false;
+
+        for (const Stmt::Case& currentCase : stmt->cases) {
+            if (!currentCase.value.has_value()) {
+                hasDefault = true;
+                continue;
+            }
+
+
+            // compare values
+            compileExpression(currentCase.value.value());
+            loadNamedVariable("");
+            emitByte(Bytecode::EQUALS);
+
+            // jump, get rid of condition if falsey
+            entryJumps.push_back(emitJump(Bytecode::JUMP_TRUE));
+            emitByte(Bytecode::POP);
+        }
+
+        const u64 defaultJump = emitJump(Bytecode::JUMP);
+
+        {
+            u64 currentIndex = 0;
+            for (const Stmt::Case& currentCase : stmt->cases) {
+                if (currentCase.value.has_value()) {
+                    patchJump(entryJumps.at(currentIndex++));
+                    emitByte(Bytecode::POP); // pop the condition
+                } else {
+                    patchJump(defaultJump);
+                }
+
+                compileSwitchCase(currentCase);
+            }
+        }
+
+        if (!hasDefault) patchJump(defaultJump);
+
+        for (u64 exitJump : findSwitch().breaks) {
+            patchJump(exitJump);
+        }
+
+        endScope();
+
+        breakables.pop_back();
+
+        return std::monostate();
     }
 
 };

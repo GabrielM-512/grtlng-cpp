@@ -185,10 +185,10 @@ if __name__ == "__main__":
                           "Return              | Expr::Expr* value",
                           "Continue            | ",
                           "Break               | ",
-                          "Switch              | Expr::Expr* condition, std::vector<Case> cases, std::optional<Case> defaultCase"
+                          "Switch              | Expr::Expr* condition, std::vector<Case> cases"
               ],
                visit_results = "std::monostate, std::string",
                includes="\"expr.h\"|<optional>",
                data_structs=[
-                   "Case                | Expr::Expr* value, Lexing::Token valueToken, std::vector<Stmt*> content"
+                   "Case                | std::optional<Expr::Expr*> value, Lexing::Token valueToken, std::vector<Stmt*> content"
                ])

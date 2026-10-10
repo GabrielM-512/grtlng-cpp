@@ -4,6 +4,8 @@
 #include <unordered_map>
 #include <utility>
 
+#include "classifying.h"
+
 using namespace Resolving;
 
 class Resolver : public Expr::ExprVisitor, public Stmt::StmtVisitor {
@@ -11,6 +13,7 @@ class Resolver : public Expr::ExprVisitor, public Stmt::StmtVisitor {
     Error::ErrorHandler &handler;
     Scope* current;
     bool globalPhase = true;
+    Classifying::Classifier classifier;
 
     void expression(Expr::Expr* expr) {
         expr->accept(this);
@@ -260,8 +263,16 @@ public:
         return std::monostate();
     }
 
-    StmtVisitResults visitSwitchStmt(Stmt::Switch *) override {
-        // TODO
+    StmtVisitResults visitSwitchStmt(Stmt::Switch *stmt) override {
+        expression(stmt->condition);
+
+        for (const Stmt::Case& currentCase : stmt->cases) {
+            if (currentCase.value.has_value() && !classifier.isConstexprQualified(currentCase.value.value())) error("Tried using a non-constant expression as a condition for a switch case", currentCase.valueToken);
+
+            for (Stmt::Stmt* currentStmt : currentCase.content) {
+                statement(currentStmt);
+            }
+        }
         return std::monostate();
     }
 
