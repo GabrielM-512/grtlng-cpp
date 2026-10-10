@@ -20,7 +20,7 @@ int main() {
     auto program = parser.parse();
 
     std::string target = "[EXPR] ( ( 16 + ( 5 * 3 ) ) - a )";
-    std::string got = Printer::print({.success = true, .tree = program});
+    std::string got = Printer::print({.success = true, .tree = program, .zeroReturn = new Stmt::Return(Parsing::Parser::fakeToken(), new Expr::Number(Parsing::Parser::fakeToken(), 0))});
 
     if (!target.compare(got)) {
         std::cerr << "Parsing: Failed" << std::endl <<
