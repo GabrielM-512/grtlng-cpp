@@ -29,12 +29,26 @@ void printOffsetInstruction(u64 offset, const std::string& instruction, bool pip
     return offset + 2;
 }
 
-[[nodiscard]] u64 u16Instruction(u64 offset, const std::string& instruction, const std::vector<u8>& code) {
+[[nodiscard]] u64 jumpInstruction(u64 offset, const std::string& instruction, const std::vector<u8>& code) {
     u16 value = (u16)(code[offset + 1] << 8);
     value |= code[offset + 2];
 
+    u64 target = offset + 1 + 2 + value; // +1 for jump opcode, +2 for operand, + value for final pos
+
     printOffsetInstruction(offset, instruction, true);
-    std::cout << value << std::endl;
+    std::cout << value << std::format(" | 0x{:04X}", target) << std::endl;
+
+    return offset + 3;
+}
+
+[[nodiscard]] u64 loopInstruction(u64 offset, const std::string& instruction, const std::vector<u8>& code) {
+    u16 value = (u16)(code[offset + 1] << 8);
+    value |= code[offset + 2];
+
+    u64 target = offset + 1 + 2 - value; // +1 for jump opcode, +2 for operand, - value for final pos
+
+    printOffsetInstruction(offset, instruction, true);
+    std::cout << value << std::format(" | 0x{:04X}", target) << std::endl;
 
     return offset + 3;
 }
@@ -184,22 +198,22 @@ void decompileChunk(std::vector<u8> code, const std::string& name, const Bytecod
             }
 
             case Bytecode::JUMP: {
-                offset = u16Instruction(offset, "JUMP", code);
+                offset = jumpInstruction(offset, "JUMP", code);
                 break;
             }
 
             case Bytecode::JUMP_FALSE: {
-                offset = u16Instruction(offset, "JUMP_FALSE", code);
+                offset = jumpInstruction(offset, "JUMP_FALSE", code);
                 break;
             }
 
             case Bytecode::JUMP_TRUE: {
-                offset = u16Instruction(offset, "JUMP_TRUE", code);
+                offset = jumpInstruction(offset, "JUMP_TRUE", code);
                 break;
             }
 
             case Bytecode::LOOP: {
-                offset = u16Instruction(offset, "LOOP", code);
+                offset = loopInstruction(offset, "LOOP", code);
                 break;
             }
 
