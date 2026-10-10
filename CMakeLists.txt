@@ -38,6 +38,8 @@ add_executable(grtlng_cpp
         src/interpreter/bytecode/compiler.h
         src/interpreter/bytecode/decompile.cpp
         src/interpreter/bytecode/decompile.h
+        src/compiler/classifiying.cpp
+        src/compiler/classifying.h
         src/compiler/compileStructs.h
 )
 
