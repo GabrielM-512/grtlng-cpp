@@ -26,7 +26,7 @@ namespace Resolving {
 
 namespace Value {
 
-    enum ObjectType {
+    enum ObjectType : u8 {
         FUNCTION,
         NATIVE_FN
     };
@@ -79,6 +79,7 @@ namespace Value {
 
 #define VALUE_FUNCTION(func) ((Value::Value) {.type = Value::OBJECT, .as = {.object = func}})
 #define VALUE_NATIVE(native) ((Value::Value) {.type = Value::OBJECT, .as = {.object = native}})
+#define VALUE_OBJ(obj) ((Value::Value) {.type = Value::OBJECT, .as = {.object = obj}})
 #define VALUE_NUM(number) ((Value::Value) {.type = Value::NUMBER, .as = {.num = static_cast<double>(number)}})
 #define VALUE_TRUE (VALUE_NUM(1))
 #define VALUE_FALSE (VALUE_NUM(0))

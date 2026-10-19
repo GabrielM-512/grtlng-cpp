@@ -7,42 +7,63 @@
 #include "interpreter/bytecode/interpreting.h"
 
 #include "argvParse.h"
+#include "interpreter/bytecode/compiler.h"
+#include "util/programDump.h"
 
-//#define CATCH_ERRORS
+Bytecode::Program compileProgram(const argvParse::ProgramArgs& compileFlags) {
+    std::string file = fileIO::readFile(compileFlags.filePath);
+
+    Error::ErrorHandler handler(file);
+
+    Compiler::CompileResult program = Compiler::compile(file, handler);
+
+    if (!program.success) {
+        handler.printErrors();
+        exit(1);
+    }
+
+    if (compileFlags.printAst) {
+        std::cout << Printer::print(program) << std::endl;
+    }
+
+    Bytecode::Program bcProgram;
+
+    try {
+        bcProgram = BytecodeCompilation::compile(program);
+    } catch (BytecodeCompilation::CompileError& e) {
+        std::cerr << e.message << std::endl;
+        exit(EX_DATAERR);
+    }
+
+    return bcProgram;
+}
 
 int main(const int argc, char* argv[]) {
     argvParse::ProgramArgs compileFlags = argvParse::parse(argc, argv);
-#ifdef CATCH_ERRORS
-    try {
-#endif
-        std::string file = fileIO::readFile(compileFlags.filePath);
+    Bytecode::Program bcProgram;
 
-        Error::ErrorHandler handler(file);
-
-        Compiler::CompileResult program = Compiler::compile(file, handler);
-
-        if (!program.success) {
-            handler.printErrors();
+    if (compileFlags.dump == argvParse::LOAD) {
+        try {
+            bcProgram = programDump::readBytecode(compileFlags.filePath);
+        } catch (programDump::LoadError& e) {
+            std::cerr << "Error while loading Bytecode Program: " << e.what() << std::endl;
             return 1;
         }
-
-        if (compileFlags.printAst) {
-            std::cout << Printer::print(program) << std::endl;
-        }
-
-        switch (compileFlags.type) {
-            case argvParse::INTERPRET: {
-                double result = Bytecode::interpret(program, compileFlags.decompile);
-                return (int) result;
-            }
-
-            case argvParse::NONE: return 0;
-
-        }
-#ifdef CATCH_ERRORS
-    } catch (std::exception& e) {
-        std::cerr << "Error: " << e.what() << std::endl;
-        return 1;
+    } else {
+        bcProgram = compileProgram(compileFlags);
     }
-#endif
+
+    if (compileFlags.dump == argvParse::DUMP) {
+        programDump::dumpBytecode(bcProgram, compileFlags.dumpPath);
+    }
+
+    switch (compileFlags.type) {
+        case argvParse::INTERPRET: {
+            double result = Bytecode::interpret(bcProgram, compileFlags.decompile);
+            return (int) result;
+        }
+
+        case argvParse::COMP_NONE: return 0;
+
+    }
 }

@@ -41,6 +41,10 @@ add_executable(grtlng_cpp
         src/compiler/classifiying.cpp
         src/compiler/classifying.h
         src/compiler/compileStructs.h
+        src/util/programDump.cpp
+        src/util/programDump.h
+        src/util/dumping/bytecode.cpp
+        src/util/dumping/bytecode.h
 )
 
 target_compile_options(grtlng_cpp

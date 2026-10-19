@@ -2,7 +2,7 @@
 #include <argp.h>
 #include <cstdlib>
 #include <cstring>
-#include <sysexits.h>
+#include <iostream>
 
 using namespace argvParse;
 
@@ -10,6 +10,10 @@ struct parseInfos {
     ProgramArgs args;
     bool setMode = false;
 };
+
+#define PRINT_AST 256
+#define BC_DUMP 257
+#define BC_EXEC 258
 
 error_t parse_opt (int key, char *arg, argp_state *state) {
     auto arguments = static_cast<parseInfos *>(state->input);
@@ -23,7 +27,7 @@ error_t parse_opt (int key, char *arg, argp_state *state) {
             arguments->setMode = true;
 
             if (strcmp(arg, "i") == 0) arguments->args.type = INTERPRET;
-            else if (strcmp(arg, "n") == 0) arguments->args.type = NONE;
+            else if (strcmp(arg, "n") == 0) arguments->args.type = COMP_NONE;
 
             else {
                 argp_error(state, "Bad option \"%s\" to -c\n    Valid options: i, n", arg);
@@ -37,18 +41,66 @@ error_t parse_opt (int key, char *arg, argp_state *state) {
             break;
         }
 
-        case 256: {
+        case PRINT_AST: {
             arguments->args.printAst = true;
             break;
         }
 
-        case ARGP_KEY_ARG: {
-            if (arguments->args.filePath == nullptr) {
-                arguments->args.filePath = (char*) malloc(strlen(arg));
-                strcpy(arguments->args.filePath, arg);
-            } else {
-                argp_error(state, "Supplied more than one file path to executable");
+        case BC_DUMP: { // bc-dump
+            if (arguments->args.dump != DUMP_NONE) {
+                switch (arguments->args.dump) {
+                    case DUMP: {
+                        argp_error(state, "Set bc-dump twice");
+                        break;
+                    }
+
+                    case LOAD: {
+                        argp_error(state, "Cannot set both bc-dump and bc-exec");
+                        break;
+                    }
+
+                    case DUMP_NONE:
+                        break; // unreachable
+                }
             }
+
+            arguments->args.dump = DUMP;
+            arguments->args.dumpPath = (char*) malloc(sizeof(char) * strlen(arg) + 1);
+            strcpy(arguments->args.dumpPath, arg);
+            arguments->args.dumpPath[strlen(arg)] = '\0';
+
+            break;
+        }
+
+        case BC_EXEC: { // bc-exec
+            if (arguments->args.dump != DUMP_NONE) {
+                switch (arguments->args.dump) {
+                    case DUMP: {
+                        argp_error(state, "Cannot set both bc-dump and bc-exec");
+                        break;
+                    }
+
+                    case LOAD: {
+                        argp_error(state, "Set bc-exec twice");
+                        break;
+                    }
+
+                    case DUMP_NONE:
+                        break; // unreachable
+                }
+            }
+
+            arguments->args.dump = LOAD;
+            break;
+        }
+
+        case ARGP_KEY_ARG: {
+            if (arguments->args.filePath != nullptr) argp_error(state, "Supplied more than one file path to executable");
+
+            arguments->args.filePath = (char*) malloc(strlen(arg) + 1);
+            strcpy(arguments->args.filePath, arg);
+            arguments->args.filePath[strlen(arg)] = '\0';
+
             break;
         }
 
@@ -73,7 +125,9 @@ ProgramArgs argvParse::parse(int argc, char* argv[]) {
     static argp_option options[] = {
         {.name = "compile-mode", .key = 'c', .arg = "type", .flags = 0, .doc = "The mode of the compiler. Possible options: i (interpret program), n (none). Default: i", .group = 0},
         {.name = nullptr, .key = 'd', .arg = nullptr, .flags = 0, .doc = "Whether to decompile the bytecode before execution. Only valid when used in combination with -ci.", .group = 0},
-        {.name = "print-ast", .key = 256, .arg = nullptr, .flags = 0, .doc = "Prints the AST for the program using parentheses in expressions to explicitly show precedence.", .group = 0},
+        {.name = "print-ast", .key = PRINT_AST, .arg = nullptr, .flags = 0, .doc = "Prints the AST for the program using parentheses in expressions to explicitly show precedence.", .group = 0},
+        {.name = "bc-dump=", .key = BC_DUMP, .arg = "path", .flags = 0, .doc = "Compiles a Bytecode Program and dumps it to the file specified after '='. The program does not have to be executed afterwards.", .group = 0},
+        {.name = "bc-exec", .key = BC_EXEC, .arg = nullptr, .flags = 0, .doc = "Expects the input file to be a bytecode dump and executes it as such. Only valid when used in combination with -ci.", .group = 0},
         {.name = nullptr, .key = 0, .arg = nullptr, .flags = 0, .doc = nullptr, .group = 0} // last entry
     };
 
@@ -90,6 +144,11 @@ ProgramArgs argvParse::parse(int argc, char* argv[]) {
     parseInfos args;
 
     argp_parse(&parser, argc, argv, 0, nullptr, &args);
+
+    if (args.args.dump == LOAD && args.args.type != INTERPRET) {
+        std::cerr << "Loading a bytecode program is only allowed when omitting -c or selecting -ci." << std::endl;
+        exit(1);
+    }
 
     return args.args;
 
