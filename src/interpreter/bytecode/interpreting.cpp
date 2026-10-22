@@ -11,6 +11,8 @@ using namespace Bytecode;
 #define READ_SHORT() (ip += 2, (u16)((ip[-2] << 8) | ip[-1]))
 #define READ_OP() (static_cast<Operation>(READ_BYTE()))
 
+#define CURRENT_FRAME() (this->callStack[fp - 1])
+
 //#define BYTECODE_SAFETY
 
 #define FRAME_COUNT (256)
@@ -154,14 +156,16 @@ public:
                     Value::Value returnValue = pop();
 
                     // restore old call frame and ip
-                    fp--;
-                    ip = callStack[fp].returnip;
+
+                    ip = CURRENT_FRAME().returnip;
 
                     // pop local vars + params
                     Value::Value* stackTop = &stack[sp + 1]; // leave pointing just past actual top to account for function object still sitting underneath params
-                    u16 diff = stackTop - callStack[fp].slots;
+                    u16 diff = stackTop - CURRENT_FRAME().slots;
 
                     sp -= diff;
+
+                    fp--;
 
 
                     push(returnValue);
@@ -266,7 +270,7 @@ public:
 
                 case LOAD_LOCAL: {
                     u8 slot = READ_BYTE();
-                    push(callStack[fp - 1].slots[slot]);
+                    push(CURRENT_FRAME().slots[slot]);
                     break;
                 }
 
@@ -278,7 +282,7 @@ public:
 
                 case SET_LOCAL: {
                     u8 slot = READ_BYTE();
-                    callStack[fp - 1].slots[slot] = peek(0);
+                    CURRENT_FRAME().slots[slot] = peek(0);
                     break;
                 }
 
