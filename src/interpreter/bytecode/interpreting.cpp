@@ -327,15 +327,7 @@ public:
     }
 };
 
-i32 Bytecode::interpret(const Compiler::CompileResult &ast, bool decompile) {
-    Program program;
-    try {
-        program = BytecodeCompilation::compile(ast);
-    } catch (BytecodeCompilation::CompileError& e) {
-        std::cerr << e.message << std::endl;
-        return EX_DATAERR;
-    }
-
+i32 Bytecode::interpret(Program &program, bool decompile) {
     if (decompile) Decompile::decompile(program);
 
     VM vm(program);

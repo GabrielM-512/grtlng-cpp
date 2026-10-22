@@ -52,5 +52,5 @@ namespace Bytecode {
         u16 globalCount {};
     };
 
-    i32 interpret(const Compiler::CompileResult &ast, bool decompile);
+    i32 interpret(Program &program, bool decompile);
 }
