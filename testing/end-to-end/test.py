@@ -164,7 +164,7 @@ def expected_got_format(expected : str, got : str) -> list[str]:
     return returns
 
 def make_error_message(test : Test, time_start, timed_out : bool,  stdout = None, stdout_cap = None, stderr = None, stderr_cap = None) -> list[str]:
-    timestamp = time.strftime("%d:%m:%Y %H:%M:%S", time_start)
+    timestamp = time.strftime("%d-%m-%Y %H:%M:%S", time_start)
 
     err_string = f"{timestamp}: Failed test \"{test.name}\" ({test.path}):\n"
 
