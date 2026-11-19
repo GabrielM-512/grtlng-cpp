@@ -228,7 +228,10 @@ public:
                     u8 argCount = READ_BYTE();
                     Value::Value func = peek(argCount);
 
-                    if (!callValue(func, argCount)) return EX_DATAERR;
+                    if (!callValue(func, argCount)) {
+                        cleanup();
+                        return EX_DATAERR;
+                    }
                     break;
                 }
 
