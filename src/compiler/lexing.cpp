@@ -231,28 +231,32 @@ Token Lexer::keyword() const {
     const u32 length = head - base;
     switch (source[base]) {
         case 'b': return checkKeyword(1, "reak", BREAK);
-        case 'c': if (length > 1) {
-            switch (source[base + 1]) {
-                case 'a': return checkKeyword(2, "se", CASE);
-                case 'o': return checkKeyword(2, "ntinue", CONTINUE);
-                default:
-                    break;
+        case 'c': {
+            if (length > 1) {
+                switch (source[base + 1]) {
+                    case 'a': return checkKeyword(2, "se", CASE);
+                    case 'o': return checkKeyword(2, "ntinue", CONTINUE);
+                    default:
+                        break;
+                }
             }
-        }
             break;
+        }
 
         case 'd': return checkKeyword(1, "efault", DEFAULT);
-        case 'e': if (length > 1) {
-            switch (source[base + 1]) {
-                case 'l': return checkKeyword(2, "se", ELSE);
-                case 'x': return checkKeyword(2, "tern", EXTERN);
-                default:
-                    break;
+        case 'e': {
+            if (length > 1) {
+                switch (source[base + 1]) {
+                    case 'l': return checkKeyword(2, "se", ELSE);
+                    case 'x': return checkKeyword(2, "tern", EXTERN);
+                    default:
+                        break;
+                }
             }
-        }
             break;
+        }
 
-        case 'f':
+        case 'f': {
             if (length > 1) {
                 switch (source[base + 1]) {
                     case 'a': return checkKeyword(2, "lse", FALSE);
@@ -264,7 +268,9 @@ Token Lexer::keyword() const {
                 }
             }
             break;
-        case 'i':
+        }
+
+        case 'i': {
             if (length > 1) {
                 switch (source[base + 1]) {
                     case '8': return checkKeyword(2, "", I8);
@@ -277,16 +283,26 @@ Token Lexer::keyword() const {
                 }
             }
             break;
+        }
 
         case 'p': return checkKeyword(1, "rint", PRINT);
 
         case 'r': return checkKeyword(1, "eturn", RETURN);
 
-        case 's': return checkKeyword(1, "witch", SWITCH);
+        case 's': {
+            if (length > 1) {
+                switch (source[base + 1]) {
+                    case 'w': return checkKeyword(2, "itch", SWITCH);
+                    default:
+                        break;
+                }
+            }
+            break;
+        }
 
         case 't': return checkKeyword(1, "rue", TRUE);
 
-        case 'u':
+        case 'u': {
             if (length > 1) {
                 switch (source[base + 1]) {
                     case '8': return checkKeyword(2, "", U8);
@@ -298,6 +314,7 @@ Token Lexer::keyword() const {
                 }
             }
             break;
+        }
 
         case 'v': return checkKeyword(1, "oid", VOID);
         case 'w': return checkKeyword(1, "hile", WHILE);
