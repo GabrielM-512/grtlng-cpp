@@ -52,7 +52,12 @@ target_compile_options(grtlng_cpp
         PUBLIC -Wextra
         PUBLIC -Werror
         PUBLIC -Ofast
+        PUBLIC -fsanitize=address,undefined
         PUBLIC -fno-finite-math-only # to ensure nan/infinity are handled correctly even when -Ofast is enabled
+)
+
+target_link_options(grtlng_cpp
+        PUBLIC -fsanitize=address,undefined
 )
 
 
