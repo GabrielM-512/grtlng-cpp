@@ -20,7 +20,6 @@ namespace Resolving {
         }
 
         Scope(Scope* enclosing): enclosing(enclosing) {}
-        ~Scope() = default;
 
         bool hasVar(const std::string& name) const {
             return symbols.contains(name);

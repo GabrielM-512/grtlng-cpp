@@ -112,7 +112,7 @@ namespace Lexing {
         [[nodiscard]] std::string toString() const;
         static std::string toString(TokenType tokenType);
 
-        };
+    };
 
     class ScanException : public std::runtime_error {
     public:

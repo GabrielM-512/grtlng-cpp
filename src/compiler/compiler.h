@@ -8,7 +8,6 @@ namespace Compiler {
     struct CompileResult {
         bool success = true;
         std::vector<Stmt::Stmt*> tree;
-        Stmt::Return* zeroReturn;
     };
 
     class CompileError : std::runtime_error {

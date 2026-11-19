@@ -48,8 +48,6 @@ Stmt::Stmt* Parser::functionDeclaration(Lexing::Token dataType, const Lexing::To
     Stmt::Block* body = blockStatement();
 
     return new Stmt::Function(dataType, dataType.type, name, parameters, body);
-
-    return nullptr;
 }
 
 Stmt::Stmt* Parser::globalDeclaration() {

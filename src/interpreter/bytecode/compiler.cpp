@@ -5,6 +5,8 @@
 #include <ranges>
 #include <unordered_map>
 
+#include "../../compiler/parsing/parsing.h"
+
 using namespace BytecodeCompilation;
 
 struct Local {
@@ -203,34 +205,35 @@ class BytecodeCompiler : public Stmt::StmtVisitor, public Expr::ExprVisitor{
     }
 
 
-    void compileFunction(const Stmt::Function& function) {
+    void compileFunction(const Stmt::Function* function) {
+        // use a pointer instead of a reference so that the original doesn't get destoryed taking its child nodes with it
 
         inInit = false;
 
         beginScope();
 
-        for (Stmt::VariableDeclaration* param: function.params) {
+        for (Stmt::VariableDeclaration* param: function->params) {
             createLocal(param->name.data.name);
         }
 
-        for (Stmt::Stmt* stmt : function.body->statements) {
+        for (Stmt::Stmt* stmt : function->body->statements) {
             compileStatement(stmt);
         }
 
         endScope();
 
-        auto* compiledFunction = new Value::Function(currentChunk(), function.name.data.name, (u8) function.params.size());
+        auto* compiledFunction = new Value::Function(currentChunk(), function->name.data.name, (u8) function->params.size());
 
         currentFunction.clear();
 
         inInit = true;
 
         emitConstant(VALUE_FUNCTION(compiledFunction));
-        emitBytes(Bytecode::SET_GLOBAL, resolveGlobal(function.name.data.name));
+        emitBytes(Bytecode::SET_GLOBAL, resolveGlobal(function->name.data.name));
         emitByte(Bytecode::POP);
 
-        if (function.params.size() > UINT8_MAX) {
-            std::string message = "Error: Function \"" + std::string(function.name.data.name) + "\" takes " + std::to_string(function.params.size()) + " parameters, maximum allowed is 255";
+        if (function->params.size() > UINT8_MAX) {
+            std::string message = "Error: Function \"" + std::string(function->name.data.name) + "\" takes " + std::to_string(function->params.size()) + " parameters, maximum allowed is 255";
             errors.push_back(message);
         }
     }
@@ -304,8 +307,9 @@ public:
             if (auto func = dynamic_cast<Stmt::Function*> (current)) {
                 createGlobal(func->name.data.name);
                 if (func->body->statements.empty() || !dynamic_cast<Stmt::Return*>(func->body->statements.back())) {
-
-                    func->body->statements.push_back(ast.zeroReturn);
+                    // allocate a new node every time so we can properly free them all after compilation
+                    auto zeroReturn = new Stmt::Return(Parsing::Parser::fakeToken(), new Expr::Number(Parsing::Parser::fakeToken(), 0));
+                    func->body->statements.push_back(zeroReturn);
                 }
 
                 funcs.push_back(func);
@@ -325,8 +329,7 @@ public:
         declareNatives();
 
         for (Stmt::Function* func : funcs) {
-            Stmt::Function function = *func;
-            compileFunction(function);
+            compileFunction(func);
         }
 
         if (!errors.empty()) {
@@ -600,8 +603,7 @@ public:
     }
 
     StmtVisitResults visitFunctionStmt(Stmt::Function *stmt) override {
-        Stmt::Function function = *stmt;
-        compileFunction(function);
+        compileFunction(stmt);
 
         return std::monostate();
     }

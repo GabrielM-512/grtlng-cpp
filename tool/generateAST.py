@@ -54,6 +54,33 @@ class Subclass:
 
         return output
 
+    def define_destructor(self, fields: list[str]) -> str:
+
+        pointers = []
+        vectors = []
+
+        for parameter in fields:
+            if parameter.split()[0][-1] == "*":
+                pointers.append(f"{parameter.split()[1]}")
+
+            if is_vector(parameter) and parameter.split()[0][-2:-1] == "*":
+
+                vectors.append(f"{parameter.split()[1]}")
+
+        if not pointers and not vectors: return ""
+
+        output = f"\n        ~{self.name}() override " + "{\n"
+
+        for p in pointers:
+            output += f"            delete {p};\n"
+
+        for v in vectors:
+            output += f"            for (auto curr : {v}) delete curr;\n"
+
+        output +=   "        }\n\n"
+
+        return output
+
 
     def define_class(self) -> str:
         output = f"\n\n    struct {self.name}: {self.base_class} " + "{\n"
@@ -62,6 +89,8 @@ class Subclass:
             output += f"        {arg.split("=")[0].strip()};\n"
 
         output += self.define_constructor(self.args)
+        output += self.define_destructor(self.args + self.optionals)
+
         if len(self.optionals) > 0: output += self.define_constructor(self.args + self.optionals)
 
         output += (f"        {self.base_class}VisitResults accept({self.base_class}Visitor* visitor) override " + "{\n" +
@@ -72,6 +101,14 @@ class Subclass:
 
         return output
 
+def is_vector(parameter : str) -> bool:
+    parameter.strip(" -")
+
+    if len(parameter) <= len("std::vector<"): return False
+
+    if parameter[:12] == "std::vector<": return True
+
+    return False
 
 def define_data_struct(struct : str) -> str:
     struct_name = struct.split("|")[0].strip()

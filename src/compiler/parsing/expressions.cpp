@@ -86,6 +86,9 @@ public:
         if(const auto target = dynamic_cast<Expr::Identifier*>(left)) {
             Lexing::Token name = target->token;
 
+            // clean up after ourselves please
+            delete target;
+
             return new Expr::Assign(token, name, right);
         }
 

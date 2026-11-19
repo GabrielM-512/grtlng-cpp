@@ -19,6 +19,11 @@ Parser::Parser(std::vector<Lexing::Token>& tokens, Error::ErrorHandler& handler)
     Expressions::registerExpressionParselets(*this);
 }
 
+Parser::~Parser() {
+    for (auto curr : infixTable) delete curr.second;
+    for (auto curr : prefixTable) delete curr.second;
+}
+
 std::vector<Stmt::Stmt*> Parser::parse() {
 
     std::vector<Stmt::Stmt*> tree;

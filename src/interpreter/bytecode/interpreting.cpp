@@ -137,6 +137,15 @@ class VM {
 
         return output;
     }
+
+    void cleanup() {
+
+        free(globals);
+
+        for (Value::Value value : program.constants) {
+            if (IS_OBJ(value)) delete value.as.object;
+        }
+    }
     
 public:
     explicit VM(Program& program): ip(nullptr), sp(0), fp(0), program(program) {
@@ -317,6 +326,8 @@ public:
 #ifdef BYTECODE_SAFETY
                     if (sp != 0) std::cerr << "stack was not empty, included " << sp << " values" << std::endl;
 #endif
+                    cleanup();
+
                     return AS_NUM(returnValue);
                 }
 

@@ -61,6 +61,11 @@ namespace Stmt {
             Expr::Expr* expression
         ): expression(expression) {this->token = token;}
 
+
+        ~Expression() override {
+            delete expression;
+        }
+
         StmtVisitResults accept(StmtVisitor* visitor) override {
             return visitor->visitExpressionStmt(this);
         }
@@ -72,6 +77,11 @@ namespace Stmt {
         explicit Print(Lexing::Token token,
             Expr::Expr* expression
         ): expression(expression) {this->token = token;}
+
+
+        ~Print() override {
+            delete expression;
+        }
 
         StmtVisitResults accept(StmtVisitor* visitor) override {
             return visitor->visitPrintStmt(this);
@@ -89,6 +99,11 @@ namespace Stmt {
             Expr::Expr* value = nullptr
         ): dataType(dataType), name(name), value(value) {this->token = token;}
 
+
+        ~VariableDeclaration() override {
+            delete value;
+        }
+
         StmtVisitResults accept(StmtVisitor* visitor) override {
             return visitor->visitVariableDeclarationStmt(this);
         }
@@ -105,6 +120,13 @@ namespace Stmt {
             Stmt* elseBranch
         ): condition(condition), thenBranch(thenBranch), elseBranch(elseBranch) {this->token = token;}
 
+
+        ~If() override {
+            delete condition;
+            delete thenBranch;
+            delete elseBranch;
+        }
+
         StmtVisitResults accept(StmtVisitor* visitor) override {
             return visitor->visitIfStmt(this);
         }
@@ -118,6 +140,12 @@ namespace Stmt {
             Expr::Expr* condition,
             Stmt* body
         ): condition(condition), body(body) {this->token = token;}
+
+
+        ~While() override {
+            delete condition;
+            delete body;
+        }
 
         StmtVisitResults accept(StmtVisitor* visitor) override {
             return visitor->visitWhileStmt(this);
@@ -137,6 +165,14 @@ namespace Stmt {
             Stmt* body
         ): initialiser(initialiser), condition(condition), incrementer(incrementer), body(body) {this->token = token;}
 
+
+        ~For() override {
+            delete initialiser;
+            delete condition;
+            delete incrementer;
+            delete body;
+        }
+
         StmtVisitResults accept(StmtVisitor* visitor) override {
             return visitor->visitForStmt(this);
         }
@@ -147,6 +183,11 @@ namespace Stmt {
 
         explicit Block(Lexing::Token token
         ) {this->token = token;}
+
+
+        ~Block() override {
+            for (auto curr : statements) delete curr;
+        }
 
 
         explicit Block(Lexing::Token token,
@@ -171,6 +212,12 @@ namespace Stmt {
             Block* body
         ): dataType(dataType), name(name), params(params), body(body) {this->token = token;}
 
+
+        ~Function() override {
+            delete body;
+            for (auto curr : params) delete curr;
+        }
+
         StmtVisitResults accept(StmtVisitor* visitor) override {
             return visitor->visitFunctionStmt(this);
         }
@@ -182,6 +229,11 @@ namespace Stmt {
         explicit Return(Lexing::Token token,
             Expr::Expr* value
         ): value(value) {this->token = token;}
+
+
+        ~Return() override {
+            delete value;
+        }
 
         StmtVisitResults accept(StmtVisitor* visitor) override {
             return visitor->visitReturnStmt(this);
@@ -216,6 +268,11 @@ namespace Stmt {
             Expr::Expr* condition,
             std::vector<Case> cases
         ): condition(condition), cases(cases) {this->token = token;}
+
+
+        ~Switch() override {
+            delete condition;
+        }
 
         StmtVisitResults accept(StmtVisitor* visitor) override {
             return visitor->visitSwitchStmt(this);

@@ -10,6 +10,11 @@
 #include "interpreter/bytecode/compiler.h"
 #include "util/programDump.h"
 
+#define FREE_PATHS() do {\
+    if (compileFlags.dumpPath != nullptr) free(compileFlags.dumpPath);\
+    if (compileFlags.filePath != nullptr) free(compileFlags.filePath);\
+} while (false)
+
 Bytecode::Program compileProgram(const argvParse::ProgramArgs& compileFlags) {
     std::string file = fileIO::readFile(compileFlags.filePath);
 
@@ -35,6 +40,9 @@ Bytecode::Program compileProgram(const argvParse::ProgramArgs& compileFlags) {
         exit(EX_DATAERR);
     }
 
+    // free the AST
+    for (Stmt::Stmt * current : program.tree) delete current;
+
     return bcProgram;
 }
 
@@ -56,6 +64,8 @@ int main(const int argc, char* argv[]) {
     if (compileFlags.dump == argvParse::DUMP) {
         programDump::dumpBytecode(bcProgram, compileFlags.dumpPath);
     }
+
+    FREE_PATHS();
 
     switch (compileFlags.type) {
         case argvParse::INTERPRET: {

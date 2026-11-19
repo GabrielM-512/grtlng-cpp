@@ -73,6 +73,10 @@ public:
         Value::defineNativesResolver(current);
     }
 
+    ~Resolver() override {
+        endScope(); // delete the global scope
+    }
+
 /*
     EEEEE   X   X   PPPP    RRRR    EEEEE    SSSS    SSSS   IIIII    OOO    N   N    SSSS
     E        X X    P   P   R   R   E       S       S        III    O   O   NN  N   S

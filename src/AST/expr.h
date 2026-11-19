@@ -51,6 +51,12 @@ namespace Expr {
             Expr* right = nullptr
         ): left(left), operatorType(operatorType), right(right) {this->token = token;}
 
+
+        ~Binary() override {
+            delete left;
+            delete right;
+        }
+
         ExprVisitResults accept(ExprVisitor* visitor) override {
             return visitor->visitBinaryExpr(this);
         }
@@ -64,6 +70,11 @@ namespace Expr {
             Lexing::TokenType operatorType = Lexing::ERROR,
             Expr* right = nullptr
         ): operatorType(operatorType), right(right) {this->token = token;}
+
+
+        ~Unary() override {
+            delete right;
+        }
 
         ExprVisitResults accept(ExprVisitor* visitor) override {
             return visitor->visitUnaryExpr(this);
@@ -101,6 +112,11 @@ namespace Expr {
             Expr* value
         ): name(name), value(value) {this->token = token;}
 
+
+        ~Assign() override {
+            delete value;
+        }
+
         ExprVisitResults accept(ExprVisitor* visitor) override {
             return visitor->visitAssignExpr(this);
         }
@@ -116,6 +132,12 @@ namespace Expr {
             std::vector<Expr*> args,
             Lexing::Token paren
         ): callee(callee), args(args), paren(paren) {this->token = token;}
+
+
+        ~Call() override {
+            delete callee;
+            for (auto curr : args) delete curr;
+        }
 
         ExprVisitResults accept(ExprVisitor* visitor) override {
             return visitor->visitCallExpr(this);
@@ -133,6 +155,12 @@ namespace Expr {
             Expr* right
         ): left(left), operatorType(operatorType), right(right) {this->token = token;}
 
+
+        ~Logical() override {
+            delete left;
+            delete right;
+        }
+
         ExprVisitResults accept(ExprVisitor* visitor) override {
             return visitor->visitLogicalExpr(this);
         }
@@ -148,6 +176,13 @@ namespace Expr {
             Expr* thenBranch,
             Expr* elseBranch
         ): condition(condition), thenBranch(thenBranch), elseBranch(elseBranch) {this->token = token;}
+
+
+        ~Conditional() override {
+            delete condition;
+            delete thenBranch;
+            delete elseBranch;
+        }
 
         ExprVisitResults accept(ExprVisitor* visitor) override {
             return visitor->visitConditionalExpr(this);

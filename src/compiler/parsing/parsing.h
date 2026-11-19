@@ -95,6 +95,7 @@ namespace Parsing {
         static Lexing::Token fakeToken();
 
         explicit Parser(std::vector<Lexing::Token>& tokens, Error::ErrorHandler& handler);
+        ~Parser();
 
         std::vector<Stmt::Stmt *> parse();
         [[nodiscard]] bool hadParseError() const;
