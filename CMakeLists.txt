@@ -3,6 +3,12 @@ project(grtlng_cpp)
 
 set(CMAKE_CXX_STANDARD 26)
 
+if ( NOT CMAKE_BUILD_TYPE )
+        message( "Build Type not set, defaulting to Debug..." )
+        set( CMAKE_BUILD_TYPE Debug )
+endif()
+
+
 add_executable(grtlng_cpp
         src/main.cpp
         src/global.h
@@ -52,13 +58,16 @@ target_compile_options(grtlng_cpp
         PUBLIC -Wextra
         PUBLIC -Werror
         PUBLIC -Ofast
-        PUBLIC -fsanitize=address,undefined
         PUBLIC -fno-finite-math-only # to ensure nan/infinity are handled correctly even when -Ofast is enabled
 )
 
-target_link_options(grtlng_cpp
-        PUBLIC -fsanitize=address,undefined
-)
+if (${CMAKE_BUILD_TYPE} STREQUAL "Debug")
+        message( "Including Address and UB sanitisers" )
+        target_compile_options(grtlng_cpp PUBLIC -fsanitize=address,undefined
+        )
+        target_link_options(grtlng_cpp PUBLIC -fsanitize=address,undefined)
+endif ()
+
 
 
 include(CTest)
