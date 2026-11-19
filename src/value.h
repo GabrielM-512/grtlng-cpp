@@ -54,21 +54,21 @@ namespace Value {
     };
 
     struct Function : Obj {
+        u8 arity;
         std::vector<u8> code;
         std::string name;
-        u8 arity;
 
-        Function(const std::vector<u8> &code, const std::string &name, u8 arity): Obj(FUNCTION), code(code), name(name), arity(arity) {}
+        Function(const std::vector<u8> &code, const std::string &name, u8 arity): Obj(FUNCTION), arity(arity), code(code), name(name) {}
     };
 
     typedef Value (*NativeFunction)(Value*);
 
     struct NativeFn : Obj {
+        u8 arity;
         NativeFunction fn;
         std::string name;
-        u8 arity;
 
-        NativeFn(NativeFunction func, std::string  name, u8 arity): Obj(NATIVE_FN), fn(func), name(std::move(name)), arity(arity) {}
+        NativeFn(NativeFunction func, std::string  name, u8 arity): Obj(NATIVE_FN), arity(arity), fn(func), name(std::move(name)) {}
     };
 
     bool isObjType(const Value& val, ObjectType type);
