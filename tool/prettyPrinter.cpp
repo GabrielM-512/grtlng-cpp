@@ -144,7 +144,9 @@ public:
     }
 
     StmtVisitResults visitReturnStmt(Stmt::Return *stmt) override {
-        return "RETURN " + expression(stmt->value);
+        std::string value;
+        if (stmt->value != nullptr) value = expression(stmt->value);
+        return "RETURN " + value;
     }
 
     std::string print(const std::vector<Stmt::Stmt*>& tree) {
