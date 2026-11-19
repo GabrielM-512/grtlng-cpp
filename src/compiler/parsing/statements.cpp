@@ -44,11 +44,12 @@ Stmt::Expression *Parser::expressionStatement() {
     return new Stmt::Expression(expr->token, expr);
 }
 
-Stmt::VariableDeclaration *Parser::variableDeclaration(Lexing::Token dataType, const Lexing::Token &name) {
+Stmt::VariableDeclaration *Parser::variableDeclaration(const Lexing::Token &dataType, const Lexing::Token &name, bool allowValue) {
     Expr::Expr* value = nullptr;
 
     if (match(Lexing::EQUALS)) {
-        value = expression();
+        if (allowValue) value = expression();
+        else throw error("An assignment is not allowed in this context");
     }
 
     consume(Lexing::SEMICOLON, " after variable declaration");
@@ -66,7 +67,7 @@ Stmt::VariableDeclaration *Parser::localDeclarationStatement() {
 
     const Lexing::Token name = previous;
 
-    return variableDeclaration(dataType, name);
+    return variableDeclaration(dataType, name, true);
 }
 
 Stmt::If *Parser::ifStatement() {

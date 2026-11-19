@@ -64,5 +64,5 @@ Stmt::Stmt* Parser::globalDeclaration() {
     const Lexing::Token name = previous;
 
     if (match(Lexing::LEFT_PAREN)) return functionDeclaration(dataType, name);
-    return variableDeclaration(dataType, name);
+    return variableDeclaration(dataType, name, true);
 }
