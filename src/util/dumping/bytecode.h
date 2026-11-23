@@ -1,5 +1,5 @@
 #pragma once
-#include "../../interpreter/bytecode/interpreting.h"
+#include "../../interpreter/interpreter.h"
 
 namespace Bytecode {
     void dump(const Program& program, const char* filepath);

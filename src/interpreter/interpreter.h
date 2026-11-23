@@ -1,6 +1,9 @@
 #pragma once
 
-#include "../../compiler/compiler.h"
+#include <vector>
+
+#include "../global.h"
+#include "../value.h"
 
 namespace Bytecode {
     enum Operation : u8 {

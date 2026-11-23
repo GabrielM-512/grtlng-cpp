@@ -1,9 +1,9 @@
 #pragma once
-#include "../interpreter/bytecode/interpreting.h"
+#include "../interpreter/interpreter.h"
 
 namespace programDump {
     void dumpBytecode(const Bytecode::Program& program, const char* filepath);
-    Bytecode::Program readBytecode(const char *filepath);
+    Bytecode::Program readBytecodeFile(const char *filepath);
 
     class LoadError : public std::runtime_error {
     public:

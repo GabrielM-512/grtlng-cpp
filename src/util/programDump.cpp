@@ -9,6 +9,6 @@ void programDump::dumpBytecode(const Bytecode::Program &program, const char *fil
 }
 
 
-Bytecode::Program programDump::readBytecode(const char *filepath) {
+Bytecode::Program programDump::readBytecodeFile(const char *filepath) {
     return Bytecode::load(filepath);
 }

@@ -1,5 +1,7 @@
 #include "bytecode.h"
 
+#include <optional>
+
 #include "../fileIO.h"
 #include "../programDump.h"
 

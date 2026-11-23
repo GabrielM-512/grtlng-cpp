@@ -1,9 +1,9 @@
-#include "interpreting.h"
+#include "interpreter.h"
 
 #include <iostream>
 
-#include "compiler.h"
-#include "decompile.h"
+#include "../compiler/bytecode.h"
+#include "../../tool/decompile.h"
 
 using namespace Bytecode;
 
