@@ -1,5 +1,5 @@
 {
-  "Instance": "/home/gabriel/CLionProjects/grtlng-cpp/cmake-build-debug/grtlng_cpp",
+  "Instance": "/home/gabriel/CLionProjects/grtlng-cpp/cmake-build-release/grtlng_cpp",
   "log": "/home/gabriel/CLionProjects/grtlng-cpp/testing/end-to-end/log.txt",
   "tests": {
     "assignment.associativity": {
