@@ -57,15 +57,16 @@ target_compile_options(grtlng_cpp
         PUBLIC -Wall
         PUBLIC -Wextra
         PUBLIC -Werror
-        PUBLIC -Ofast
         PUBLIC -fno-finite-math-only # to ensure nan/infinity are handled correctly even when -Ofast is enabled
 )
 
 if (${CMAKE_BUILD_TYPE} STREQUAL "Debug")
         message( "Including Address and UB sanitisers" )
-        target_compile_options(grtlng_cpp PUBLIC -fsanitize=address,undefined
-        )
+        target_compile_options(grtlng_cpp PUBLIC -fsanitize=address,undefined)
         target_link_options(grtlng_cpp PUBLIC -fsanitize=address,undefined)
+else ()
+        message( "Enabling optimisations" )
+        target_compile_options(grtlng_cpp PUBLIC -Ofast)
 endif ()
 
 
