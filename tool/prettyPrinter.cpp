@@ -173,7 +173,7 @@ public:
     }
 };
 
-std::string Printer::print(const Compiler::CompileResult& tree) {
+std::string Printer::print(const Compiler::SyntaxTree& tree) {
     PrettyPrinter printer;
     return printer.print(tree.tree);
 }

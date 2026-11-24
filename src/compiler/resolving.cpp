@@ -9,7 +9,7 @@
 using namespace Resolving;
 
 class Resolver : public Expr::ExprVisitor, public Stmt::StmtVisitor {
-    Compiler::CompileResult& tree;
+    Compiler::SyntaxTree& tree;
     Error::ErrorHandler &handler;
     Scope* current;
     bool globalPhase = true;
@@ -68,7 +68,7 @@ class Resolver : public Expr::ExprVisitor, public Stmt::StmtVisitor {
     }
 
 public:
-    Resolver(Compiler::CompileResult& tree, Error::ErrorHandler &handler) : tree(tree), handler(handler) {
+    Resolver(Compiler::SyntaxTree& tree, Error::ErrorHandler &handler) : tree(tree), handler(handler) {
         current = new Scope();
         Value::defineNativesResolver(current);
     }
@@ -305,7 +305,7 @@ public:
     }
 };
 
-void Resolving::resolve(Compiler::CompileResult &program, Error::ErrorHandler &handler) {
+void Resolving::resolve(Compiler::SyntaxTree &program, Error::ErrorHandler &handler) {
     Resolver resolver(program, handler);
 
     resolver.resolve();

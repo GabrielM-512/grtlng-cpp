@@ -37,5 +37,5 @@ namespace Resolving {
             return symbols.find(name)->second;
         }
     };
-    void resolve(Compiler::CompileResult &program, Error::ErrorHandler &handler);
+    void resolve(Compiler::SyntaxTree &program, Error::ErrorHandler &handler);
 }

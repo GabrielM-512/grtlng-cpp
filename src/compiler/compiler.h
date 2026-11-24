@@ -4,8 +4,11 @@
 #include "../error.h"
 #include "../AST/stmt.h"
 
+#include "../interpreter/interpreter.h"
+#include "../argvParse.h"
+
 namespace Compiler {
-    struct CompileResult {
+    struct SyntaxTree {
         bool success = true;
         std::vector<Stmt::Stmt*> tree;
     };
@@ -22,5 +25,5 @@ namespace Compiler {
                                                                          token(token), makeError(false) {}
     };
 
-    CompileResult compile(const std::string &source, Error::ErrorHandler& errorHandler);
+    Bytecode::Program compile(const argvParse::ProgramArgs& flags);
 }

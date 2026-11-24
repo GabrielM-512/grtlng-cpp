@@ -6,20 +6,50 @@
 #include "resolving.h"
 #include "parsing/parsing.h"
 
-Compiler::CompileResult Compiler::compile(const std::string& source, Error::ErrorHandler& errorHandler) {
-    CompileResult result;
+#include "../util/fileIO.h"
+#include "bytecode.h"
 
-    std::vector<Lexing::Token> tokens = Lexing::scan(source);
+#include "../../tool/prettyPrinter.h"
+
+Bytecode::Program Compiler::compile(const argvParse::ProgramArgs& flags) {
+    std::string file = fileIO::readFile(flags.filePath);
+
+    Error::ErrorHandler errorHandler(file);
+
+    SyntaxTree tree;
+
+    std::vector<Lexing::Token> tokens = Lexing::scan(file);
 
     Parsing::Parser parser(tokens, errorHandler);
-    result.tree = parser.parse();
+    tree.tree = parser.parse();
 
-    if (parser.hadParseError()) result.success = false;
+    if (parser.hadParseError()) tree.success = false;
+    if (parser.hadFatalParseError()) {
+        errorHandler.printErrors();
+        exit(1);
+    }
 
-    if (parser.hadFatalParseError()) return result;
+    Resolving::resolve(tree, errorHandler);
 
+    if (!tree.success) {
+        errorHandler.printErrors();
+        exit(1);
+    }
 
-    Resolving::resolve(result, errorHandler);
+    if (flags.printAst) {
+        std::cout << Printer::print(tree) << std::endl;
+    }
 
-    return result;
+    Bytecode::Program bcProgram;
+    try {
+        Bytecode::BytecodeCompiler compiler;
+        bcProgram = compiler.compile(tree);
+    } catch (CompileError& e) {
+        std::cerr << e.message << std::endl;
+        exit(EX_DATAERR);
+    }
+    // free the AST
+    for (Stmt::Stmt * current : tree.tree) delete current;
+
+    return bcProgram;
 }

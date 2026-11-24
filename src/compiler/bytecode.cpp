@@ -7,7 +7,6 @@
 
 #include "parsing/parsing.h"
 #include "../util/fileIO.h"
-#include "../../tool/prettyPrinter.h"
 
 using namespace Bytecode;
 
@@ -15,24 +14,6 @@ bool is_i8(double number) {
     double fraction;
     return std::modf(number, &fraction) == 0 && INT8_MIN <= number && INT8_MAX >= number;
 }
-
-struct Bytecode::Local {
-    std::string name;
-    i32 depth;
-};
-
-enum Bytecode::BreakType : u32 {
-    BREAK_LOOP,
-    BREAK_SWITCH
-};
-
-// loops and switch statements
-struct Bytecode::BreakStop {
-    BreakType type;
-    i32 localsSize {};
-    std::vector<u64> breaks {};
-    std::vector<u64> continues {};
-};
 
 
 std::vector<u8>& BytecodeCompiler::currentChunk() {
@@ -294,7 +275,7 @@ void BytecodeCompiler::compileSwitchCase(const Stmt::Case& case_) {
     }
 }
 
-Program BytecodeCompiler::compile(const Compiler::CompileResult& ast) {
+Program BytecodeCompiler::compile(const Compiler::SyntaxTree& ast) {
     std::vector<Stmt::Function*> funcs;
     for (Stmt::Stmt* current : ast.tree) {
         if (auto func = dynamic_cast<Stmt::Function*> (current)) {
@@ -731,37 +712,4 @@ StmtVisitResults BytecodeCompiler::visitSwitchStmt(Stmt::Switch *stmt)  {
     breakables.pop_back();
 
     return std::monostate();
-}
-
-
-Program Bytecode::compile(const argvParse::ProgramArgs& compileFlags) {
-    std::string file = fileIO::readFile(compileFlags.filePath);
-
-    Error::ErrorHandler handler(file);
-
-    Compiler::CompileResult program = Compiler::compile(file, handler);
-
-    if (!program.success) {
-        handler.printErrors();
-        exit(1);
-    }
-
-    if (compileFlags.printAst) {
-        std::cout << Printer::print(program) << std::endl;
-    }
-
-    Program bcProgram;
-
-    try {
-        BytecodeCompiler compiler;
-        bcProgram = compiler.compile(program);
-    } catch (CompileError& e) {
-        std::cerr << e.message << std::endl;
-        exit(EX_DATAERR);
-    }
-
-    // free the AST
-    for (Stmt::Stmt * current : program.tree) delete current;
-
-    return bcProgram;
 }

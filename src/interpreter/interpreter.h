@@ -53,6 +53,7 @@ namespace Bytecode {
         std::vector<u16> lines;
         std::vector<Value::Value> constants;
         u16 globalCount {};
+        bool isValid;
     };
 
     i32 interpret(Program &program, bool decompile);

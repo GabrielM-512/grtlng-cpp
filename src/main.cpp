@@ -1,13 +1,10 @@
 #include <iostream>
 
-#include "../tool/prettyPrinter.h"
 #include "compiler/compiler.h"
-#include "util/fileIO.h"
 
 #include "interpreter/interpreter.h"
 
 #include "argvParse.h"
-#include "compiler/bytecode.h"
 #include "util/programDump.h"
 
 #define FREE_PATHS() do {\
@@ -27,7 +24,7 @@ int main(const int argc, char* argv[]) {
             return 1;
         }
     } else {
-        bcProgram = Bytecode::compile(compileFlags);
+        bcProgram = Compiler::compile(compileFlags);
     }
 
     if (compileFlags.dump == argvParse::DUMP) {

@@ -121,7 +121,6 @@ bool Parser::consume(Lexing::TokenType type, const std::string &message) {
     }
 
     throw errorAtCurrent("Expected " + Lexing::Token::toString(type) + message + ", got " + current.toString() + " instead");
-    return false;
 }
 
 bool Parser::consume(Lexing::TokenType type) {

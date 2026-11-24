@@ -82,15 +82,11 @@ std::string getObjectString(const Value::Obj* obj) {
         case Value::NATIVE_FN: {
             auto func = static_cast<const Value::NativeFn*>(obj);
             return "<fn \"" + func->name + "\">";
-            break;
         }
 
         default:
             return "UNKNOWN OBJECT TYPE";
     }
-
-    return "";
-
 }
 
 std::string Value::getValueString(const Value& value) {
