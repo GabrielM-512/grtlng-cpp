@@ -98,7 +98,7 @@ int Parser::getPrecedence() const {
 */
 
 Lexing::Token Parser::fakeToken() {
-    return {.type = Lexing::ERROR, .line = 0, .position = 0, .data = {.name = nullptr}};
+    return {.type = Lexing::ERROR, .line = 0, .position = 0, .lexeme = ""};
 }
 
 Lexing::Token Parser::advance() {
@@ -108,7 +108,7 @@ Lexing::Token Parser::advance() {
         current = tokens[currentToken++];
         if (current.type != Lexing::ERROR) break;
 
-        errorAtCurrent(current.data.name);
+        errorAtCurrent(current.lexeme);
     }
 
     return previous;

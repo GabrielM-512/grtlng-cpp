@@ -72,8 +72,8 @@ ExprVisitResults Classifier::visitConditionalExpr(Expr::Conditional *expr) {
 }
 
 ExprVisitResults Classifier::visitIdentifierExpr(Expr::Identifier *expr) {
-    bool isStatic = isStaticInitialised(expr->token.data.name);
-    bool isConst = isConstVar(expr->token.data.name);
+    bool isStatic = isStaticInitialised(expr->token.lexeme);
+    bool isConst = isConstVar(expr->token.lexeme);
 
     return (structs::test) {.isConstexpr = isStatic && isConst};
 }

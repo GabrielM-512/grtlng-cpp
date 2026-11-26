@@ -119,5 +119,5 @@ bool Value::isTruthy(const Value& value) {
         case OBJECT:
             return true;
     }
-    throw Interpreting::RuntimeException("Invalid value type", (Lexing::Token) {.type = Lexing::ERROR, .line = 0, .position = 0, .data = {.number = 0}});
+    throw Interpreting::RuntimeException("Invalid value type", (Lexing::Token) {.type = Lexing::ERROR, .line = 0, .position = 0, .lexeme = ""});
 }

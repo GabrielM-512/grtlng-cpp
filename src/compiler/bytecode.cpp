@@ -188,7 +188,7 @@ void BytecodeCompiler::compileFunction(const Stmt::Function* function) {
     beginScope();
 
     for (Stmt::VariableDeclaration* param: function->params) {
-        createLocal(param->name.data.name);
+        createLocal(param->name.lexeme);
     }
 
     for (Stmt::Stmt* stmt : function->body->statements) {
@@ -197,18 +197,18 @@ void BytecodeCompiler::compileFunction(const Stmt::Function* function) {
 
     endScope();
 
-    auto* compiledFunction = new Value::Function(currentChunk(), function->name.data.name, (u8) function->params.size());
+    auto* compiledFunction = new Value::Function(currentChunk(), function->name.lexeme, (u8) function->params.size());
 
     currentFunction.clear();
 
     inInit = true;
 
     emitConstant(VALUE_FUNCTION(compiledFunction));
-    emitBytes(SET_GLOBAL, resolveGlobal(function->name.data.name));
+    emitBytes(SET_GLOBAL, resolveGlobal(function->name.lexeme));
     emitByte(POP);
 
     if (function->params.size() > UINT8_MAX) {
-        std::string message = "Error: Function \"" + std::string(function->name.data.name) + "\" takes " + std::to_string(function->params.size()) + " parameters, maximum allowed is 255";
+        std::string message = "Error: Function \"" + std::string(function->name.lexeme) + "\" takes " + std::to_string(function->params.size()) + " parameters, maximum allowed is 255";
         errors.push_back(message);
     }
 }
@@ -279,7 +279,7 @@ Program BytecodeCompiler::compile(const Compiler::SyntaxTree& ast) {
     std::vector<Stmt::Function*> funcs;
     for (Stmt::Stmt* current : ast.tree) {
         if (auto func = dynamic_cast<Stmt::Function*> (current)) {
-            createGlobal(func->name.data.name);
+            createGlobal(func->name.lexeme);
             if (func->body->statements.empty() || !dynamic_cast<Stmt::Return*>(func->body->statements.back())) {
                 // allocate a new node every time so we can properly free them all after compilation
                 auto zeroReturn = new Stmt::Return(Parsing::Parser::fakeToken(), new Expr::Number(Parsing::Parser::fakeToken(), 0));
@@ -290,11 +290,11 @@ Program BytecodeCompiler::compile(const Compiler::SyntaxTree& ast) {
         } else {
             auto var = dynamic_cast<Stmt::VariableDeclaration*>(current);
 
-            createGlobal(var->name.data.name);
+            createGlobal(var->name.lexeme);
             if (var->value != nullptr) {
                 compileExpression(var->value);
 
-                emitBytes(SET_GLOBAL, resolveGlobal(var->name.data.name));
+                emitBytes(SET_GLOBAL, resolveGlobal(var->name.lexeme));
                 emitByte(POP);
             }
         }
@@ -331,11 +331,11 @@ ExprVisitResults BytecodeCompiler::visitAssignExpr(Expr::Assign *expr)  {
 
     compileExpression(expr->value);
 
-    i32 index = resolveGlobal(expr->name.data.name);
+    i32 index = resolveGlobal(expr->name.lexeme);
     Operation op = SET_GLOBAL;
 
     if (index == -1) {
-        index = resolveLocal(expr->name.data.name);
+        index = resolveLocal(expr->name.lexeme);
         op = SET_LOCAL;
     }
 
@@ -405,7 +405,7 @@ ExprVisitResults BytecodeCompiler::visitConditionalExpr(Expr::Conditional *expr)
 }
 
 ExprVisitResults BytecodeCompiler::visitIdentifierExpr(Expr::Identifier *expr)  {
-    loadNamedVariable(expr->token.data.name);
+    loadNamedVariable(expr->token.lexeme);
     return std::monostate();
 }
 
@@ -621,7 +621,7 @@ StmtVisitResults BytecodeCompiler::visitVariableDeclarationStmt(Stmt::VariableDe
     if (stmt->value != nullptr) compileExpression(stmt->value);
     else emitByte(FALSE);
 
-    createLocal(stmt->name.data.name);
+    createLocal(stmt->name.lexeme);
 
     return std::monostate();
 }

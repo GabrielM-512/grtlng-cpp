@@ -104,13 +104,12 @@ namespace Lexing {
         TokenType type;
         u16 line;
         u32 position;
-        union {
-            const char* name;
-            double number;
-        } data;
+        std::string lexeme;
 
         [[nodiscard]] std::string toString() const;
         static std::string toString(TokenType tokenType);
+
+        ~Token() = default;
 
     };
 

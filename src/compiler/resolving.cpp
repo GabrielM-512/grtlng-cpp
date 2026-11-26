@@ -1,6 +1,5 @@
 #include "resolving.h"
 
-#include <cstring>
 #include <unordered_map>
 #include <utility>
 
@@ -114,13 +113,13 @@ public:
     }
 
     ExprVisitResults visitIdentifierExpr(Expr::Identifier *expr) override {
-        if (!varExists(expr->token.data.name)) {
-            error("Unknown symbol \"" + std::string(expr->token.data.name) + "\"", expr->token);
+        if (!varExists(expr->token.lexeme)) {
+            error("Unknown symbol \"" + std::string(expr->token.lexeme) + "\"", expr->token);
             return std::monostate();
         }
 
-        if (!varActivated(expr->token.data.name))
-            error("Symbol \"" + std::string(expr->token.data.name) + "\" used in its own initialiser", expr->token);
+        if (!varActivated(expr->token.lexeme))
+            error("Symbol \"" + std::string(expr->token.lexeme) + "\" used in its own initialiser", expr->token);
 
         return std::monostate();
     }
@@ -183,13 +182,13 @@ public:
         Scope params;
 
         for (Stmt::VariableDeclaration* param : stmt->params) {
-            const char* name = param->name.data.name;
+            const std::string name = param->name.lexeme;
             if (params.hasVar(name)) {
-                error("Redeclared parameter \"" + std::string(param->name.data.name) + "\" in function \"" + std::string(stmt->name.data.name) + "\"", param->name);
+                error("Redeclared parameter \"" + std::string(param->name.lexeme) + "\" in function \"" + std::string(stmt->name.lexeme) + "\"", param->name);
                 continue;
             }
 
-            if (strlen(name) > 0) {
+            if (!name.empty()) {
                 params.createVar(name);
                 params.activateVar(name);
             }
@@ -224,14 +223,14 @@ public:
     }
 
     StmtVisitResults visitVariableDeclarationStmt(Stmt::VariableDeclaration *stmt) override {
-        if (current->hasVar(stmt->name.data.name))
-            error("Redeclared variable \"" + std::string(stmt->name.data.name) + "\" in same scope", stmt->name);
+        if (current->hasVar(stmt->name.lexeme))
+            error("Redeclared variable \"" + std::string(stmt->name.lexeme) + "\" in same scope", stmt->name);
         else
-            current->createVar(stmt->name.data.name);
+            current->createVar(stmt->name.lexeme);
 
         if (stmt->value != nullptr) expression(stmt->value);
 
-        activateVar(stmt->name.data.name);
+        activateVar(stmt->name.lexeme);
 
         return std::monostate();
     }
@@ -285,14 +284,14 @@ public:
         for (Stmt::Stmt* stmt : tree.tree) {
             std::string name;
             if (auto func = dynamic_cast<Stmt::Function*> (stmt)) {
-                if (varExists(func->name.data.name)) {
-                    error("Redeclared function \"" + std::string(func->name.data.name) + "\"",
+                if (varExists(func->name.lexeme)) {
+                    error("Redeclared function \"" + std::string(func->name.lexeme) + "\"",
                     "No functions may be declared using names of native functions",
                     func->name);
                 }
 
-                current->createVar(func->name.data.name);
-                activateVar(func->name.data.name);
+                current->createVar(func->name.lexeme);
+                activateVar(func->name.lexeme);
                 functions.push_back(func);
             } else if (auto var = dynamic_cast<Stmt::VariableDeclaration*> (stmt)) {
                 statement(var);

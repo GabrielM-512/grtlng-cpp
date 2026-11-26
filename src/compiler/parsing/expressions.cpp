@@ -18,7 +18,8 @@ public:
 class NumberParselet : public Parsing::PrefixParselet {
 public:
     Expr::Expr* parse(Parsing::Parser&, Lexing::Token& token) override {
-        return new Expr::Number(token, token.data.number);
+        const double value = strtod(token.lexeme.c_str(), nullptr);
+        return new Expr::Number(token, value);
     }
 };
 

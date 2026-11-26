@@ -9,6 +9,6 @@ namespace Interpreting {
         std::string message;
         Lexing::Token token;
         RuntimeException(const std::string& message, Lexing::Token token) : std::runtime_error(message), message(message), token(token) {}
-        RuntimeException(const std::string& message) : std::runtime_error(message), message(message), token((Lexing::Token) {.type = Lexing::ERROR, .line = 0, .position = 0, .data = {nullptr}}) {}
+        RuntimeException(const std::string& message) : std::runtime_error(message), message(message), token((Lexing::Token) {.type = Lexing::ERROR, .line = 0, .position = 0, .lexeme = ""}) {}
     };
 }

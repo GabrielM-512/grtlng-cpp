@@ -8,6 +8,8 @@ if ( NOT CMAKE_BUILD_TYPE )
         set( CMAKE_BUILD_TYPE Debug )
 endif()
 
+set( CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
 
 add_executable(grtlng_cpp
         src/main.cpp

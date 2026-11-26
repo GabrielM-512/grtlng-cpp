@@ -2,6 +2,7 @@
 
 #include <cstring>
 #include <iostream>
+#include <utility>
 
 using namespace Lexing;
 
@@ -94,12 +95,10 @@ class Lexer {
     [[nodiscard]] bool isAtEnd() const;
     [[nodiscard]] char peekNext() const;
 
-                  Token makeToken(TokenType type, const char* data) const;
-                  Token makeToken(TokenType type, const char* data, u16 beginningLine) const;
-    [[nodiscard]] Token makeToken(TokenType type, double number) const;
+    [[nodiscard]] Token makeToken(TokenType type, std::string lexeme, u16 beginningLine) const;
     [[nodiscard]] Token noDataToken(TokenType type) const;
-                  Token errorToken(const char* message) const;
-                  Token errorToken(const char *message, u16 beginningLine) const;
+    [[nodiscard]] Token errorToken(std::string message) const;
+    [[nodiscard]] Token errorToken(std::string message, u16 beginningLine) const;
 
                   Token number();
                   Token string();
@@ -156,30 +155,22 @@ char Lexer::peekNext() const {
 // Token creators
 
 // generic/strings
-Token Lexer::makeToken(const TokenType type, const char* data, u16 beginningLine) const {
-    return (Token) {.type = type, .line = beginningLine, .position = base, .data = {.name = data}};
-}
-
-// for identifier tokens
-Token Lexer::makeToken(const TokenType type, const char* data) const {
-    return makeToken(type, data, line);
-}
-
-// for number tokens
-Token Lexer::makeToken(const TokenType type, double number) const {
-    return (Token) {.type = type, .line = line, .position = base, .data = {.number = number}};
+Token Lexer::makeToken(const TokenType type, std::string lexeme, u16 beginningLine) const {
+    return (Token) {.type = type, .line = beginningLine, .position = base, .lexeme = std::move(lexeme)};
 }
 
 Token Lexer::noDataToken(const TokenType type) const {
-    return makeToken(type, nullptr, line);
+    u64 tokenLength = head - base;
+    std::string lexeme = source.substr(base, tokenLength);
+    return makeToken(type, lexeme, line);
 }
 
-Token Lexer::errorToken(const char* message) const {
-    return (Token) {.type = ERROR, .line = line, .position = base, .data = {message}};
+Token Lexer::errorToken(std::string message) const {
+    return (Token) {.type = ERROR, .line = line, .position = base, .lexeme = std::move(message)};
 }
 
-Token Lexer::errorToken(const char* message, u16 beginningLine) const {
-    return (Token) {.type = ERROR, .line = beginningLine, .position = base, .data = {message}};
+Token Lexer::errorToken(std::string message, u16 beginningLine) const {
+    return (Token) {.type = ERROR, .line = beginningLine, .position = base, .lexeme = std::move(message)};
 }
 
 // internals
@@ -192,9 +183,7 @@ Token Lexer::number() {
         while (isNum(peek())) advance();
     }
 
-    const double value = strtod(source.c_str() + base, nullptr);
-
-    return makeToken(NUMBER, value);
+    return noDataToken(NUMBER);
 }
 
 Token Lexer::string() {
@@ -211,9 +200,7 @@ Token Lexer::string() {
 
     u32 size = head - beginning;
 
-    char *data = (char*) malloc(sizeof(char) * size);
-    memcpy(data, source.c_str() + beginning, size - 1);
-    data[size - 1] = '\0';
+    std::string data = source.substr(beginning, size);
 
     return makeToken(STRING, data, start);
 
@@ -334,18 +321,13 @@ Token Lexer::identifier() {
     }
 
     // keyword check
-    const Token token = keyword();
+    Token token = keyword();
     if (token.type != IDENTIFIER) return token;
 
 
     // is identifier
 
-    const size_t size = head - base + 1;
-
-    char *data = (char*) malloc(sizeof(char) * size);
-    memcpy(data, source.c_str() + base, size - 1);
-    data[size - 1] = '\0';
-    return makeToken(IDENTIFIER, data);
+    return noDataToken(IDENTIFIER);
 
 }
 
@@ -519,10 +501,9 @@ std::vector<Token> Lexing::scan(const std::string& input) {
     std::vector<Token> tokens;
     Lexer lexer(input);
 
-    Token token = {.type = ERROR, .line = 0, .position = 0, .data = {.name = nullptr}};
-
     lexer.skipWhitespace();
     try {
+        Token token = {.type = ERROR, .line = 1, .position = 0, .lexeme = "No Tokens"};
         while (token.type != END_OF_FILE) {
             token = lexer.scanToken();
             tokens.push_back(token);

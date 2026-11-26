@@ -20,7 +20,7 @@ std::vector<Stmt::VariableDeclaration*> Parser::parseParameters() {
 
             Lexing::Token name = current;
 
-            name.data.name = "";
+            name.lexeme = "";
 
             if (match(Lexing::IDENTIFIER)) {
                 name = previous;

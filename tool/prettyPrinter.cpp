@@ -39,11 +39,11 @@ public:
     }
 
     ExprVisitResults visitIdentifierExpr(Expr::Identifier* expr) override {
-        return expr->token.data.name;
+        return expr->token.lexeme;
     }
 
     ExprVisitResults visitAssignExpr(Expr::Assign *expr) override {
-        return "( " + std::string(expr->name.data.name) + " = "
+        return "( " + std::string(expr->name.lexeme) + " = "
                     + expression(expr->value) + " )";
     }
 
@@ -121,16 +121,16 @@ public:
         std::string dataType = Lexing::Token::toString(stmt->dataType);
         dataType = dataType.substr(1, dataType.size() - 2);
 
-        return "Declare Variable '" + std::string(stmt->name.data.name) + "' of type " + dataType +
+        return "Declare Variable '" + std::string(stmt->name.lexeme) + "' of type " + dataType +
             (stmt->value == nullptr ? " without value" : " with value = " + expression(stmt->value));
     }
 
     StmtVisitResults visitFunctionStmt(Stmt::Function *stmt) override {
-        std::string output = std::string(stmt->name.data.name) + "(";
+        std::string output = std::string(stmt->name.lexeme) + "(";
 
         for (const Stmt::VariableDeclaration* param : stmt->params) {
             std::string dataType = Lexing::Token::toString(param->dataType);
-            output += dataType.substr(1, dataType.size() - 2) + " " + param->name.data.name + ", ";
+            output += dataType.substr(1, dataType.size() - 2) + " " + param->name.lexeme + ", ";
         }
 
         if (!stmt->params.empty())
